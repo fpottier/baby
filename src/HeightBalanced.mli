@@ -1,9 +1,6 @@
 open Signatures
 
-module Make
-(E : OrderedType)
-(_ : BST with type key = E.t)
-: sig
+module Make (E : OrderedType) : sig
   type elt = E.t
   type set
   type t = set

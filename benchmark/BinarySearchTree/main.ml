@@ -4,7 +4,7 @@ open Bbst
 module B = Common.Benchmark
 module R = Set.Make(Int)
 module C = BinarySearchTree.Make(Int)(Height.Make(Int))
-module F = BinarySearchTree.Flat(Int)
+module F = HeightBalanced.Make(Int)
 
 let quota =
   "5.0s"
