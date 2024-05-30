@@ -67,6 +67,11 @@ module[@inline] Make (E : sig type t end) = struct
      balanced, and the difference in their heights must be at most 3. If
      necessary, one step of rebalancing is performed. *)
 
+  (* Because [create] calls [height], this code involves several redundant
+     computations of the height of a subtree. However, modifying the code to
+     avoid this redundancy makes it much less readable and makes no measurable
+     difference in the run time. *)
+
   let bal l v r =
     let hl = height l
     and hr = height r in
