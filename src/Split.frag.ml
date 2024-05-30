@@ -13,6 +13,24 @@ let rec split (k : key) (t : tree) : tree * bool * tree =
         let rl, b, rr = split k r in
         node l m rl, b, rr
 
+(* [split2] is a variant of [split] that returns a pair of subtrees. Compared
+   with [split], the Boolean component of the result is dropped. *)
+
+let rec split2 (k : key) (t : tree) : tree * tree =
+  match VIEW(t) with
+  | LEAF ->
+      leaf, leaf
+  | NODE(l, m, r) ->
+      let c = E.compare k m in
+      if c = 0 then
+        l, r
+      else if c < 0 then
+        let ll, lr = split2 k l in
+        ll, node lr m r
+      else
+        let rl, rr = split2 k r in
+        node l m rl, rr
+
 let rec split_last (l : tree) (k : key) (r : tree) : tree * key =
   match VIEW(r) with
   | LEAF ->
