@@ -2,7 +2,7 @@ open Signatures
 
 module[@inline] Make (E : OrderedType) = struct
 
-  include Height.Make(E)
+include Height.Make(E)
 
 (* [node] is known as [join] in BFS. *)
 
@@ -15,11 +15,6 @@ let leaf : tree =
 
 let[@inline] node (l : tree) (k : key) (r : tree) : tree =
   make (Node (l, k, r))
-
-(* TODO
-let[@inline] singleton (k : key) =
-  node leaf k leaf
- *)
 
 let rec split (k : key) (t : tree) : tree * bool * tree =
   match t with
