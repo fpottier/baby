@@ -14,6 +14,7 @@
   (depends
     ocaml
     dune
+    cppo
     (monolith :with-test)
   )
 )

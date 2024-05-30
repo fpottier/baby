@@ -10,5 +10,17 @@
   (release (flags :standard           ) (ocamlopt_flags :standard -S))
 )
 
+;; Some files require preprocessing by cppo.
+
+(rule
+  (targets BinarySearchTree.ml)
+  (deps BinarySearchTree.cppo.ml (glob_files *.frag.ml))
+  (action (run %{bin:cppo} BinarySearchTree.cppo.ml -o %{targets})))
+
+(rule
+  (targets HeightBalanced.ml)
+  (deps HeightBalanced.cppo.ml (glob_files *.frag.ml))
+  (action (run %{bin:cppo} HeightBalanced.cppo.ml -o %{targets})))
+
 ;; Request documentation.
 (documentation)
