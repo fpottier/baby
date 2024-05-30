@@ -1,5 +1,13 @@
 (* The following code taken from OCaml's Set library, and slightly adapted. *)
 
+let[@inline] max (x : int) (y : int) =
+  if x <= y then y else x
+
+(* This function is not inlined, so as to reduce code size and produce
+   more readable assembly code. *)
+let impossible () =
+  assert false
+
 module[@inline] Make (E : sig type t end) = struct
 
   type key = E.t
@@ -18,12 +26,6 @@ module[@inline] Make (E : sig type t end) = struct
         0
     | TNode { h; _ } ->
         h
-
-  let[@inline] max (x : int) (y : int) =
-    if x <= y then y else x
-
-  let(* not inlined *) impossible () =
-    assert false
 
   (* [create l v r] requires [l < v < r]. It constructs a node with left child
      [l], value [v], and right child [r]. The subtrees [l] and [r] must be

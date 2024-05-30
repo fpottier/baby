@@ -10,6 +10,8 @@ let impossible () =
 
 module Make (E : OrderedType) = struct
 
+  include Height.Make(E)
+
   type key = E.t
 
   (* Trees are height-balanced. Each node stores its left child, key, right
