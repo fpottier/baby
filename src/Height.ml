@@ -39,6 +39,22 @@ module[@inline] Make (E : sig type t end) = struct
     (* This is equivalent to [create TLeaf x TLeaf]. *)
     TNode { l = TLeaf; v = x; r = TLeaf; h = 1 }
 
+  let[@inline] is_singleton t =
+    match t with
+    | TLeaf ->
+        false
+    | TNode { h; _ } ->
+        h = 1
+
+  let[@inline] seems_smaller t1 t2 =
+    match t1, t2 with
+    | TLeaf, _ ->
+        true
+    | _, TLeaf ->
+        false
+    | TNode { h = h1; _ }, TNode { h = h2; _ } ->
+        h1 <= h2
+
   (* [bal l v r] requires [l < v < r]. It constructs a node with left child
      [l], value [v], and right child [r]. The subtrees [l] and [r] must be
      balanced, and the difference in their heights must be at most 3. If

@@ -19,6 +19,7 @@ module Make (E : sig type t end)
                and type tree := tree
 
   val singleton : key -> tree (* TODO *)
+  val is_singleton : tree -> bool (* TODO *)
   val bal : tree -> key -> tree -> tree (* TODO *)
 
 end
