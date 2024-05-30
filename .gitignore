@@ -1,0 +1,4 @@
+*~
+_build
+*.opam
+dune-workspace.versions

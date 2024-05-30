@@ -1,0 +1,14 @@
+;; This is a library.
+(library
+  (name bbst)
+  (public_name bbst)
+)
+
+;; Warnings are enabled in development builds and disabled in release builds.
+(env
+  (dev     (flags :standard -w @A-4-44) (ocamlopt_flags :standard -S))
+  (release (flags :standard           ) (ocamlopt_flags :standard -S))
+)
+
+;; Request documentation.
+(documentation)
