@@ -98,11 +98,13 @@ let () =
   run (insertion (1 lsl 8));
   eprintf "\n";
   run (insertion (1 lsl 16));
+  eprintf "\n";
 
   eprintf "*** Union benchmarks.\n";
   eprintf "\n";
   run (union (1 lsl 8));
   eprintf "\n";
   run (union (1 lsl 16));
+  eprintf "\n";
 
   ()
