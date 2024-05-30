@@ -41,6 +41,9 @@ module[@inline] Make (E : sig type t end) = struct
 
   (* [is_singleton t] is equivalent to [height t = 1]. *)
 
+  (* Instead of testing whether the height is 1, we could test whether
+     both children are [TLeaf]. This makes essentially no difference. *)
+
   let[@inline] is_singleton t =
     match t with
     | TLeaf ->
