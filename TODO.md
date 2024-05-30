@@ -3,10 +3,10 @@
 * In `bal`, manual CSE is still possible to avoid repeated height
   computations.
 
-* Implement more functions from BFS.
+* Test.
 
 * Benchmark.
 
-* Optimize `split` for the case where the Boolean result is not needed.
+* Implement more functions from BFS.
 
 * Explore parallel computation.
