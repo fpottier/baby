@@ -54,7 +54,7 @@ let insertion u =
 let union u =
   let basis = n in
 
-  let name = sprintf "Union (universe size %d) (new code)" u
+  let name = sprintf "Union (universe size %d) (new modular code)" u
   and run () =
     let open C in
     let rec multiples_from k a =
@@ -66,7 +66,21 @@ let union u =
       |> Sys.opaque_identity
       |> ignore
   in
-  let union_new = B.benchmark ~name ~quota ~basis ~run in
+  let union_modular = B.benchmark ~name ~quota ~basis ~run in
+
+  let name = sprintf "Union (universe size %d) (new flat code)" u
+  and run () =
+    let open F in
+    let rec multiples_from k a =
+      if a < u then add a (multiples_from k (a+k)) else empty in
+    let multiples k = multiples_from k 0 in
+    let a = Array.init n (fun k -> multiples (k+5)) in
+    fun () ->
+      Array.fold_left union empty a
+      |> Sys.opaque_identity
+      |> ignore
+  in
+  let union_flat = B.benchmark ~name ~quota ~basis ~run in
 
   let name = sprintf "Union (universe size %d) (OCaml Set)" u
   and run () =
@@ -82,7 +96,7 @@ let union u =
   in
   let union_old = B.benchmark ~name ~quota ~basis ~run in
 
-  [ union_old; union_new ]
+  [ union_old; union_modular; union_flat ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -93,18 +107,22 @@ let run benchmarks =
 
 let () =
 
-  eprintf "*** Insertion benchmarks.\n";
-  eprintf "\n";
-  run (insertion (1 lsl 8));
-  eprintf "\n";
-  run (insertion (1 lsl 16));
-  eprintf "\n";
+  if false then begin
+    eprintf "*** Insertion benchmarks.\n";
+    eprintf "\n";
+    run (insertion (1 lsl 8));
+    eprintf "\n";
+    run (insertion (1 lsl 16));
+    eprintf "\n";
+  end;
 
-  eprintf "*** Union benchmarks.\n";
-  eprintf "\n";
-  run (union (1 lsl 8));
-  eprintf "\n";
-  run (union (1 lsl 16));
-  eprintf "\n";
+  if true then begin
+    eprintf "*** Union benchmarks.\n";
+    eprintf "\n";
+    run (union (1 lsl 8));
+    eprintf "\n";
+    run (union (1 lsl 16));
+    eprintf "\n";
+  end;
 
   ()
