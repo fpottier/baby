@@ -3,7 +3,7 @@ open Bbst
 
 module B = Common.Benchmark
 module R = Set.Make(Int)
-module C = BinarySearchTree.M(Int)
+module C = BinarySearchTree.Make(Int)(Height.Make(Int))
 module F = BinarySearchTree.Flat(Int)
 
 let quota =

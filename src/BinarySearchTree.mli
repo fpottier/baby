@@ -1,9 +1,9 @@
-module type OrderedType = sig
-  type t
-  val compare : t -> t -> int
-end
+open Signatures
 
-module M (E : OrderedType) : sig
+module Make
+(E : OrderedType)
+(_ : BST with type key = E.t)
+: sig
   type elt = E.t
   type set
   type t = set
