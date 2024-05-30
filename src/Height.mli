@@ -21,5 +21,6 @@ module Make (E : sig type t end)
   val singleton : key -> tree (* TODO *)
   val is_singleton : tree -> bool (* TODO *)
   val bal : tree -> key -> tree -> tree (* TODO *)
+  val join : tree -> key -> tree -> tree (* TODO *)
 
 end

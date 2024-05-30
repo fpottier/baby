@@ -1,5 +1,11 @@
 open Signatures
 
+(* Unfortunately, the OCaml compiler is pretty bad at optimization. In my
+   experience, although it does usually inline functions when this is
+   requested, it does not subsequently perform the simplifications that one
+   might naturally expect. In particular, it does not simplify match-of-match,
+   and cannot even simplify match-of-constructor. *)
+
 module[@inline] Make (E : OrderedType) = struct
 
 include Height.Make(E)
@@ -10,11 +16,15 @@ include Height.Make(E)
    ranks of two trees, and the rank of the result of a join must be at most
    one more than the maximum rank of the two arguments". *)
 
-let leaf : tree =
-  make Leaf
+(* [leaf] is equivalent to [make Leaf]. *)
 
-let[@inline] node (l : tree) (k : key) (r : tree) : tree =
-  make (Node (l, k, r))
+let leaf : tree =
+  TLeaf
+
+(* [node l k r] is equivalent to [make (Node (l, k, r))]. *)
+
+let node =
+  join
 
 #define VIEW(t)       (t)
 #define LEAF          TLeaf
