@@ -33,10 +33,10 @@ let[@inline] node (l : tree) (k : key) (r : tree) : tree =
    case and more efficient. *)
 
 let rec add (x : key) (t : tree) : tree =
-  match t with
-  | TLeaf ->
+  match VIEW(t) with
+  | LEAF ->
       singleton x
-  | TNode { l; v; r; _ } ->
+  | NODE(l, v, r) ->
       let c = E.compare x v in
       if c = 0 then
         t
