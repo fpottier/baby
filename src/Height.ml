@@ -39,12 +39,16 @@ module[@inline] Make (E : sig type t end) = struct
     (* This is equivalent to [create TLeaf x TLeaf]. *)
     TNode { l = TLeaf; v = x; r = TLeaf; h = 1 }
 
+  (* [is_singleton t] is equivalent to [height t = 1]. *)
+
   let[@inline] is_singleton t =
     match t with
     | TLeaf ->
         false
     | TNode { h; _ } ->
         h = 1
+
+  (* [seems_smaller t1 t2] is equivalent to [height t1 <= height t2]. *)
 
   let[@inline] seems_smaller t1 t2 =
     match t1, t2 with
