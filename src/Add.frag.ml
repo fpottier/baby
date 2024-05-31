@@ -19,8 +19,8 @@ let rec add (x : key) (t : tree) : tree =
       if c = 0 then
         t
       else if c < 0 then
-        let ll = add x l in
-        if l == ll then t else join_neighbors ll v r
+        let l' = add x l in
+        if l == l' then t else join_neighbors l' v r
       else
-        let rr = add x r in
-        if r == rr then t else join_neighbors l v rr
+        let r' = add x r in
+        if r == r' then t else join_neighbors l v r'
