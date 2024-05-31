@@ -18,9 +18,8 @@ module type BST = sig
      ranks of two trees, and the rank of the result of a join must be at most
      one more than the maximum rank of the two arguments". *)
   val join_neighbors : tree -> key -> tree -> tree
-    (* assumes that the two trees [l] and [r] were neighbors in a well-formed tree,
-       i.e., either [l] and [r] were siblings, or [l]'s parent was a sibling of [r],
-       or vice-versa. *)
+    (* assumes that the two trees [l] and [r] were siblings in a well-formed tree
+       and that one of them has been disturbed by adding or removing one element. *)
 
   (* TODO not part of the minimal interface: *)
   val singleton : key -> tree
