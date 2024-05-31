@@ -25,6 +25,7 @@ module type BST = sig
   val singleton : key -> tree
   val is_singleton : tree -> bool
   val seems_smaller : tree -> tree -> bool
+  val siblings : tree -> tree -> bool
 end
 
 module type SET = sig

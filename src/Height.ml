@@ -29,12 +29,23 @@ module[@inline] Make (E : sig type t end) = struct
     | TNode { h; _ } ->
         h
 
+  (* [siblings l r] checks that [l] and [r] could be siblings in a valid
+     tree. [neighbors l r] checks that [l] and [r] could be neighbors,
+     that is, siblings where one tree has been disturbed by removing or
+     adding one element. *)
+
+  let siblings l r =
+    abs (height l - height r) <= 2
+
+  let neighbors l r =
+    abs (height l - height r) <= 3
+
   (* [create l v r] requires [l < v < r]. It constructs a node with left child
      [l], value [v], and right child [r]. The subtrees [l] and [r] must be
      balanced, and the difference in their heights must be at most 2. *)
 
   let[@inline] create l v r =
-    if debug then assert (abs (height l - height r) <= 2);
+    if debug then assert (siblings l r);
     let h = max (height l) (height r) + 1 in
     TNode { l; v; r; h }
 
@@ -76,7 +87,7 @@ module[@inline] Make (E : sig type t end) = struct
      difference in the run time. *)
 
   let bal l v r =
-    if debug then assert (abs (height l - height r) <= 3);
+    if debug then assert (neighbors l r);
     let hl = height l
     and hr = height r in
     if hl > hr + 2 then begin
