@@ -6,9 +6,7 @@ let _simple_add (k : key) (t : tree) : tree =
 
 (* This is a less elegant but more efficient version of insertion. *)
 
-(* This implementation of [add] is taken from OCaml's Set library.
-   The function [join_neighbors] is used to join two subtrees that
-   were neighbors in the original tree. *)
+(* This implementation is taken from OCaml's Set library. *)
 
 let rec add (x : key) (t : tree) : tree =
   match VIEW(t) with
