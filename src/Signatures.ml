@@ -39,6 +39,8 @@ module type SET = sig
   val mem : elt -> set -> bool
   val add : elt -> set -> set
   val remove : elt -> set -> set
+  val remove_min_elt : set -> set
+  val remove_max_elt : set -> set
   val union : set -> set -> set
   val inter : set -> set -> set
   val diff : set -> set -> set

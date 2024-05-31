@@ -47,6 +47,12 @@ let () =
   let spec = value ^> set ^> set in
   declare "remove" spec R.remove C.remove;
 
+  let spec = set ^!> set in
+  declare "remove_min_elt" spec R.remove_min_elt C.remove_min_elt;
+
+  let spec = set ^!> set in
+  declare "remove_max_elt" spec R.remove_max_elt C.remove_max_elt;
+
   let spec = set ^> set ^> set in
   declare "union" spec R.union C.union;
 
