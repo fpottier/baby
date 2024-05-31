@@ -1,4 +1,5 @@
 open Signatures
+open Profile
 
 (* Unfortunately, the OCaml compiler is pretty bad at optimization. In my
    experience, although it does usually inline functions when this is
@@ -14,20 +15,12 @@ include Height.Make(E)
 #define LEAF          TLeaf
 #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
+#include "Basics.frag.ml"
 #include "MinMax.frag.ml"
 #include "Readers.frag.ml"
 #include "Split.frag.ml"
 #include "Add.frag.ml"
 #include "Remove.frag.ml"
 #include "Union.frag.ml"
-
-(* The set API. *)
-
-type elt = key
-type set = tree
-type t = set
-
-let empty =
-  leaf
 
 end
