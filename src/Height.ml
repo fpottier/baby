@@ -138,10 +138,10 @@ module[@inline] Make (E : sig type t end) = struct
         add_min_element v r
     | _, TLeaf ->
         add_max_element v l
-    | TNode { l = ll; v = lv; r = lr; h = lh },
-      TNode { l = rl; v = rv; r = rr; h = rh } ->
-        if lh > rh + 2 then bal ll lv (join lr v r) else
-        if rh > lh + 2 then bal (join l v rl) rv rr else
+    | TNode { l = ll; v = lv; r = lr; h = hl },
+      TNode { l = rl; v = rv; r = rr; h = hr } ->
+        if hl > hr + 2 then bal ll lv (join lr v r) else
+        if hr > hl + 2 then bal (join l v rl) rv rr else
         create l v r
 
   type view =
