@@ -30,6 +30,10 @@ let node =
 #define LEAF          TLeaf
 #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
+(* [mem] *)
+
+#include "Readers.frag.ml"
+
 (* [split] *)
 (* [split2] *)
 (* [split_last] *)

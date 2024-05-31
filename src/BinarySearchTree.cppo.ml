@@ -27,6 +27,10 @@ let[@inline] singleton (k : key) =
 #define LEAF          Leaf
 #define NODE(x, y, z) Node (x, y, z)
 
+(* [mem] *)
+
+#include "Readers.frag.ml"
+
 (* [split] *)
 (* [split2] *)
 (* [split_last] *)
