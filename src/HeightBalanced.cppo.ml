@@ -31,6 +31,7 @@ let node =
 #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
 (* [split] *)
+(* [split2] *)
 (* [split_last] *)
 (* [join2] *)
 

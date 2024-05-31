@@ -28,6 +28,7 @@ let[@inline] singleton (k : key) =
 #define NODE(x, y, z) Node (x, y, z)
 
 (* [split] *)
+(* [split2] *)
 (* [split_last] *)
 (* [join2] *)
 
