@@ -38,8 +38,42 @@ let remove_max_elt (t : tree) : tree =
   | NODE(l, v, r) ->
       remove_max_elt_1 l v r
 
+(* [join2_siblings l r] requires [l] and [r] to be siblings in a valid
+   tree. *)
+
+(* [join2_siblings] is named [merge] in OCaml's Set library. *)
+
+let join2_siblings (l : tree) (r : tree) : tree =
+  if debug then assert (siblings l r);
+  match VIEW(l), VIEW(r) with
+  | _, LEAF ->
+      l
+  | LEAF, _ ->
+      r
+  | _, _ ->
+      join_neighbors l (min_elt r) (remove_min_elt r)
+
 (* This is removal in the style of BFS. *)
 
-let remove (k : key) (t : tree) : tree =
+let _simple_remove (k : key) (t : tree) : tree =
   let l, _, r = split k t in
   join2 l r
+
+(* This is a less elegant but more efficient version of removal. *)
+
+(* This implementation is taken from OCaml's Set library. *)
+
+let rec remove (x : key) (t : tree) : tree =
+  match VIEW(t) with
+  | LEAF ->
+      empty
+  | NODE(l, v, r) ->
+      let c = E.compare x v in
+      if c = 0 then
+        join2_siblings l r
+      else if c < 0 then
+        let l' = remove x l in
+        if l == l' then t else join_neighbors l' v r
+      else
+        let r' = remove x r in
+        if r == r' then t else join_neighbors l v r'
