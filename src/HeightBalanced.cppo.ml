@@ -14,34 +14,11 @@ include Height.Make(E)
 #define LEAF          TLeaf
 #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
-(* [min_elt] *)
-
 #include "MinMax.frag.ml"
-
-(* [mem] *)
-
 #include "Readers.frag.ml"
-
-(* [split] *)
-(* [split2] *)
-(* [split_last] *)
-(* [join2] *)
-
 #include "Split.frag.ml"
-
-(* [add] *)
-
 #include "Add.frag.ml"
-
-(* [remove] *)
-
 #include "Remove.frag.ml"
-
-(* [union] *)
-(* [inter] *)
-(* [diff] *)
-(* [xor] *)
-
 #include "Union.frag.ml"
 
 (* The set API. *)

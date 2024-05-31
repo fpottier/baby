@@ -12,34 +12,11 @@ open T
 #define LEAF          Leaf
 #define NODE(x, y, z) Node (x, y, z)
 
-(* [min_elt] *)
-
 #include "MinMax.frag.ml"
-
-(* [mem] *)
-
 #include "Readers.frag.ml"
-
-(* [split] *)
-(* [split2] *)
-(* [split_last] *)
-(* [join2] *)
-
 #include "Split.frag.ml"
-
-(* [add] *)
-
 #include "Add.frag.ml"
-
-(* [remove] *)
-
 #include "Remove.frag.ml"
-
-(* [union] *)
-(* [inter] *)
-(* [diff] *)
-(* [xor] *)
-
 #include "Union.frag.ml"
 
 (* The set API. *)
