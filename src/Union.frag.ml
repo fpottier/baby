@@ -20,7 +20,7 @@ let rec union (t1 : tree) (t2 : tree) : tree =
       let l1, r1 = split2 k2 t1 in
       let l = union l1 l2
       and r = union r1 r2 in
-      node l k2 r
+      join l k2 r
 
 let union (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
@@ -43,7 +43,7 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
       let l1, b, r1 = split k2 t1 in
       let l = inter l1 l2
       and r = inter r1 r2 in
-      if b then node l k2 r else join2 l r
+      if b then join l k2 r else join2 l r
 
 let rec diff (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
@@ -67,4 +67,4 @@ let rec xor (t1 : tree) (t2 : tree) : tree =
       let l1, b, r1 = split k2 t1 in
       let l = xor l1 l2
       and r = xor r1 r2 in
-      if b then join2 l r else node l k2 r
+      if b then join2 l r else join l k2 r

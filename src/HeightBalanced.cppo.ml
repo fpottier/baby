@@ -10,22 +10,6 @@ module[@inline] Make (E : OrderedType) = struct
 
 include Height.Make(E)
 
-(* [node] is known as [join] in BFS. *)
-
-(* BFS write: "the cost of [join] must be proportional to the difference in
-   ranks of two trees, and the rank of the result of a join must be at most
-   one more than the maximum rank of the two arguments". *)
-
-(* [leaf] is equivalent to [make Leaf]. *)
-
-let leaf : tree =
-  TLeaf
-
-(* [node l k r] is equivalent to [make (Node (l, k, r))]. *)
-
-let node =
-  join
-
 #define VIEW(t)       (t)
 #define LEAF          TLeaf
 #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }

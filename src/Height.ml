@@ -152,11 +152,7 @@ module[@inline] Make (E : sig type t end) = struct
     | TNode { l; v; r; _ } ->
         Node (l, v, r)
 
-  let[@inline] make v =
-    match v with
-    | Leaf ->
-        TLeaf
-    | Node (l, v, r) ->
-        join l v r
+  let leaf =
+    TLeaf
 
 end

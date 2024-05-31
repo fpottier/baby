@@ -8,10 +8,10 @@ let rec split (k : key) (t : tree) : tree * bool * tree =
         l, true, r
       else if c < 0 then
         let ll, b, lr = split k l in
-        ll, b, node lr m r
+        ll, b, join lr m r
       else
         let rl, b, rr = split k r in
-        node l m rl, b, rr
+        join l m rl, b, rr
 
 (* [split2] is a variant of [split] that returns a pair of subtrees. Compared
    with [split], the Boolean component of the result is dropped. *)
@@ -26,10 +26,10 @@ let rec split2 (k : key) (t : tree) : tree * tree =
         l, r
       else if c < 0 then
         let ll, lr = split2 k l in
-        ll, node lr m r
+        ll, join lr m r
       else
         let rl, rr = split2 k r in
-        node l m rl, rr
+        join l m rl, rr
 
 let rec split_last (l : tree) (k : key) (r : tree) : tree * key =
   match VIEW(r) with
@@ -37,7 +37,7 @@ let rec split_last (l : tree) (k : key) (r : tree) : tree * key =
       l, k
   | NODE(l', k', r') ->
       let r, m = split_last l' k' r' in
-      node l k r, m
+      join l k r, m
 
 (* [join2] is known as [concat] in OCaml's Set library. *)
 
@@ -47,4 +47,4 @@ let join2 (l : tree) (r : tree) : tree =
       r
   | NODE(ll, m, lr) ->
       let l', k = split_last ll m lr in
-      node l' k r
+      join l' k r

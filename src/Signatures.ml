@@ -10,9 +10,17 @@ module type BST = sig
     | Leaf
     | Node of tree * key * tree
   val view : tree -> view
-  val make : view -> tree
+
+  (* TODO val make : view -> tree *)
+  val leaf : tree
+  val join : tree -> key -> tree -> tree
+  (* BFS write: "the cost of [join] must be proportional to the difference in
+     ranks of two trees, and the rank of the result of a join must be at most
+     one more than the maximum rank of the two arguments". *)
+
 
   (* TODO not part of the minimal interface: *)
+  val singleton : key -> tree
   val is_singleton : tree -> bool
   val seems_smaller : tree -> tree -> bool
 end
