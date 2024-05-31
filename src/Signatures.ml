@@ -17,7 +17,10 @@ module type BST = sig
   (* BFS write: "the cost of [join] must be proportional to the difference in
      ranks of two trees, and the rank of the result of a join must be at most
      one more than the maximum rank of the two arguments". *)
-
+  val join_neighbors : tree -> key -> tree -> tree
+    (* assumes that the two trees [l] and [r] were neighbors in a well-formed tree,
+       i.e., either [l] and [r] were siblings, or [l]'s parent was a sibling of [r],
+       or vice-versa. *)
 
   (* TODO not part of the minimal interface: *)
   val singleton : key -> tree

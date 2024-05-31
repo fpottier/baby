@@ -6,10 +6,9 @@ let _simple_add (k : key) (t : tree) : tree =
 
 (* This is a less elegant but more efficient version of insertion. *)
 
-(* This implementation of [add] is inspired by OCaml's Set library,
-   but must use [node] to join two subtrees, because [node] is the
-   only operation exposed by the abstract interface; whereas OCaml's
-   Set library uses [bal] here. *)
+(* This implementation of [add] is taken from OCaml's Set library.
+   The function [join_neighbors] is used to join two subtrees that
+   were neighbors in the original tree. *)
 
 let rec add (x : key) (t : tree) : tree =
   match VIEW(t) with
@@ -21,7 +20,7 @@ let rec add (x : key) (t : tree) : tree =
         t
       else if c < 0 then
         let ll = add x l in
-        if l == ll then t else join ll v r
+        if l == ll then t else join_neighbors ll v r
       else
         let rr = add x r in
-        if r == rr then t else join l v rr
+        if r == rr then t else join_neighbors l v rr

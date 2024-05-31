@@ -27,24 +27,7 @@ include Height.Make(E)
 
 (* [add] *)
 
-(* This implementation of [add] is taken from OCaml's Set library. It
-   uses [bal] instead of [node] because [bal] is safe to use in this
-   case and more efficient. *)
-
-let rec add (x : key) (t : tree) : tree =
-  match VIEW(t) with
-  | LEAF ->
-      singleton x
-  | NODE(l, v, r) ->
-      let c = E.compare x v in
-      if c = 0 then
-        t
-      else if c < 0 then
-        let ll = add x l in
-        if l == ll then t else bal ll v r
-      else
-        let rr = add x r in
-        if r == rr then t else bal l v rr
+#include "Add.frag.ml"
 
 (* [remove] *)
 

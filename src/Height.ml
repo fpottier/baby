@@ -108,6 +108,9 @@ module[@inline] Make (E : sig type t end) = struct
       let h = max hl hr + 1 in
       TNode { l; v; r; h }
 
+  let join_neighbors =
+    bal
+
   (* [add_min_element x t] requires [x < t]. *)
 
   let rec add_min_element x t =
