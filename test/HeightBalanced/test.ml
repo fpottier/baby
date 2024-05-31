@@ -32,6 +32,21 @@ let () =
   let spec = value ^> set ^> set in
   declare "add" spec R.add C.add;
 
+  let spec = value ^> set ^> set in
+  declare "remove" spec R.remove C.remove;
+
+  let spec = set ^> set ^> set in
+  declare "union" spec R.union C.union;
+
+  let spec = set ^> set ^> set in
+  declare "inter" spec R.inter C.inter;
+
+  let spec = set ^> set ^> set in
+  declare "diff" spec R.diff C.diff;
+
+  let spec = set ^> set ^> set in
+  declare "xor" spec R.xor C.xor;
+
   ()
 
 (* -------------------------------------------------------------------------- *)
