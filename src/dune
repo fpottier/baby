@@ -24,3 +24,21 @@
 
 ;; Request documentation.
 (documentation)
+
+;; This rule allows distinguishing development builds and release builds.
+;; The file Profile.ml defines the Boolean flag [release] to be [true]
+;; in a release build and false in a development build.
+
+(rule
+  (enabled_if (= %{profile} dev))
+  (action
+    (with-stdout-to profile.ml
+      (echo "let release = false\nlet debug = true\n")
+)))
+
+(rule
+  (enabled_if (= %{profile} release))
+  (action
+    (with-stdout-to profile.ml
+      (echo "let release = true\nlet debug = false\n")
+)))
