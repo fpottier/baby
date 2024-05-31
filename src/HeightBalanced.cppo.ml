@@ -14,6 +14,10 @@ include Height.Make(E)
 #define LEAF          TLeaf
 #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
+(* [min_elt] *)
+
+#include "MinMax.frag.ml"
+
 (* [mem] *)
 
 #include "Readers.frag.ml"

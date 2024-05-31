@@ -32,6 +32,7 @@ module type SET = sig
   type set
   type t = set
   val empty : set
+  val min_elt : set -> elt
   val mem : elt -> set -> bool
   val add : elt -> set -> set
   val remove : elt -> set -> set

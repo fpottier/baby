@@ -12,6 +12,10 @@ open T
 #define LEAF          Leaf
 #define NODE(x, y, z) Node (x, y, z)
 
+(* [min_elt] *)
+
+#include "MinMax.frag.ml"
+
 (* [mem] *)
 
 #include "Readers.frag.ml"

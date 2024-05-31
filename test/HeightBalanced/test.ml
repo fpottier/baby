@@ -26,6 +26,9 @@ let () =
   let spec = set in
   declare "empty" spec R.empty C.empty;
 
+  let spec = set ^!> value in
+  declare "min_elt" spec R.min_elt C.min_elt;
+
   let spec = value ^> set ^> bool in
   declare "mem" spec R.mem C.mem;
 
