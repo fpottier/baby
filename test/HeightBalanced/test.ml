@@ -29,6 +29,15 @@ let () =
   let spec = set ^!> value in
   declare "min_elt" spec R.min_elt C.min_elt;
 
+  let spec = set ^!> option value in
+  declare "min_elt_opt" spec R.min_elt_opt C.min_elt_opt;
+
+  let spec = set ^!> value in
+  declare "max_elt" spec R.max_elt C.max_elt;
+
+  let spec = set ^!> option value in
+  declare "max_elt_opt" spec R.max_elt_opt C.max_elt_opt;
+
   let spec = value ^> set ^> bool in
   declare "mem" spec R.mem C.mem;
 
