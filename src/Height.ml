@@ -1,3 +1,5 @@
+open Profile
+
 (* The following code taken from OCaml's Set library, and slightly adapted. *)
 
 let[@inline] max (x : int) (y : int) =
@@ -32,6 +34,7 @@ module[@inline] Make (E : sig type t end) = struct
      balanced, and the difference in their heights must be at most 2. *)
 
   let[@inline] create l v r =
+    if debug then assert (abs (height l - height r) <= 2);
     let h = max (height l) (height r) + 1 in
     TNode { l; v; r; h }
 
@@ -73,6 +76,7 @@ module[@inline] Make (E : sig type t end) = struct
      difference in the run time. *)
 
   let bal l v r =
+    if debug then assert (abs (height l - height r) <= 3);
     let hl = height l
     and hr = height r in
     if hl > hr + 2 then begin
