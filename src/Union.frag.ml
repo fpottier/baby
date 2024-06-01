@@ -64,6 +64,9 @@ let rec disjoint (t1 : tree) (t2 : tree) : bool =
    therefore does not construct new trees; it does not allocate
    memory or perform rebalancing work. *)
 
+(* In comparison with [disjoint] in OCaml's Set library, this version
+   of [disjoint] can be twice faster and up to 40% slower. *)
+
 (* [split_disjoint t1 l2 v2 r2] tests whether the trees [t1]
    and [join l2 v2 r2] are disjoint. *)
 
