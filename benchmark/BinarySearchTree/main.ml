@@ -232,6 +232,7 @@ let disjoint cm u1 u2 c =
   [ R.benchmark; F.benchmark ]
 
 let triple (u1, u2, c) =
+  eprintf "\n";
   if u1 + u2 = 0 then eprintf "--- here, the sets are physically equal\n";
   if u1 = 0 || u2 = 0 then eprintf "--- here, one set is a subset of the other\n";
   if c = 0 && u1 + u2 > 0 then eprintf "--- here, the sets are disjoint\n";
@@ -288,7 +289,6 @@ let () =
       0, 0, 1000;
       0, 0, 10000;
       (* 10 unique elements on one side. *)
-      10, 0, 0;
       10, 0, 10;
       10, 0, 100;
       10, 0, 1000;
@@ -300,7 +300,6 @@ let () =
       10, 10, 1000;
       10, 10, 10000;
       (* 100 unique elements on one side. *)
-      100, 0, 0;
       100, 0, 10;
       100, 0, 100;
       100, 0, 1000;
@@ -323,13 +322,6 @@ let () =
       10000, 10000, 100;
       10000, 10000, 1000;
       10000, 10000, 10000;
-      (* 100000 unique elements on each side. *)
-      100000, 100000, 0;
-      100000, 100000, 10;
-      100000, 100000, 100;
-      100000, 100000, 1000;
-      100000, 100000, 10000;
-      100000, 100000, 100000;
     ]
   end;
 
