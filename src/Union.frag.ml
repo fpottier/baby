@@ -67,10 +67,10 @@ let rec disjoint (t1 : tree) (t2 : tree) : bool =
 (* In comparison with [disjoint] in OCaml's Set library, this version
    of [disjoint] can be twice faster and up to 40% slower. *)
 
-(* [split_disjoint t1 l2 v2 r2] tests whether the trees [t1]
-   and [join l2 v2 r2] are disjoint. *)
+(* [disjoint_node t1 l2 v2 r2] tests whether the trees [t1]
+   and [NODE(l2, v2, r2)] are disjoint. *)
 
-let rec split_disjoint t1 l2 v2 r2 =
+let rec disjoint_node t1 l2 v2 r2 =
   match VIEW(t1) with
   | LEAF ->
       true
@@ -81,11 +81,11 @@ let rec split_disjoint t1 l2 v2 r2 =
       else if c < 0 then
         not (mem v1 r2) &&
         disjoint r1 r2 &&
-        split_disjoint l1 l2 v2 r2
+        disjoint_node l1 l2 v2 r2
       else
         not (mem v1 l2) &&
         disjoint l1 l2 &&
-        split_disjoint r1 l2 v2 r2
+        disjoint_node r1 l2 v2 r2
 
 and disjoint (t1 : tree) (t2 : tree) : bool =
   match VIEW(t1), VIEW(t2) with
@@ -94,7 +94,7 @@ and disjoint (t1 : tree) (t2 : tree) : bool =
       true
   | NODE(_, _, _), NODE(l2, v2, r2) ->
       t1 != t2 && (* fast path *)
-      split_disjoint t1 l2 v2 r2
+      disjoint_node t1 l2 v2 r2
 
 let rec diff (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
