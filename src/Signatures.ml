@@ -21,8 +21,13 @@ module type BST = sig
     (* assumes that the two trees [l] and [r] were siblings in a well-formed tree
        and that one of them has been disturbed by adding or removing one element. *)
 
+  val join_weight_balanced : tree -> key -> tree -> tree
+    (* assumes that the weights of the two trees differ by at most one *)
+
   (* TODO not part of the minimal interface: *)
   val singleton : key -> tree
+  val doubleton : key -> key -> tree
+  val tripleton : key -> key -> key -> tree
   val is_singleton : tree -> bool
   val seems_smaller : tree -> tree -> bool
   val siblings : tree -> tree -> bool

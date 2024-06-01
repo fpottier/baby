@@ -2,7 +2,7 @@ open Signatures
 
 (**This module defines a memory layout and a balancing scheme for
    height-balanced binary search trees. *)
-module Make (E : sig type t end)
+module Make (E : OrderedType)
 : sig
 
   type key = E.t
@@ -17,10 +17,5 @@ module Make (E : sig type t end)
   (**The minimal abstract interface. *)
   include BST with type key := E.t
                and type tree := tree
-
-  val singleton : key -> tree (* TODO *)
-  val is_singleton : tree -> bool (* TODO *)
-  val bal : tree -> key -> tree -> tree (* TODO *)
-  val join : tree -> key -> tree -> tree (* TODO *)
 
 end
