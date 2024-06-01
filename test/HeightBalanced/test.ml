@@ -14,8 +14,7 @@ let set =
 (* We draw random integer keys. *)
 
 let value =
-  let n = 1 lsl 4 in
-  semi_open_interval (-n) (n-1)
+  semi_open_interval (-16) (15)
 
 (* We can also draw an inhabitant out of a set. *)
 
@@ -31,6 +30,29 @@ let inhabits s =
     let z = if b then k else min_elt r in
     assert (mem z s);
     z
+
+(* Generating arrays. *)
+
+let array_value =
+  easily_constructible
+    Gen.(array (int 16) (semi_open_interval (-16) (15)))
+    Print.(array int)
+
+let sorted_array compare n element () =
+  let a = Gen.array n element () in
+  Array.sort compare a;
+  a
+
+let sorted_unique_array compare n element () =
+  let a = sorted_array compare n element () in
+  let equal x y = compare x y = 0 in
+  let n = Bbst.ArrayExtra.compress equal a in
+  Array.sub a 0 n
+
+let sorted_unique_array_value =
+  easily_constructible
+    Gen.(sorted_unique_array Int.compare (int 16) (semi_open_interval (-16) (15)))
+    Print.(array int)
 
 (* Exchanging two arguments. *)
 
@@ -93,6 +115,12 @@ let () =
      of creating nontrivial sets. It consumes just one unit of fuel. *)
   let spec = list value ^> set in
   declare "of_list" spec R.of_list C.of_list;
+
+  let spec = array_value ^> set in
+  declare "of_array" spec R.of_array C.of_array;
+
+  let spec = sorted_unique_array_value ^> set in
+  declare "of_sorted_unique_array" spec R.of_array C.of_array;
 
   ()
 

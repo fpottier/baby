@@ -52,4 +52,6 @@ module type SET = sig
   val diff : set -> set -> set
   val xor : set -> set -> set
   val of_list : elt list -> set
+  val of_sorted_unique_array : elt array -> set
+  val of_array : elt array -> set
 end

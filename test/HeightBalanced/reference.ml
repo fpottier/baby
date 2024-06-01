@@ -17,4 +17,10 @@ module Make (E : OrderedType) = struct
   let xor s1 s2 =
     union (diff s1 s2) (diff s2 s1)
 
+  let of_array a =
+    a |> Array.to_list |> of_list
+
+  let of_sorted_unique_array =
+    of_array
+
 end
