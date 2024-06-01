@@ -62,9 +62,13 @@ let join2_siblings (l : tree) (r : tree) : tree =
 
 (* This is removal in the style of BFS. *)
 
-let _simple_remove (k : key) (t : tree) : tree =
+(* (Disabled.)
+
+let remove (k : key) (t : tree) : tree =
   let l, _, r = split k t in
   join2 l r
+
+ *)
 
 (* This is a less elegant but more efficient version of removal. *)
 

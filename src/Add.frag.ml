@@ -1,8 +1,12 @@
 (* This is insertion in the style of BFS. *)
 
-let _simple_add (k : key) (t : tree) : tree =
+(* (Disabled.)
+
+let add (k : key) (t : tree) : tree =
   let l, _, r = split k t in
   join l k r
+
+ *)
 
 (* This is a less elegant but more efficient version of insertion. *)
 
