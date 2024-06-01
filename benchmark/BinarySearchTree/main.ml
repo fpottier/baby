@@ -279,7 +279,7 @@ let () =
     eprintf "\n";
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** disjoint\n";
     eprintf "\n";
     List.iter triple [
