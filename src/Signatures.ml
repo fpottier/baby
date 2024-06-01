@@ -53,6 +53,7 @@ module type SET = sig
   val disjoint : set -> set -> bool
   val diff : set -> set -> set
   val xor : set -> set -> set
+  val elements : set -> elt list
   val of_list : elt list -> set
   val of_sorted_unique_array : elt array -> set
   val of_array : elt array -> set

@@ -116,6 +116,9 @@ let () =
   let spec = set ^> set ^> set in
   declare "xor" spec R.xor C.xor;
 
+  let spec = set ^> list value in
+  declare "elements" spec R.elements C.elements;
+
   (* [of_list] is important in this test because it offers a cheap way
      of creating nontrivial sets. It consumes just one unit of fuel. *)
   let spec = list value ^> set in
