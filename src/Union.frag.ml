@@ -45,7 +45,8 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
       and r = inter r1 r2 in
       if b then join l k2 r else join2 l r
 
-(* TODO optimize? *)
+(* This simple version of [disjoint] has the same structure as [inter]. *)
+
 let rec disjoint (t1 : tree) (t2 : tree) : bool =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _
