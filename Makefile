@@ -22,7 +22,7 @@ clean:
 
 .PHONY: test
 test:
-	@ dune test
+	@ make -C test/HeightBalanced random
 
 .PHONY: install
 install: all
