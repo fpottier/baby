@@ -47,6 +47,8 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
 
 (* This simple version of [disjoint] has the same structure as [inter]. *)
 
+(* (Disabled.)
+
 let rec disjoint (t1 : tree) (t2 : tree) : bool =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _
@@ -55,6 +57,41 @@ let rec disjoint (t1 : tree) (t2 : tree) : bool =
   | NODE(_, _, _), NODE(l2, k2, r2) ->
       let l1, b, r1 = split k2 t1 in
       not b && disjoint l1 l2 && disjoint r1 r2
+
+ *)
+
+(* This more complex version of [disjoint] does not use [split],
+   therefore does not construct new trees; it does not allocate
+   memory or perform rebalancing work. *)
+
+(* [split_disjoint t1 l2 v2 r2] tests whether the trees [t1]
+   and [join l2 v2 r2] are disjoint. *)
+
+let rec split_disjoint t1 l2 v2 r2 =
+  match VIEW(t1) with
+  | LEAF ->
+      true
+  | NODE(l1, v1, r1) ->
+      let c = E.compare v2 v1 in
+      if c = 0 then
+        false
+      else if c < 0 then
+        not (mem v1 r2) &&
+        disjoint r1 r2 &&
+        split_disjoint l1 l2 v2 r2
+      else
+        not (mem v1 l2) &&
+        disjoint l1 l2 &&
+        split_disjoint r1 l2 v2 r2
+
+and disjoint (t1 : tree) (t2 : tree) : bool =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _
+  | _, LEAF ->
+      true
+  | NODE(_, _, _), NODE(l2, v2, r2) ->
+      t1 != t2 && (* fast path *)
+      split_disjoint t1 l2 v2 r2
 
 let rec diff (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
