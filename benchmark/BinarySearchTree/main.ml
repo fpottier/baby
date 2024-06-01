@@ -49,6 +49,43 @@ let insertion u =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Removal benchmark. *)
+
+let remove u =
+  let basis = n in
+  let a = Array.init n (fun _i -> Random.int u) in
+  let c = C.(Array.fold_left (fun s x -> add x s) empty a)
+  and f = F.(Array.fold_left (fun s x -> add x s) empty a)
+  and r = R.(Array.fold_left (fun s x -> add x s) empty a) in
+
+  let name = sprintf "Removal (universe size %d) (new modular code)" u
+  and run () () =
+    Array.fold_left (fun s x -> C.remove x s) c a
+    |> Sys.opaque_identity
+    |> ignore
+  in
+  let modular = B.benchmark ~name ~quota ~basis ~run in
+
+  let name = sprintf "Removal (universe size %d) (new flat code)" u
+  and run () () =
+    Array.fold_left (fun s x -> F.remove x s) f a
+    |> Sys.opaque_identity
+    |> ignore
+  in
+  let flat = B.benchmark ~name ~quota ~basis ~run in
+
+  let name = sprintf "Removal (universe size %d) (OCaml Set)" u
+  and run () () =
+    Array.fold_left (fun s x -> R.remove x s) r a
+    |> Sys.opaque_identity
+    |> ignore
+  in
+  let old = B.benchmark ~name ~quota ~basis ~run in
+
+  [ old; modular; flat ]
+
+(* -------------------------------------------------------------------------- *)
+
 (* Union benchmark. *)
 
 let union u =
@@ -117,6 +154,15 @@ let () =
   end;
 
   if true then begin
+    eprintf "*** Removal benchmarks.\n";
+    eprintf "\n";
+    run (remove (1 lsl 8));
+    eprintf "\n";
+    run (remove (1 lsl 16));
+    eprintf "\n";
+  end;
+
+  if false then begin
     eprintf "*** Union benchmarks.\n";
     eprintf "\n";
     run (union (1 lsl 8));
