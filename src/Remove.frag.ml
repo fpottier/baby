@@ -43,6 +43,13 @@ let remove_max_elt (t : tree) : tree =
 
 (* [join2_siblings] is named [merge] in OCaml's Set library. *)
 
+(* This implementation arbitrarily chooses to place the minimum element of the
+   tree [r] at the root. One could also choose to place the maximum element of
+   the tree [l] at the root. One could imagine choosing between these
+   alternatives, based on the weights or heights of the trees [l] and [r], if
+   such a notion exists. That would remove the need for rebalancing. However,
+   this seems to make essentially no difference in practice. *)
+
 let join2_siblings (l : tree) (r : tree) : tree =
   if debug then assert (siblings l r);
   match VIEW(l), VIEW(r) with
