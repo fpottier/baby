@@ -38,6 +38,7 @@ module type SET = sig
   type set
   type t = set
   val empty : set
+  val is_empty : set -> bool
   val min_elt : set -> elt
   val min_elt_opt : set -> elt option
   val max_elt : set -> elt
@@ -49,6 +50,7 @@ module type SET = sig
   val remove_max_elt : set -> set
   val union : set -> set -> set
   val inter : set -> set -> set
+  val disjoint : set -> set -> bool
   val diff : set -> set -> set
   val xor : set -> set -> set
   val of_list : elt list -> set

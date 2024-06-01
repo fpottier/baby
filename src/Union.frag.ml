@@ -45,6 +45,16 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
       and r = inter r1 r2 in
       if b then join l k2 r else join2 l r
 
+(* TODO optimize? *)
+let rec disjoint (t1 : tree) (t2 : tree) : bool =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _
+  | _, LEAF ->
+      true
+  | NODE(_, _, _), NODE(l2, k2, r2) ->
+      let l1, b, r1 = split k2 t1 in
+      not b && disjoint l1 l2 && disjoint r1 r2
+
 let rec diff (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->

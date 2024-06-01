@@ -68,6 +68,8 @@ let () =
   let spec = set in
   declare "empty" spec R.empty C.empty;
 
+  (* not tested: [is_empty] *)
+
   let spec = set ^!> value in
   declare "min_elt" spec R.min_elt C.min_elt;
 
@@ -104,6 +106,9 @@ let () =
 
   let spec = set ^> set ^> set in
   declare "inter" spec R.inter C.inter;
+
+  let spec = set ^> set ^> bool in
+  declare "disjoint" spec R.disjoint C.disjoint;
 
   let spec = set ^> set ^> set in
   declare "diff" spec R.diff C.diff;
