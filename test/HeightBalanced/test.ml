@@ -14,8 +14,28 @@ let set =
 (* We draw random integer keys. *)
 
 let value =
-  let n = 1 lsl 10 in
+  let n = 1 lsl 4 in
   semi_open_interval (-n) (n-1)
+
+(* We can also draw an inhabitant out of a set. *)
+
+let inhabits s =
+  int_within @@ fun () ->
+    let open R in
+    let open Gen in
+    if is_empty s then reject() else
+    let x = min_elt s
+    and y = max_elt s in
+    let k = x + Random.int (y - x + 1) in
+    let _, b, r = split k s in
+    let z = if b then k else min_elt r in
+    assert (mem z s);
+    z
+
+(* Exchanging two arguments. *)
+
+let flip f x y =
+  f y x
 
 (* -------------------------------------------------------------------------- *)
 
@@ -47,6 +67,10 @@ let () =
   let spec = value ^> set ^> set in
   declare "remove" spec R.remove C.remove;
 
+  (* Specifically remove a value that is in the set. *)
+  let spec = set ^>> fun s -> (inhabits s) ^> set in
+  declare "remove" spec (flip R.remove) (flip C.remove);
+
   let spec = set ^!> set in
   declare "remove_min_elt" spec R.remove_min_elt C.remove_min_elt;
 
@@ -65,6 +89,11 @@ let () =
   let spec = set ^> set ^> set in
   declare "xor" spec R.xor C.xor;
 
+  (* [of_list] is important in this test because it offers a cheap way
+     of creating nontrivial sets. It consumes just one unit of fuel. *)
+  let spec = list value ^> set in
+  declare "of_list" spec R.of_list C.of_list;
+
   ()
 
 (* -------------------------------------------------------------------------- *)
@@ -72,5 +101,5 @@ let () =
 (* Start the engine! *)
 
 let () =
-  let fuel = 128 in
+  let fuel = 16 in
   main fuel

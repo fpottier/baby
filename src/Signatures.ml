@@ -46,4 +46,5 @@ module type SET = sig
   val inter : set -> set -> set
   val diff : set -> set -> set
   val xor : set -> set -> set
+  val of_list : elt list -> set
 end

@@ -20,5 +20,6 @@ open T
 #include "Add.frag.ml"
 #include "Remove.frag.ml"
 #include "Union.frag.ml"
+#include "Conversions.frag.ml"
 
 end
