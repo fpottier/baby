@@ -33,12 +33,14 @@ module type BST = sig
   val is_singleton : tree -> bool
   val seems_smaller : tree -> tree -> bool
   val siblings : tree -> tree -> bool
+  val check : tree -> unit
 end
 
 module type SET = sig
   type elt
   type set
   type t = set
+  val check : set -> unit
   val empty : set
   val is_empty : set -> bool
   val min_elt : set -> elt

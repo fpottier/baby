@@ -43,6 +43,18 @@ module[@inline] Make (E : OrderedType) = struct
   let neighbors l r =
     abs (height l - height r) <= 3
 
+  (* A well-formedness check. *)
+
+  let rec check t =
+    match t with
+    | TLeaf ->
+        ()
+    | TNode { l; r; h; _ } ->
+        check l;
+        check r;
+        assert (h = max (height l) (height r) + 1);
+        assert (siblings l r)
+
   (* [create l v r] requires [l < v < r]. It constructs a node with left child
      [l], value [v], and right child [r]. The subtrees [l] and [r] must be
      balanced, and the difference in their heights must be at most 2. *)

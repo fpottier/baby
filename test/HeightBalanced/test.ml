@@ -8,8 +8,15 @@ module C = Bbst.HeightBalanced.Make(V)
 
 (* We have one abstract type, namely [set]. *)
 
+(* It is equipped with a well-formedness check,
+   which ignores the model (the reference side). *)
+
+let check _model =
+  C.check,
+  constant "check"
+
 let set =
-  declare_abstract_type ()
+  declare_abstract_type ~check ()
 
 (* We draw random integer keys. *)
 

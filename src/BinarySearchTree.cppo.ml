@@ -7,7 +7,7 @@ module[@inline] Make
 (E : OrderedType)
 (T : BST with type key = E.t)
 = struct
-open T
+include T
 
 #define VIEW(t)       (view t)
 #define LEAF          Leaf
