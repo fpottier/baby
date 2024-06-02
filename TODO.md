@@ -10,6 +10,8 @@
   and fast paths for `subset` and `equal`.
   It also facilitates conversion to a sorted array.
 
+* Test `Enum`.
+
 * Test.
 
 * Benchmark.
