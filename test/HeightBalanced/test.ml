@@ -119,6 +119,9 @@ let () =
   let spec = set ^> set ^> set in
   declare "xor" spec R.xor C.xor;
 
+  let spec = set ^> set ^> int in
+  declare "compare" spec R.compare C.compare;
+
   let spec = set ^> list value in
   declare "elements" spec R.elements C.elements;
 
