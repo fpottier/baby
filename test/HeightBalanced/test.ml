@@ -151,5 +151,8 @@ let () =
 (* Start the engine! *)
 
 let () =
+  let prologue () =
+    dprintf "          open Bbst.HeightBalanced.Make(Int);;\n"
+  in
   let fuel = 16 in
-  main fuel
+  main ~prologue fuel
