@@ -11,6 +11,8 @@ let[@inline] max (x : int) (y : int) =
 let impossible () =
   assert false
 
+(* Although this functor requires an ordered type, the ordering function
+   [E.compare] is used in assertions only. *)
 module[@inline] Make (E : OrderedType) = struct
 
   type key = E.t
