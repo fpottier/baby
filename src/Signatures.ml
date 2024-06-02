@@ -24,6 +24,8 @@ module type BST = sig
   val join_weight_balanced : tree -> key -> tree -> tree
     (* assumes that the weights of the two trees differ by at most one *)
 
+  val add_min_element : key -> tree -> tree
+
   (* TODO not part of the minimal interface: *)
   val singleton : key -> tree
   val doubleton : key -> key -> tree
