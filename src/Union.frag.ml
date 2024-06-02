@@ -1,3 +1,7 @@
+(* -------------------------------------------------------------------------- *)
+
+(* Union. *)
+
 (* The union algorithm proposed by BFS is improved (or complicated)
    with two features of OCaml's Set library:
    - the subtree that seems smaller is split (this is a heuristic);
@@ -34,6 +38,10 @@ let union (t1 : tree) (t2 : tree) : tree =
       else
         union t1 t2
 
+(* -------------------------------------------------------------------------- *)
+
+(* Intersection. *)
+
 let rec inter (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _
@@ -44,6 +52,10 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
       let l = inter l1 l2
       and r = inter r1 r2 in
       if b then join l k2 r else join2 l r
+
+(* -------------------------------------------------------------------------- *)
+
+(* Disjointness. *)
 
 (* This simple version of [disjoint] has the same structure as [inter]. *)
 
@@ -96,6 +108,10 @@ and disjoint (t1 : tree) (t2 : tree) : bool =
       t1 != t2 && (* fast path *)
       disjoint_node t1 l2 v2 r2
 
+(* -------------------------------------------------------------------------- *)
+
+(* Difference. *)
+
 let rec diff (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
@@ -107,6 +123,10 @@ let rec diff (t1 : tree) (t2 : tree) : tree =
       let l = diff l1 l2
       and r = diff r1 r2 in
       join2 l r
+
+(* -------------------------------------------------------------------------- *)
+
+(* Symmetric difference. *)
 
 let rec xor (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
