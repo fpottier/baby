@@ -17,10 +17,10 @@ include Height.Make(E)
 
 #include "Basics.frag.ml"
 #include "MinMax.frag.ml"
-#include "Readers.frag.ml"
-#include "Split.frag.ml"
 #include "Add.frag.ml"
 #include "Remove.frag.ml"
+#include "Split.frag.ml"
+#include "Readers.frag.ml"
 #include "Union.frag.ml"
 #include "Conversions.frag.ml"
 
