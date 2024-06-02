@@ -54,6 +54,11 @@ let sorted_unique_array_value =
     Gen.(sorted_unique_array Int.compare (int 16) (semi_open_interval (-16) (15)))
     Print.(array int)
 
+(* Consuming a sequence. *)
+
+let seq_value =
+  declare_seq value
+
 (* Exchanging two arguments. *)
 
 let flip f x y =
@@ -124,6 +129,9 @@ let () =
 
   let spec = set ^> list value in
   declare "elements" spec R.elements C.elements;
+
+  let spec = set ^> seq_value in
+  declare "to_seq" spec R.to_seq C.to_seq;
 
   (* [of_list] is important in this test because it offers a cheap way
      of creating nontrivial sets. It consumes just one unit of fuel. *)

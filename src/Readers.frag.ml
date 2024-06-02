@@ -194,6 +194,11 @@ module Enum = struct
 
 end
 
+(* Conversion of a tree to an OCaml sequence. *)
+
+let to_seq (t : tree) : key Seq.t =
+  fun () -> Enum.(to_seq_node (enum t))
+
 (* -------------------------------------------------------------------------- *)
 
 (* Comparisons. *)
