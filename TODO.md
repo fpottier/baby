@@ -1,5 +1,10 @@
 # To Do
 
+* Reduce the duplication between HeightBalanced, WeightBalanced,
+  and the general case.
+
+* Benchmark weight-balanced trees. (Vary α.)
+
 * Look at `split_last` and `join2`,
   because OCaml's `concat` is implemented in a different way.
 
