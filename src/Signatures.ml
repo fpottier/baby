@@ -59,8 +59,8 @@ module type SET = sig
   val compare : set -> set -> int
   val elements : set -> elt list
   val of_list : elt list -> set
-  val of_sorted_unique_array : elt array -> set
   val of_array : elt array -> set
+  val of_sorted_unique_array : elt array -> set
 
   module Enum : sig
 
