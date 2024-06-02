@@ -56,8 +56,68 @@ module type SET = sig
   val diff : set -> set -> set
   val subset : set -> set -> bool
   val xor : set -> set -> set
+  val compare : set -> set -> int
   val elements : set -> elt list
   val of_list : elt list -> set
   val of_sorted_unique_array : elt array -> set
   val of_array : elt array -> set
+
+  module Enum : sig
+
+    type set = t
+    (** The type [set] is a synonym for the type of sets. *)
+
+    type enum
+    (** The type of enumerations. An enumeration represents an increasing
+        sequence of elements of type [elt]. *)
+
+    type t = enum
+    (** A synonym for the type [enum]. *)
+
+    val empty : enum
+    (** [empty] is the empty enumeration. It contains zero elements. *)
+
+    val is_empty : enum -> bool
+    (** [is_empty e] tests whether the enumeration [e] is empty. *)
+
+    val enum : set -> enum
+    (** [enum s] returns an enumeration of the set [s]. This enumeration
+        contains all of the elements of the set [s], in increasing order. *)
+
+    val enum_from : elt -> set -> enum
+    (** [enum_from x s] returns an enumeration of the subset of [s]
+        formed of just the elements that are no less than [x].
+        It is equivalent to [from x (enum s)]. *)
+
+    val head : enum -> elt
+    (** [head e] returns the first element of the enumeration [e].
+        The enumeration [e] must be nonempty. *)
+
+    val tail : enum -> enum
+    (** [tail e] returns the enumeration [e], deprived of its first element.
+        The enumeration [e] must be nonempty. *)
+
+    val head_opt : enum -> elt option
+    (** If the enumeration [e] is nonempty, then [head_opt e] returns its
+        first element. Otherwise, it returns [None]. *)
+
+    val tail_opt : enum -> enum option
+    (** If the enumeration [e] is nonempty, then [tail_opt e] returns the
+        enumeration [e], deprived of its first element. Otherwise, it
+        returns [None]. *)
+
+    val from : elt -> enum -> enum
+    (** [from x e] returns the enumeration obtained from the enumeration [e]
+        by skipping the elements that lie below the threshold [x]. In other
+        words, only the elements of [e] that lie at or above the threshold
+        [x] are retained. *)
+
+    val to_seq : enum -> elt Seq.t
+    (** [to_seq] converts an enumeration into a (persistent) sequence. *)
+
+    val elements : enum -> set
+    (** [elements] converts an enumeration into a set. *)
+
+  end (* Enum *)
+
 end
