@@ -52,6 +52,7 @@ module type SET = sig
   val inter : set -> set -> set
   val disjoint : set -> set -> bool
   val diff : set -> set -> set
+  val subset : set -> set -> bool
   val xor : set -> set -> set
   val elements : set -> elt list
   val of_list : elt list -> set

@@ -126,6 +126,42 @@ let rec diff (t1 : tree) (t2 : tree) : tree =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Inclusion. *)
+
+(* This version of [subset] has the same structure as [disjoint] above.
+   Compared with [subset] in OCaml's Set library, this version does not
+   allocate any memory, and includes a fast path based on a physical
+   equality test. It also avoids redundant pattern matching.  *)
+
+let rec subset_node t1 l2 v2 r2 =
+  match VIEW(t1) with
+  | LEAF ->
+      true
+  | NODE(l1, v1, r1) ->
+      let c = E.compare v2 v1 in
+      if c = 0 then
+        subset l1 l2 && subset r1 r2
+      else if c < 0 then
+        mem v1 r2 &&
+        subset r1 r2 &&
+        subset_node l1 l2 v2 r2
+      else
+        mem v1 l2 &&
+        subset l1 l2 &&
+        subset_node r1 l2 v2 r2
+
+and subset (t1 : tree) (t2 : tree) : bool =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _ ->
+      true
+  | _, LEAF ->
+      false
+  | NODE(_, _, _), NODE(l2, v2, r2) ->
+      t1 == t2 || (* fast path *)
+      subset_node t1 l2 v2 r2
+
+(* -------------------------------------------------------------------------- *)
+
 (* Symmetric difference. *)
 
 let rec xor (t1 : tree) (t2 : tree) : tree =

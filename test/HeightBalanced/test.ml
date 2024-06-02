@@ -113,6 +113,9 @@ let () =
   let spec = set ^> set ^> set in
   declare "diff" spec R.diff C.diff;
 
+  let spec = set ^> set ^> bool in
+  declare "subset" spec R.subset C.subset;
+
   let spec = set ^> set ^> set in
   declare "xor" spec R.xor C.xor;
 
