@@ -8,6 +8,7 @@
 * Weight balance gives gives us constant-time cardinal,
   random access and splitting by index,
   and fast paths for `subset` and `equal`.
+  It also facilitates conversion to a sorted array.
 
 * Test.
 
