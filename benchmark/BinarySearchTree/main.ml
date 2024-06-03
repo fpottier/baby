@@ -166,7 +166,8 @@ end) (P : sig
   val candidate : string
   val cm : cm
   (* This is the binary operation that we want to test. *)
-  val binary : S.t -> S.t -> bool
+  type result
+  val binary : S.t -> S.t -> result
 end) = struct
   open P
   open S
@@ -321,17 +322,31 @@ let run_binary_benchmark (benchmark : quadruple -> B.benchmark list) =
 let disjoint (u1, u2, c, cm) =
   let module P = struct
     let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
+    type result = bool
   end in
   let module R = Binary(R)(struct include P let binary = R.disjoint let candidate = "disjoint (reference)" end) in
   let module F = Binary(F)(struct include P let binary = F.disjoint let candidate = "disjoint (height/flat)" end) in
   let module W = Binary(W)(struct include P let binary = W.disjoint let candidate = "disjoint (weight/flat)" end) in
   [ R.benchmark; F.benchmark; W.benchmark ]
 
+(* Comparison. *)
+
+let compare (u1, u2, c, cm) =
+  let module P = struct
+    let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
+    type result = int
+  end in
+  let module R = Binary(R)(struct include P let binary = R.compare let candidate = "compare (reference)" end) in
+  let module W1 = Binary(W)(struct include P let binary = W.compare let candidate = "compare (weight/flat)" end) in
+  let module W2 = Binary(W)(struct include P let binary = W.xompare let candidate = "xompare (weight/flat)" end) in
+  [ R.benchmark; W1.benchmark; W2.benchmark ]
+
 (* Equality. *)
 
 let equal (u1, u2, c, cm) =
   let module P = struct
     let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
+    type result = bool
   end in
   let module R = Binary(R)(struct include P let binary = R.equal let candidate = "equal (reference)" end) in
   let module F = Binary(F)(struct include P let binary = F.equal let candidate = "equal (height/flat)" end) in
@@ -377,6 +392,11 @@ let () =
   end;
 
   if true then begin
+    eprintf "*** compare\n";
+    run_binary_benchmark compare
+  end;
+
+  if false then begin
     eprintf "*** equal\n";
     run_binary_benchmark equal
   end;

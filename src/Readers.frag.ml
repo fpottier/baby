@@ -43,7 +43,7 @@ module Enum = struct
   let empty : enum =
     End
 
-  let is_empty (e : enum) : bool =
+  let[@inline] is_empty (e : enum) : bool =
     match e with
     | End -> true
     | More _ -> false
@@ -167,6 +167,30 @@ module Enum = struct
         if c <> 0 then c else
         compare (cons_enum r1 e1) (cons_enum r2 e2)
 
+  exception Xompare of int
+
+  let rec xompare (t1 : tree) (e2 : enum) : enum =
+    match VIEW(t1), e2 with
+    | LEAF, _ ->
+        e2
+    | NODE(l1, v1, r1), _ ->
+        let e2 = xompare l1 e2 in
+        match e2 with
+        | End ->
+            raise (Xompare 1)
+        | More (v2, r2, e2) ->
+            let c = E.compare v1 v2 in
+            if c <> 0 then raise (Xompare c) else
+            xompare r1 (cons_enum r2 e2)
+
+  let xompare (t1 : tree) (t2 : tree) : int =
+    if t1 == t2 then 0 else (* fast path *)
+    match xompare t1 (enum t2) with
+    | exception Xompare c ->
+        c
+    | e2 ->
+        if is_empty e2 then 0 else -1
+
   (* [to_seq] converts an enumeration to an OCaml sequence. *)
 
   let rec to_seq_node (e : enum) : key Seq.node =
@@ -204,4 +228,8 @@ let to_seq (t : tree) : key Seq.t =
 (* Comparisons. *)
 
 let compare (t1 : tree) (t2 : tree) : int =
+  if t1 == t2 then 0 else (* fast path *)
   Enum.(compare (enum t1) (enum t2))
+
+let[@inline] xompare (t1 : tree) (t2 : tree) : int =
+  Enum.xompare t1 t2

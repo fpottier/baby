@@ -60,6 +60,7 @@ module type SET = sig
   val xor : set -> set -> set
   val equal : set -> set -> bool
   val compare : set -> set -> int
+  val xompare : set -> set -> int
   val elements : set -> elt list
   val to_seq : set -> elt Seq.t
   val of_list : elt list -> set

@@ -137,6 +137,9 @@ let () =
   let spec = set ^> set ^> int in
   declare "compare" spec R.compare C.compare;
 
+  let spec = set ^> set ^> int in
+  declare "compare" spec R.compare C.xompare;
+
   let spec = set ^> list value in
   declare "elements" spec R.elements C.elements;
 
