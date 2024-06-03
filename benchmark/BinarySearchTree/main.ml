@@ -235,18 +235,6 @@ end) = struct
 
 end
 
-let disjoint cm u1 u2 c =
-  let module P = struct
-    let seed = 123
-    let n = n
-    let u1, u2, c = u1, u2, c
-    let cm = cm
-  end in
-  let module R = Binary(R)(struct include P let binary = R.disjoint let candidate = "disjoint (reference)" end) in
-  let module F = Binary(F)(struct include P let binary = F.disjoint let candidate = "disjoint (height/flat)" end) in
-  let module W = Binary(W)(struct include P let binary = W.disjoint let candidate = "disjoint (weight/flat)" end) in
-  [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
-
 (* This emits a human-readable comment on a quadruple [u1, u2, c, cm]. *)
 
 let binary_benchmark_comment (u1, u2, c, cm) =
@@ -307,11 +295,36 @@ let binary_benchmark_data : (int * int * int) list =
     10000, 10000, 10000;
   ]
 
-let triple (u1, u2, c) =
-  binary_benchmark_comment (u1, u2, c, Common);
-  run (disjoint Common u1 u2 c);
-  binary_benchmark_comment (u1, u2, c, Separate);
-  run (disjoint Separate u1 u2 c)
+(* This is a list of [u1, u2, c, cm] quadruples. *)
+
+type quadruple =
+  int * int * int * cm
+
+let binary_benchmark_data : quadruple list =
+  binary_benchmark_data
+  |> List.map (fun (u1, u2, c) ->
+      [ (u1, u2, c, Common); (u1, u2, c, Separate) ])
+  |> List.flatten
+
+(* This runs a benchmark of a binary operation,
+   using the above quadruples. *)
+
+let run_binary_benchmark (benchmark : quadruple -> B.benchmark list) =
+  binary_benchmark_data |> List.iter @@ fun (q : quadruple) ->
+  binary_benchmark_comment q;
+  run (benchmark q)
+
+let disjoint (u1, u2, c, cm) =
+  let module P = struct
+    let seed = 123
+    let n = n
+    let u1, u2, c = u1, u2, c
+    let cm = cm
+  end in
+  let module R = Binary(R)(struct include P let binary = R.disjoint let candidate = "disjoint (reference)" end) in
+  let module F = Binary(F)(struct include P let binary = F.disjoint let candidate = "disjoint (height/flat)" end) in
+  let module W = Binary(W)(struct include P let binary = W.disjoint let candidate = "disjoint (weight/flat)" end) in
+  [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -348,8 +361,7 @@ let () =
 
   if true then begin
     eprintf "*** disjoint\n";
-    eprintf "\n";
-    List.iter triple binary_benchmark_data
+    run_binary_benchmark disjoint
   end;
 
   ()
