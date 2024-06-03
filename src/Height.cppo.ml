@@ -25,6 +25,15 @@ module[@inline] Make (E : OrderedType) = struct
     | TLeaf
     | TNode of { l : tree; v : key; r : tree; h : int }
 
+  (* This macro destructs a tree [t] that is known not to be a leaf. *)
+
+  #define DESTRUCT(t,tl,tv,tr) \
+    match t with \
+    | TLeaf -> impossible() \
+    | TNode { l = tl; v = tv; r = tr; _ }
+
+  (* [height t] reads and returns the height of the tree [t]. *)
+
   let[@inline] height t =
     match t with
     | TLeaf ->
@@ -118,27 +127,19 @@ module[@inline] Make (E : OrderedType) = struct
     let hl = height l
     and hr = height r in
     if hl > hr + 2 then begin
-      match l with
-      | TLeaf -> impossible()
-      | TNode { l = ll; v = lv; r = lr; _ } ->
+      DESTRUCT(l, ll, lv, lr) ->
       if height ll >= height lr then
         create ll lv (create lr v r)
       else
-        match lr with
-        | TLeaf -> impossible()
-        | TNode { l = lrl; v = lrv; r = lrr; _ } ->
+        DESTRUCT(lr, lrl, lrv, lrr) ->
         create (create ll lv lrl) lrv (create lrr v r)
     end
     else if hr > hl + 2 then begin
-      match r with
-      | TLeaf -> impossible()
-      | TNode { l = rl; v = rv; r = rr; _ } ->
+      DESTRUCT(r, rl, rv, rr) ->
       if height rr >= height rl then
         create (create l v rl) rv rr
       else
-        match rl with
-        | TLeaf -> impossible()
-        | TNode { l = rll; v = rlv; r = rlr; _ } ->
+        DESTRUCT(rl, rll, rlv, rlr) ->
         create (create l v rll) rlv (create rlr rv rr)
     end
     else

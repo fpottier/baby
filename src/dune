@@ -13,6 +13,11 @@
 ;; Some files require preprocessing by cppo.
 
 (rule
+  (targets Height.ml)
+  (deps Height.cppo.ml (glob_files *.frag.ml))
+  (action (run %{bin:cppo} Height.cppo.ml -o %{targets})))
+
+(rule
   (targets Weight.ml)
   (deps Weight.cppo.ml (glob_files *.frag.ml))
   (action (run %{bin:cppo} Weight.cppo.ml -o %{targets})))
