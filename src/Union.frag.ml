@@ -175,3 +175,19 @@ let rec xor (t1 : tree) (t2 : tree) : tree =
       let l = xor l1 l2
       and r = xor r1 r2 in
       if b then join2 l r else join l k2 r
+
+(* -------------------------------------------------------------------------- *)
+
+(* Equality. *)
+
+(* Equality can be implemented in several ways. E.g., [equal t1 t2] could be
+   implemented in one line by [subset t1 t2 && subset t2 t1] or also in one
+   line by [is_empty (xor t1 t2)]. (The latter idea could be optimized, so
+   as to avoid actually constructing the tree [xor t1 t2] in memory.) Some
+   experiments suggest that either of these approaches is more expensive
+   than the following approach, which is based on [compare]. *)
+
+let equal t1 t2 =
+  t1 == t2 || (* fast path *)
+  compare t1 t2 = 0
+  (* TODO [compare] could be optimized by using just one enumeration *)

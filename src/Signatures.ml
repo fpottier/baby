@@ -58,6 +58,7 @@ module type SET = sig
   val diff : set -> set -> set
   val subset : set -> set -> bool
   val xor : set -> set -> set
+  val equal : set -> set -> bool
   val compare : set -> set -> int
   val elements : set -> elt list
   val to_seq : set -> elt Seq.t
