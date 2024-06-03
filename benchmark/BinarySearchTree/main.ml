@@ -131,22 +131,32 @@ let union u =
 
 (* -------------------------------------------------------------------------- *)
 
-(* Disjointness benchmark. *)
+(* A benchmark for all operations that take two sets as arguments:
+   [union], [inter], [diff], [xor], [subset], [equal], [compare],
+   etc. *)
 
-(* u1, u2 = number of elements that appear in one set -- not in the other set *)
-(* c = number of elements that appear in both sets *)
-(* cm = set construction method *)
+(* The parameters [u1] and [u2] control how many unique elements each set
+   contains -- that is, how many elements are one set and in not in the other
+   set. The parameter [c] controls how many elements are common. *)
+
+(* The parameter [cm] is a construction method for the two sets. If the
+   parameter is [Common] then we first build a set of the common elements, and
+   insert the unique elements into this common basis. If the parameter is
+   [Separate] then we build two separate sets of the common elements, using
+   different insertion orders, so the two sets are likely to be represented by
+   trees of different shapes, even though they are equal sets. *)
+
 type cm =
   | Common
   | Separate
 
-module Disjoint (S : sig
+module Binary (S : sig
+  (* These are used to construct sets. *)
   type t
   val empty : t
   val add : int -> t -> t
   val union : t -> t -> t
   val elements : t -> int list
-  val disjoint : t -> t -> bool
 end) (P : sig
   val seed : int
   val n : int
@@ -155,6 +165,8 @@ end) (P : sig
   val c : int
   val candidate : string
   val cm : cm
+  (* This is the binary operation that we want to test. *)
+  val binary : S.t -> S.t -> bool
 end) = struct
   open P
   open S
@@ -214,10 +226,10 @@ end) = struct
         sprintf "separate bases (u1 = %d, u2 = %d, c = %d)" u1 u2 c
 
   let benchmark =
-    let name = sprintf "disjoint (%s); %s" candidate comment
+    let name = sprintf "%s; %s" candidate comment
     and run () () =
       sets |> Array.iter @@ fun (s1, s2) ->
-      ignore (disjoint s1 s2)
+      ignore (binary s1 s2)
     in
     B.benchmark ~name ~quota ~basis ~run
 
@@ -230,10 +242,10 @@ let disjoint cm u1 u2 c =
     let u1, u2, c = u1, u2, c
     let cm = cm
   end in
-  let module R = Disjoint(R)(struct include P let candidate = "reference" end) in
-  (* let module C = Disjoint(C)(struct include P let candidate = "height/modular" end) in *)
-  let module F = Disjoint(F)(struct include P let candidate = "height/flat" end) in
-  [ R.benchmark; (* C.benchmark; *) F.benchmark ]
+  let module R = Binary(R)(struct include P let binary = R.disjoint let candidate = "disjoint (reference)" end) in
+  let module F = Binary(F)(struct include P let binary = F.disjoint let candidate = "disjoint (height/flat)" end) in
+  let module W = Binary(W)(struct include P let binary = W.disjoint let candidate = "disjoint (weight/flat)" end) in
+  [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
 
 let triple (u1, u2, c) =
   eprintf "\n";
@@ -256,7 +268,7 @@ let triple (u1, u2, c) =
 
 let () =
 
-  if true then begin
+  if false then begin
     eprintf "*** add\n";
     eprintf "\n";
     run (add (1 lsl 8));
@@ -265,7 +277,7 @@ let () =
     eprintf "\n";
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** remove\n";
     eprintf "\n";
     run (remove (1 lsl 8));
@@ -274,7 +286,7 @@ let () =
     eprintf "\n";
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** union\n";
     eprintf "\n";
     run (union (1 lsl 8));
@@ -283,7 +295,7 @@ let () =
     eprintf "\n";
   end;
 
-  if false then begin
+  if true then begin
     eprintf "*** disjoint\n";
     eprintf "\n";
     List.iter triple [
