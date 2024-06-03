@@ -55,7 +55,7 @@ let add u =
   let module C = Add(C)(struct include P let candidate = "height/modular" end) in
   let module F = Add(F)(struct include P let candidate = "height/flat" end) in
   let module W = Add(W)(struct include P let candidate = "weight/flat" end) in
-  [ R.benchmark; C.benchmark; F.benchmark; W.benchmark ]
+  [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -90,7 +90,7 @@ let remove u =
   let module C = Remove(C)(struct include P let candidate = "height/modular" end) in
   let module F = Remove(F)(struct include P let candidate = "height/flat" end) in
   let module W = Remove(W)(struct include P let candidate = "weight/flat" end) in
-  [ R.benchmark; C.benchmark; F.benchmark; W.benchmark ]
+  [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -127,7 +127,7 @@ let union u =
   let module C = Union(C)(struct include P let candidate = "height/modular" end) in
   let module F = Union(F)(struct include P let candidate = "height/flat" end) in
   let module W = Union(W)(struct include P let candidate = "weight/flat" end) in
-  [ R.benchmark; C.benchmark; F.benchmark; W.benchmark ]
+  [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -233,7 +233,7 @@ let disjoint cm u1 u2 c =
   let module R = Disjoint(R)(struct include P let candidate = "reference" end) in
   (* let module C = Disjoint(C)(struct include P let candidate = "height/modular" end) in *)
   let module F = Disjoint(F)(struct include P let candidate = "height/flat" end) in
-  [ R.benchmark; F.benchmark ]
+  [ R.benchmark; (* C.benchmark; *) F.benchmark ]
 
 let triple (u1, u2, c) =
   eprintf "\n";
