@@ -314,17 +314,29 @@ let run_binary_benchmark (benchmark : quadruple -> B.benchmark list) =
   binary_benchmark_comment q;
   run (benchmark q)
 
+(* -------------------------------------------------------------------------- *)
+
+(* Disjointness. *)
+
 let disjoint (u1, u2, c, cm) =
   let module P = struct
-    let seed = 123
-    let n = n
-    let u1, u2, c = u1, u2, c
-    let cm = cm
+    let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
   end in
   let module R = Binary(R)(struct include P let binary = R.disjoint let candidate = "disjoint (reference)" end) in
   let module F = Binary(F)(struct include P let binary = F.disjoint let candidate = "disjoint (height/flat)" end) in
   let module W = Binary(W)(struct include P let binary = W.disjoint let candidate = "disjoint (weight/flat)" end) in
-  [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
+  [ R.benchmark; F.benchmark; W.benchmark ]
+
+(* Equality. *)
+
+let equal (u1, u2, c, cm) =
+  let module P = struct
+    let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
+  end in
+  let module R = Binary(R)(struct include P let binary = R.equal let candidate = "equal (reference)" end) in
+  let module F = Binary(F)(struct include P let binary = F.equal let candidate = "equal (height/flat)" end) in
+  let module W = Binary(W)(struct include P let binary = W.equal let candidate = "equal (weight/flat)" end) in
+  [ R.benchmark; F.benchmark; W.benchmark ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -359,9 +371,14 @@ let () =
     eprintf "\n";
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** disjoint\n";
     run_binary_benchmark disjoint
+  end;
+
+  if true then begin
+    eprintf "*** equal\n";
+    run_binary_benchmark equal
   end;
 
   ()
