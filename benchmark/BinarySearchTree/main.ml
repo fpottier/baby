@@ -337,9 +337,8 @@ let compare (u1, u2, c, cm) =
     type result = int
   end in
   let module R = Binary(R)(struct include P let binary = R.compare let candidate = "compare (reference)" end) in
-  let module W1 = Binary(W)(struct include P let binary = W.compare let candidate = "compare (weight/flat)" end) in
-  let module W2 = Binary(W)(struct include P let binary = W.xompare let candidate = "xompare (weight/flat)" end) in
-  [ R.benchmark; W1.benchmark; W2.benchmark ]
+  let module W = Binary(W)(struct include P let binary = W.compare let candidate = "compare (weight/flat)" end) in
+  [ R.benchmark; W.benchmark ]
 
 (* Equality. *)
 

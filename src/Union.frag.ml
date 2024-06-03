@@ -190,4 +190,3 @@ let rec xor (t1 : tree) (t2 : tree) : tree =
 let equal t1 t2 =
   t1 == t2 || (* fast path *)
   compare t1 t2 = 0
-  (* TODO [compare] could be optimized by using just one enumeration *)
