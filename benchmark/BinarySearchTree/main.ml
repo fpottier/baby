@@ -247,19 +247,70 @@ let disjoint cm u1 u2 c =
   let module W = Binary(W)(struct include P let binary = W.disjoint let candidate = "disjoint (weight/flat)" end) in
   [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
 
-let triple (u1, u2, c) =
+(* This emits a human-readable comment on a quadruple [u1, u2, c, cm]. *)
+
+let binary_benchmark_comment (u1, u2, c, cm) =
   eprintf "\n";
-  if u1 + u2 = 0 then eprintf "--- here, the sets are physically equal\n";
-  if u1 = 0 || u2 = 0 then eprintf "--- here, one set is a subset of the other\n";
-  if c = 0 && u1 + u2 > 0 then eprintf "--- here, the sets are disjoint\n";
-  if u1 = u2 then eprintf "--- here, the sets have the same size\n";
-  if u1 > u2 && u2 + c > 0 then eprintf "--- here, the size ratio is %d\n" ((u1 + c) / (u2 + c));
+  eprintf "--- construction method: %s\n"
+    (match cm with Common -> "common" | Separate -> "separate");
+  if u1 + u2 = 0 then eprintf "--- the sets are %s\n"
+    (match cm with Common -> "physically equal" | Separate -> "equal")
+  else begin
+    if u1 = 0 || u2 = 0 then eprintf "--- one set is a subset of the other\n";
+    if c = 0 && u1 + u2 > 0 then eprintf "--- the sets are disjoint\n";
+    if u1 = u2 then eprintf "--- the sets have the same size\n";
+    if u1 > u2 && u2 + c > 0 then eprintf "--- the size ratio is %d\n" ((u1 + c) / (u2 + c))
+  end
+
+(* This is a list of [u1, u2, c] triples. *)
+
+let binary_benchmark_data : (int * int * int) list =
+  [
+    (* No unique elements. *)
+    0, 0, 10;
+    0, 0, 100;
+    0, 0, 1000;
+    0, 0, 10000;
+    (* 10 unique elements on one side. *)
+    10, 0, 10;
+    10, 0, 100;
+    10, 0, 1000;
+    10, 0, 10000;
+    (* 10 unique elements on each side. *)
+    10, 10, 0;
+    10, 10, 10;
+    10, 10, 100;
+    10, 10, 1000;
+    10, 10, 10000;
+    (* 100 unique elements on one side. *)
+    100, 0, 10;
+    100, 0, 100;
+    100, 0, 1000;
+    100, 0, 10000;
+    (* 100 unique elements on each side. *)
+    100, 100, 0;
+    100, 100, 10;
+    100, 100, 100;
+    100, 100, 1000;
+    100, 100, 10000;
+    (* 1000 unique elements on each side. *)
+    1000, 1000, 0;
+    1000, 1000, 10;
+    1000, 1000, 100;
+    1000, 1000, 1000;
+    1000, 1000, 10000;
+    (* 10000 unique elements on each side. *)
+    10000, 10000, 0;
+    10000, 10000, 10;
+    10000, 10000, 100;
+    10000, 10000, 1000;
+    10000, 10000, 10000;
+  ]
+
+let triple (u1, u2, c) =
+  binary_benchmark_comment (u1, u2, c, Common);
   run (disjoint Common u1 u2 c);
-  if u1 + u2 = 0 then eprintf "--- here, the sets are equal\n";
-  if u1 = 0 || u2 = 0 then eprintf "--- here, one set is a subset of the other\n";
-  if c = 0 && u1 + u2 > 0 then eprintf "--- here, the sets are disjoint\n";
-  if u1 = u2 then eprintf "--- here, the sets have the same size\n";
-  if u1 > u2 && u2 + c > 0 then eprintf "--- here, the size ratio is %d\n" ((u1 + c) / (u2 + c));
+  binary_benchmark_comment (u1, u2, c, Separate);
   run (disjoint Separate u1 u2 c)
 
 (* -------------------------------------------------------------------------- *)
@@ -298,47 +349,7 @@ let () =
   if true then begin
     eprintf "*** disjoint\n";
     eprintf "\n";
-    List.iter triple [
-      (* No unique elements. *)
-      0, 0, 10;
-      0, 0, 100;
-      0, 0, 1000;
-      0, 0, 10000;
-      (* 10 unique elements on one side. *)
-      10, 0, 10;
-      10, 0, 100;
-      10, 0, 1000;
-      10, 0, 10000;
-      (* 10 unique elements on each side. *)
-      10, 10, 0;
-      10, 10, 10;
-      10, 10, 100;
-      10, 10, 1000;
-      10, 10, 10000;
-      (* 100 unique elements on one side. *)
-      100, 0, 10;
-      100, 0, 100;
-      100, 0, 1000;
-      100, 0, 10000;
-      (* 100 unique elements on each side. *)
-      100, 100, 0;
-      100, 100, 10;
-      100, 100, 100;
-      100, 100, 1000;
-      100, 100, 10000;
-      (* 1000 unique elements on each side. *)
-      1000, 1000, 0;
-      1000, 1000, 10;
-      1000, 1000, 100;
-      1000, 1000, 1000;
-      1000, 1000, 10000;
-      (* 10000 unique elements on each side. *)
-      10000, 10000, 0;
-      10000, 10000, 10;
-      10000, 10000, 100;
-      10000, 10000, 1000;
-      10000, 10000, 10000;
-    ]
+    List.iter triple binary_benchmark_data
   end;
 
   ()
