@@ -24,6 +24,10 @@ clean:
 test:
 	@ make -C test/HeightBalanced random
 
+.PHONY: bench
+bench:
+	@ make -C benchmark/BinarySearchTree test
+
 .PHONY: install
 install: all
 	@ dune install -p $(THIS)
