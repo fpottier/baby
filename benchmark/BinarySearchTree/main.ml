@@ -8,6 +8,7 @@ let run benchmarks =
 module R = Set.Make(Int)
 module C = BinarySearchTree.Make(Int)(Height.Make(Int))
 module F = HeightBalanced.Make(Int)
+module W = WeightBalanced.Make(Int)
 
 module type PARAMS = sig
   val seed : int
@@ -51,9 +52,10 @@ let add u =
     let u = u
   end in
   let module R = Add(R)(struct include P let candidate = "reference" end) in
-  let module C = Add(C)(struct include P let candidate = "new/modular" end) in
-  let module F = Add(F)(struct include P let candidate = "new/flat" end) in
-  [ R.benchmark; C.benchmark; F.benchmark ]
+  let module C = Add(C)(struct include P let candidate = "height/modular" end) in
+  let module F = Add(F)(struct include P let candidate = "height/flat" end) in
+  let module W = Add(W)(struct include P let candidate = "weight/flat" end) in
+  [ R.benchmark; C.benchmark; F.benchmark; W.benchmark ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -85,9 +87,10 @@ let remove u =
     let u = u
   end in
   let module R = Remove(R)(struct include P let candidate = "reference" end) in
-  let module C = Remove(C)(struct include P let candidate = "new/modular" end) in
-  let module F = Remove(F)(struct include P let candidate = "new/flat" end) in
-  [ R.benchmark; C.benchmark; F.benchmark ]
+  let module C = Remove(C)(struct include P let candidate = "height/modular" end) in
+  let module F = Remove(F)(struct include P let candidate = "height/flat" end) in
+  let module W = Remove(W)(struct include P let candidate = "weight/flat" end) in
+  [ R.benchmark; C.benchmark; F.benchmark; W.benchmark ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -121,9 +124,10 @@ let union u =
     let u = u
   end in
   let module R = Union(R)(struct include P let candidate = "reference" end) in
-  let module C = Union(C)(struct include P let candidate = "new/modular" end) in
-  let module F = Union(F)(struct include P let candidate = "new/flat" end) in
-  [ R.benchmark; C.benchmark; F.benchmark ]
+  let module C = Union(C)(struct include P let candidate = "height/modular" end) in
+  let module F = Union(F)(struct include P let candidate = "height/flat" end) in
+  let module W = Union(W)(struct include P let candidate = "weight/flat" end) in
+  [ R.benchmark; C.benchmark; F.benchmark; W.benchmark ]
 
 (* -------------------------------------------------------------------------- *)
 
@@ -227,8 +231,8 @@ let disjoint cm u1 u2 c =
     let cm = cm
   end in
   let module R = Disjoint(R)(struct include P let candidate = "reference" end) in
-  (* let module C = Disjoint(C)(struct include P let candidate = "new/modular" end) in *)
-  let module F = Disjoint(F)(struct include P let candidate = "new/flat" end) in
+  (* let module C = Disjoint(C)(struct include P let candidate = "height/modular" end) in *)
+  let module F = Disjoint(F)(struct include P let candidate = "height/flat" end) in
   [ R.benchmark; F.benchmark ]
 
 let triple (u1, u2, c) =
@@ -252,7 +256,7 @@ let triple (u1, u2, c) =
 
 let () =
 
-  if false then begin
+  if true then begin
     eprintf "*** add\n";
     eprintf "\n";
     run (add (1 lsl 8));
@@ -261,7 +265,7 @@ let () =
     eprintf "\n";
   end;
 
-  if false then begin
+  if true then begin
     eprintf "*** remove\n";
     eprintf "\n";
     run (remove (1 lsl 8));
@@ -270,7 +274,7 @@ let () =
     eprintf "\n";
   end;
 
-  if false then begin
+  if true then begin
     eprintf "*** union\n";
     eprintf "\n";
     run (union (1 lsl 8));
