@@ -26,6 +26,10 @@ module type BST = sig
 
   val add_min_element : key -> tree -> tree
 
+  val weight : tree -> int
+    (* If weight cannot be determined in constant time,
+       OK to always return 0. Used in fast paths in subset and equality tests. *)
+
   (* TODO not part of the minimal interface: *)
   val singleton : key -> tree
   val doubleton : key -> key -> tree

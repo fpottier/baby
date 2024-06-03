@@ -160,6 +160,19 @@ and subset (t1 : tree) (t2 : tree) : bool =
       t1 == t2 || (* fast path *)
       subset_node t1 l2 v2 r2
 
+(* In weight-balanced trees, the weight of a tree can be determined in
+   constant time. This yields a fast path: [weight t1 <= weight t2] does not
+   hold, then [subset t1 t2] returns false. In height-balanced trees, the
+   [weight] function returns a constant value, so this fast path is
+   disabled. *)
+
+(* This weight-based fast path is used only at the root. It could be used
+   again at every node, but this does not seem to be worthwhile. *)
+
+let subset (t1 : tree) (t2 : tree) : bool =
+  weight t1 <= weight t2 && (* fast path *)
+  subset t1 t2
+
 (* -------------------------------------------------------------------------- *)
 
 (* Symmetric difference. *)

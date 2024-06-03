@@ -317,6 +317,18 @@ let run_binary_benchmark (benchmark : quadruple -> B.benchmark list) =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Inclusion. *)
+
+let subset (u1, u2, c, cm) =
+  let module P = struct
+    let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
+    type result = bool
+  end in
+  let module R = Binary(R)(struct include P let binary = R.subset let candidate = "subset (reference)" end) in
+  let module F = Binary(F)(struct include P let binary = F.subset let candidate = "subset (height/flat)" end) in
+  let module W = Binary(W)(struct include P let binary = W.subset let candidate = "subset (weight/flat)" end) in
+  [ R.benchmark; F.benchmark; W.benchmark ]
+
 (* Disjointness. *)
 
 let disjoint (u1, u2, c, cm) =
@@ -385,12 +397,17 @@ let () =
     eprintf "\n";
   end;
 
+  if true then begin
+    eprintf "*** subset\n";
+    run_binary_benchmark subset
+  end;
+
   if false then begin
     eprintf "*** disjoint\n";
     run_binary_benchmark disjoint
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** compare\n";
     run_binary_benchmark compare
   end;

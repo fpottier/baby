@@ -223,5 +223,12 @@ let compare (t1 : tree) (t2 : tree) : int =
    experiments suggest that either of these approaches is more expensive
    than the following approach, which is based on [compare]. *)
 
+(* In weight-balanced trees, the weight of a tree can be determined in
+   constant time. This yields a fast path: if the weights and [t1] and [t2]
+   differ, then they cannot possibly be equal. In height-balanced trees, the
+   [weight] function returns a constant value, so this fast path is
+   disabled. *)
+
 let[@inline] equal t1 t2 =
+  weight t1 = weight t2 && (* fast path *)
   compare t1 t2 = 0

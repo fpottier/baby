@@ -41,6 +41,11 @@ module[@inline] Make (E : OrderedType) = struct
     | TNode { h; _ } ->
         h
 
+  (* The weight of a tree cannot be determined in constant time. *)
+
+  let[@inline] weight _t =
+    0
+
   (* [siblings l r] checks that [l] and [r] could be siblings in a valid
      tree. [neighbors l r] checks that [l] and [r] could be neighbors,
      that is, siblings where one tree has been disturbed by removing or
