@@ -1,5 +1,7 @@
 # To Do
 
+* Remove all TODOs in the code.
+
 * Reduce the duplication between HeightBalanced, WeightBalanced,
   and the general case.
 
@@ -17,7 +19,7 @@
 
 * Test `Enum`.
 
-* Test.
+* Test. Eliminate the duplication between the tests in Height/Weight.
 
 * Benchmark.
 
