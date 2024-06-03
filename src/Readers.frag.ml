@@ -21,7 +21,7 @@ let rec elements (t : tree) (k : elt list) : elt list =
   | NODE(l, v, r) ->
       elements l (v :: elements r k)
 
-let elements (t : tree) : elt list =
+let[@inline] elements (t : tree) : elt list =
   elements t []
 
 (* -------------------------------------------------------------------------- *)
@@ -223,5 +223,5 @@ let compare (t1 : tree) (t2 : tree) : int =
    experiments suggest that either of these approaches is more expensive
    than the following approach, which is based on [compare]. *)
 
-let equal t1 t2 =
+let[@inline] equal t1 t2 =
   compare t1 t2 = 0
