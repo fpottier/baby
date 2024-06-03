@@ -30,14 +30,13 @@ module[@inline] Make (E : OrderedType) = struct
     | TNode of { l : tree; v : key; r : tree; w : int }
 
   (* This macro destructs a tree [t] that is known not to be a leaf. *)
-  (* TODO use this macro in Height.cppo.ml, too *)
 
   #define DESTRUCT(t,tl,tv,tr) \
     match t with \
     | TLeaf -> impossible() \
     | TNode { l = tl; v = tv; r = tr; _ }
 
-  (* [weight t] reads the weight of the tree [t]. *)
+  (* [weight t] reads and returns the weight of the tree [t]. *)
 
   let[@inline] weight t =
     match t with
