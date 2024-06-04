@@ -57,8 +57,11 @@ let join2_siblings (l : tree) (r : tree) : tree =
       l
   | LEAF, _ ->
       r
-  | _, _ ->
-      join_neighbors l (min_elt r) (remove_min_elt r)
+  | _, NODE(rl, rv, rr) ->
+      join_neighbors
+        l
+        (min_elt_1 rv rl)           (* same as [min_elt r] *)
+        (remove_min_elt_1 rl rv rr) (* same as [remove_min_elt r] *)
 
 (* This is removal in the style of BFS. *)
 

@@ -60,5 +60,8 @@ let join2 (l : tree) (r : tree) : tree =
       r
   | _, LEAF ->
       l
-  | _, _ ->
-      join l (min_elt r) (remove_min_elt r)
+  | _, NODE(rl, rv, rr) ->
+      join
+        l
+        (min_elt_1 rv rl)           (* same as [min_elt r] *)
+        (remove_min_elt_1 rl rv rr) (* same as [remove_min_elt r] *)
