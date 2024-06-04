@@ -253,48 +253,35 @@ let binary_benchmark_comment (u1, u2, c, cm) =
 
 (* This is a list of [u1, u2, c] triples. *)
 
+let aux u =
+  [
+    (* [u] unique elements on the left. *)
+    u, 0, 10;
+    u, 0, 100;
+    u, 0, 1000;
+    u, 0, 10000;
+    (* [u] unique elements on the right. *)
+    0, u, 10;
+    0, u, 100;
+    0, u, 1000;
+    0, u, 10000;
+    (* [u] unique elements on each side. *)
+    u, u, 0;
+    u, u, 10;
+    u, u, 100;
+    u, u, 1000;
+    u, u, 10000;
+  ]
+
 let binary_benchmark_data : (int * int * int) list =
   [
     (* No unique elements. *)
     0, 0, 10;
-    0, 0, 100;
-    0, 0, 1000;
     0, 0, 10000;
-    (* 10 unique elements on one side. *)
-    10, 0, 10;
-    10, 0, 100;
-    10, 0, 1000;
-    10, 0, 10000;
-    (* 10 unique elements on each side. *)
-    10, 10, 0;
-    10, 10, 10;
-    10, 10, 100;
-    10, 10, 1000;
-    10, 10, 10000;
-    (* 100 unique elements on one side. *)
-    100, 0, 10;
-    100, 0, 100;
-    100, 0, 1000;
-    100, 0, 10000;
-    (* 100 unique elements on each side. *)
-    100, 100, 0;
-    100, 100, 10;
-    100, 100, 100;
-    100, 100, 1000;
-    100, 100, 10000;
-    (* 1000 unique elements on each side. *)
-    1000, 1000, 0;
-    1000, 1000, 10;
-    1000, 1000, 100;
-    1000, 1000, 1000;
-    1000, 1000, 10000;
-    (* 10000 unique elements on each side. *)
-    10000, 10000, 0;
-    10000, 10000, 10;
-    10000, 10000, 100;
-    10000, 10000, 1000;
-    10000, 10000, 10000;
-  ]
+  ] @
+  aux 10 @
+  aux 10000 @
+  []
 
 (* This is a list of [u1, u2, c, cm] quadruples. *)
 
