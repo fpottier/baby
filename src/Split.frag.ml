@@ -31,6 +31,11 @@ let rec split2 (k : key) (t : tree) : tree * tree =
         let rl, rr = split2 k r in
         join l m rl, rr
 
+(* [join2] is known as [concat] in OCaml's Set library. *)
+
+(* This is the code proposed by BFS. Their [split_last] function
+   corresponds to our functions [min_elt] and [remove_min_elt_1].
+
 let rec split_last (l : tree) (k : key) (r : tree) : tree * key =
   match VIEW(r) with
   | LEAF ->
@@ -39,8 +44,6 @@ let rec split_last (l : tree) (k : key) (r : tree) : tree * key =
       let r, m = split_last l' k' r' in
       join l k r, m
 
-(* [join2] is known as [concat] in OCaml's Set library. *)
-
 let join2 (l : tree) (r : tree) : tree =
   match VIEW(l) with
   | LEAF ->
@@ -48,3 +51,14 @@ let join2 (l : tree) (r : tree) : tree =
   | NODE(ll, m, lr) ->
       let l', k = split_last ll m lr in
       join l' k r
+
+ *)
+
+let join2 (l : tree) (r : tree) : tree =
+  match VIEW(l), VIEW(r) with
+  | LEAF, _ ->
+      r
+  | _, LEAF ->
+      l
+  | _, _ ->
+      join l (min_elt r) (remove_min_elt r)
