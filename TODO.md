@@ -7,10 +7,15 @@
 
 * Benchmark weight-balanced trees. (Vary α.)
 
-* Look at `split_last` and `join2`,
-  because OCaml's `concat` is implemented in a different way.
+* Why is my `inter` slower than the reference?
 
 * Could preserve sharing in `union` and `inter`.
+
+* Should `inter`, `union`, etc. have a fast path based on
+  physical equality?
+
+* Is the complexity of `subset` and `disjoint` correct?
+  Benchmark at large sizes.
 
 * Weight balance gives gives us constant-time cardinal,
   random access and splitting by index.
