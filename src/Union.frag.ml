@@ -21,7 +21,7 @@ let rec union (t1 : tree) (t2 : tree) : tree =
       t1
   | NODE(_, k1, _), NODE(l2, k2, r2) ->
       if is_singleton t1 then add k1 t2 else
-      let l1, r1 = split2 k2 t1 in
+      let l1, r1 = split13 k2 t1 in
       let l = union l1 l2
       and r = union r1 r2 in
       join l k2 r
@@ -119,7 +119,7 @@ let rec diff (t1 : tree) (t2 : tree) : tree =
   | _, LEAF ->
       t1
   | NODE(_, _, _), NODE(l2, k2, r2) ->
-      let l1, r1 = split2 k2 t1 in
+      let l1, r1 = split13 k2 t1 in
       let l = diff l1 l2
       and r = diff r1 r2 in
       join2 l r

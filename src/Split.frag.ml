@@ -13,10 +13,10 @@ let rec split (k : key) (t : tree) : tree * bool * tree =
         let rl, b, rr = split k r in
         join l m rl, b, rr
 
-(* [split2] is a variant of [split] that returns a pair of subtrees. Compared
+(* [split13] is a variant of [split] that returns a pair of subtrees. Compared
    with [split], the Boolean component of the result is dropped. *)
 
-let rec split2 (k : key) (t : tree) : tree * tree =
+let rec split13 (k : key) (t : tree) : tree * tree =
   match VIEW(t) with
   | LEAF ->
       leaf, leaf
@@ -25,10 +25,10 @@ let rec split2 (k : key) (t : tree) : tree * tree =
       if c = 0 then
         l, r
       else if c < 0 then
-        let ll, lr = split2 k l in
+        let ll, lr = split13 k l in
         ll, join lr m r
       else
-        let rl, rr = split2 k r in
+        let rl, rr = split13 k r in
         join l m rl, rr
 
 (* [join2] is known as [concat] in OCaml's Set library. *)
