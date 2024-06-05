@@ -13,8 +13,6 @@
 * In `join2` and `join2_siblings`,
   could choose a side based on which tree seems smaller.
 
-* Could better preserve sharing in `union`, `diff`, `xor`.
-
 * Is the complexity of `subset` and `disjoint` correct?
   Benchmark at large sizes.
 
