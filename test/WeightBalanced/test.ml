@@ -118,6 +118,9 @@ let () =
   let spec = set in
   declare "empty" spec R.empty C.empty;
 
+  let spec = value ^> set in
+  declare "singleton" spec R.singleton C.singleton;
+
   (* not tested: [is_empty] *)
 
   let spec = set ^!> value in

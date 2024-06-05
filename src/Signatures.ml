@@ -47,6 +47,7 @@ module type SET = sig
   val check : set -> unit
   val empty : set
   val is_empty : set -> bool
+  val singleton : elt -> t
   val min_elt : set -> elt
   val min_elt_opt : set -> elt option
   val max_elt : set -> elt
