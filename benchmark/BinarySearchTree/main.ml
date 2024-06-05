@@ -102,43 +102,6 @@ let remove u =
 
 (* -------------------------------------------------------------------------- *)
 
-(* Union benchmark. *)
-
-module Union (S : sig
-  type t
-  val empty : t
-  val add : int -> t -> t
-  val union : t -> t -> t
-end) (P : PARAMS) = struct
-  open P
-  open S
-  let () = Random.init seed
-  let basis = n
-  let rec multiples_from k a =
-    if a < u then add a (multiples_from k (a+k)) else empty
-  let multiples k = multiples_from k 0
-  let a = Array.init n (fun k -> multiples (k+5))
-  let name = sprintf "union (universe size %d) (%s)" u candidate
-  let run () () =
-    Array.fold_left union empty a
-    |> ignore
-  let benchmark = B.benchmark ~name ~quota ~basis ~run
-end
-
-let ad_hoc_union u =
-  let module P = struct
-    let seed = 123
-    let n = n
-    let u = u
-  end in
-  let module R = Union(R)(struct include P let candidate = "reference" end) in
-  let module C = Union(C)(struct include P let candidate = "height/modular" end) in
-  let module F = Union(F)(struct include P let candidate = "height/flat" end) in
-  let module W = Union(W)(struct include P let candidate = "weight/flat" end) in
-  [ R.benchmark; (* C.benchmark; *) F.benchmark; W.benchmark ]
-
-(* -------------------------------------------------------------------------- *)
-
 (* A benchmark for all operations that take two sets as arguments:
    [union], [inter], [diff], [xor], [subset], [equal], [compare],
    etc. *)
@@ -405,6 +368,57 @@ let equal (u1, u2, c, cm) =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Synthetic benchmarks. *)
+
+module Eratosthenes (S : sig
+  type t
+  val empty : t
+  val add : int -> t -> t
+  val diff : t -> t -> t
+  val union : t -> t -> t
+end) (P : sig
+  val u : int
+  val candidate : string
+end) = struct
+  open S
+  open P
+  let basis = 1
+  let rec multiples_from k a =
+    if a < u then add a (multiples_from k (a+k)) else empty
+  let multiples k : t =
+    multiples_from k 0
+  let rec foreach f i j accu =
+    if i < j then foreach f (i+1) j (f i accu) else accu
+  let interval i j : t =
+    foreach add i j empty
+
+  let name = sprintf "eratosthenes/diff (universe size %d) (%s)" u candidate
+  let run () () =
+    (* Eratosthenes in one line! Starting from all numbers in the interval
+       [0, u), for each [k], remove the multiples of [k]. *)
+    foreach (fun k s -> diff s (multiples k)) 2 u (interval 0 u)
+    |> ignore
+  let benchmark1 = B.benchmark ~name ~quota ~basis ~run
+
+  let name = sprintf "eratosthenes/union (universe size %d) (%s)" u candidate
+  let run () () =
+    (* Starting from nothing, for each [k], add the multiples of [k]. *)
+    foreach (fun k s -> union s (multiples k)) 2 u empty
+    |> ignore
+  let benchmark2 = B.benchmark ~name ~quota ~basis ~run
+
+end
+
+let eratosthenes u =
+  let module P = struct let u = u end in
+  let module R = Eratosthenes(R)(struct include P let candidate = "reference" end) in
+  let module F = Eratosthenes(F)(struct include P let candidate = "height/flat" end) in
+  let module W = Eratosthenes(W)(struct include P let candidate = "weight/flat" end) in
+  [ R.benchmark1; F.benchmark1; W.benchmark1;
+    R.benchmark2; F.benchmark2; W.benchmark2; ]
+
+(* -------------------------------------------------------------------------- *)
+
 (* Main. *)
 
 let () =
@@ -429,15 +443,6 @@ let () =
 
   if false then begin
     eprintf "*** union\n";
-    eprintf "\n";
-    run (ad_hoc_union (1 lsl 8));
-    eprintf "\n";
-    run (ad_hoc_union (1 lsl 16));
-    eprintf "\n";
-  end;
-
-  if false then begin
-    eprintf "*** union\n";
     run_binary_benchmark union
   end;
 
@@ -451,7 +456,7 @@ let () =
     run_binary_benchmark diff
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** xor\n";
     run_binary_benchmark xor
   end;
@@ -474,6 +479,18 @@ let () =
   if false then begin
     eprintf "*** equal\n";
     run_binary_benchmark equal
+  end;
+
+  if true then begin
+    eprintf "*** eratosthenes\n";
+    eprintf "\n";
+    run (eratosthenes 100);
+    eprintf "\n";
+    run (eratosthenes 1000);
+    eprintf "\n";
+    run (eratosthenes 10000);
+    eprintf "\n";
+    run (eratosthenes 100000)
   end;
 
   ()
