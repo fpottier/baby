@@ -1,3 +1,5 @@
+(* [split] is implemented in the same way in OCaml's Set library and by BFS. *)
+
 let rec split (k : key) (t : tree) : tree * bool * tree =
   match VIEW(t) with
   | LEAF ->
@@ -13,8 +15,11 @@ let rec split (k : key) (t : tree) : tree * bool * tree =
         let rl, b, rr = split k r in
         join l m rl, b, rr
 
-(* [split13] is a variant of [split] that returns a pair of subtrees. Compared
-   with [split], the Boolean component of the result is dropped. *)
+(* A specialized version of [split] that returns just the Boolean component
+   of the result is [mem]. *)
+
+(* [split13] is a variant of [split] that returns only the first and third
+   components of the result. *)
 
 let rec split13 (k : key) (t : tree) : tree * tree =
   match VIEW(t) with
