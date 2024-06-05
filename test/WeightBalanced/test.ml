@@ -128,7 +128,7 @@ let () =
 
   (* Specifically remove a value that is in the set. *)
   let spec = set ^>> fun s -> (inhabits s) ^> set in
-  declare "remove" spec (flip R.remove) (flip C.remove);
+  declare "flip remove" spec (flip R.remove) (flip C.remove);
 
   let spec = set ^!> set in
   declare "remove_min_elt" spec R.remove_min_elt C.remove_min_elt;
@@ -184,7 +184,9 @@ let () =
 
 let () =
   let prologue () =
-    dprintf "          open Bbst.WeightBalanced.Make(Int);;\n"
+    dprintf "          open Bbst.WeightBalanced.Make(Int);;\n";
+    dprintf "          let flip f x y = f y x;;\n";
+    ()
   in
   let fuel = 16 in
   main ~prologue fuel
