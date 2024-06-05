@@ -126,6 +126,63 @@ let union t1 t2 =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Difference. *)
+
+(* This is a simple, elegant version of [diff]. This version splits the
+   tree [t1].
+
+let rec diff (t1 : tree) (t2 : tree) : tree =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _ ->
+      leaf
+  | _, LEAF ->
+      t1
+  | NODE(_, _, _), NODE(l2, k2, r2) ->
+      let l1, r1 = split13 k2 t1 in
+      let l = diff l1 l2
+      and r = diff r1 r2 in
+      join2 l r
+
+ *)
+
+(* This version of [diff] guarantees that if the result is equal to [t1]
+   then [t1] itself is returned. *)
+
+let rec diff (t1 : tree) (t2 : tree) : tree =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _ ->
+      leaf
+  | _, LEAF ->
+      t1
+  | NODE(l1, k1, r1), NODE(_, _, _) ->
+      if t1 == t2 then leaf else (* fast path *)
+      let l2, b, r2 = split k1 t2 in
+      let l = diff l1 l2
+      and r = diff r1 r2 in
+      if b then
+        join2 l r
+      else
+        if l == l1 && r == r1 then t1 else (* preserve sharing *)
+        join l k1 r
+
+(* -------------------------------------------------------------------------- *)
+
+(* Symmetric difference. *)
+
+let rec xor (t1 : tree) (t2 : tree) : tree =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _ ->
+      t2
+  | _, LEAF ->
+      t1
+  | NODE(_, _, _), NODE(l2, k2, r2) ->
+      let l1, b, r1 = split k2 t1 in
+      let l = xor l1 l2
+      and r = xor r1 r2 in
+      if b then join2 l r else join l k2 r
+
+(* -------------------------------------------------------------------------- *)
+
 (* Disjointness. *)
 
 (* This simple version of [disjoint] has the same structure as [inter]. *)
@@ -181,47 +238,6 @@ and disjoint (t1 : tree) (t2 : tree) : bool =
 
 (* -------------------------------------------------------------------------- *)
 
-(* Difference. *)
-
-(* This is a simple, elegant version of [diff]. This version splits the
-   tree [t1].
-
-let rec diff (t1 : tree) (t2 : tree) : tree =
-  match VIEW(t1), VIEW(t2) with
-  | LEAF, _ ->
-      leaf
-  | _, LEAF ->
-      t1
-  | NODE(_, _, _), NODE(l2, k2, r2) ->
-      let l1, r1 = split13 k2 t1 in
-      let l = diff l1 l2
-      and r = diff r1 r2 in
-      join2 l r
-
- *)
-
-(* This version of [diff] guarantees that if the result is equal to [t1]
-   then [t1] itself is returned. *)
-
-let rec diff (t1 : tree) (t2 : tree) : tree =
-  match VIEW(t1), VIEW(t2) with
-  | LEAF, _ ->
-      leaf
-  | _, LEAF ->
-      t1
-  | NODE(l1, k1, r1), NODE(_, _, _) ->
-      if t1 == t2 then leaf else (* fast path *)
-      let l2, b, r2 = split k1 t2 in
-      let l = diff l1 l2
-      and r = diff r1 r2 in
-      if b then
-        join2 l r
-      else
-        if l == l1 && r == r1 then t1 else (* preserve sharing *)
-        join l k1 r
-
-(* -------------------------------------------------------------------------- *)
-
 (* Inclusion. *)
 
 (* This version of [subset] has the same structure as [disjoint] above.
@@ -268,19 +284,3 @@ and subset (t1 : tree) (t2 : tree) : bool =
 let subset (t1 : tree) (t2 : tree) : bool =
   weight t1 <= weight t2 && (* fast path *)
   subset t1 t2
-
-(* -------------------------------------------------------------------------- *)
-
-(* Symmetric difference. *)
-
-let rec xor (t1 : tree) (t2 : tree) : tree =
-  match VIEW(t1), VIEW(t2) with
-  | LEAF, _ ->
-      t2
-  | _, LEAF ->
-      t1
-  | NODE(_, _, _), NODE(l2, k2, r2) ->
-      let l1, b, r1 = split k2 t1 in
-      let l = xor l1 l2
-      and r = xor r1 r2 in
-      if b then join2 l r else join l k2 r
