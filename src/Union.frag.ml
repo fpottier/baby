@@ -154,16 +154,20 @@ let rec diff (t1 : tree) (t2 : tree) : tree =
       leaf
   | _, LEAF ->
       t1
-  | NODE(l1, k1, r1), NODE(_, _, _) ->
+  | NODE(l1, k1, r1), NODE(_, k2, _) ->
+      (* TODO test [is_singleton t1] *)
       if t1 == t2 then leaf else (* fast path *)
-      let l2, b, r2 = split k1 t2 in
-      let l = diff l1 l2
-      and r = diff r1 r2 in
-      if b then
-        join2 l r
+      if is_singleton t2 then
+        remove k2 t1
       else
-        if l == l1 && r == r1 then t1 else (* preserve sharing *)
-        join l k1 r
+        let l2, b, r2 = split k1 t2 in
+        let l = diff l1 l2
+        and r = diff r1 r2 in
+        if b then
+          join2 l r
+        else
+          if l == l1 && r == r1 then t1 else (* preserve sharing *)
+          join l k1 r
 
 (* -------------------------------------------------------------------------- *)
 
