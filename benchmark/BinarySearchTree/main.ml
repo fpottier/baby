@@ -326,6 +326,17 @@ let inter (u1, u2, c, cm) =
   let module W = Binary(W)(struct include P let binary = W.inter type result = W.t let candidate = "inter (weight/flat)" end) in
   [ R.benchmark; F.benchmark; W.benchmark ]
 
+(* Difference. *)
+
+let diff (u1, u2, c, cm) =
+  let module P = struct
+    let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
+  end in
+  let module R = Binary(R)(struct include P let binary = R.diff type result = R.t let candidate = "diff (reference)" end) in
+  let module F = Binary(F)(struct include P let binary = F.diff type result = F.t let candidate = "diff (height/flat)" end) in
+  let module W = Binary(W)(struct include P let binary = W.diff type result = W.t let candidate = "diff (weight/flat)" end) in
+  [ R.benchmark; F.benchmark; W.benchmark ]
+
 (* Inclusion. *)
 
 let subset (u1, u2, c, cm) =
@@ -397,7 +408,7 @@ let () =
     eprintf "\n";
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** union\n";
     eprintf "\n";
     run (ad_hoc_union (1 lsl 8));
@@ -406,7 +417,7 @@ let () =
     eprintf "\n";
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** union\n";
     run_binary_benchmark union
   end;
@@ -414,6 +425,11 @@ let () =
   if false then begin
     eprintf "*** inter\n";
     run_binary_benchmark inter
+  end;
+
+  if false then begin
+    eprintf "*** diff\n";
+    run_binary_benchmark diff
   end;
 
   if false then begin
