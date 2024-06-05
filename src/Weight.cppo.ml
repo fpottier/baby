@@ -152,7 +152,7 @@ module[@inline] Make (E : OrderedType) = struct
     | _, TLeaf ->
         false
     | TNode { w = w1; _ }, TNode { w = w2; _ } ->
-        w1 <= w2
+        w1 < w2
 
   (* A left rotation. *)
 

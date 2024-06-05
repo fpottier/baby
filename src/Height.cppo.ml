@@ -115,7 +115,7 @@ module[@inline] Make (E : OrderedType) = struct
     | _, TLeaf ->
         false
     | TNode { h = h1; _ }, TNode { h = h2; _ } ->
-        h1 <= h2
+        h1 < h2
 
   (* [bal l v r] requires [l < v < r]. It constructs a node with left child
      [l], value [v], and right child [r]. The subtrees [l] and [r] must be
