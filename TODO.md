@@ -7,19 +7,13 @@
 
 * Benchmark weight-balanced trees. (Vary α.)
 
-* Why is my `inter` sometimes slower than the reference?
-  The only difference seems to be which tree is split
-    (the arguments are exchanged!).
-  This suggests that maybe we should choose which tree we split
-  based on its apparent size. And (when trying to preserve sharing)
-  we should choose which tree we try to preserve, based on its
-  apparent size.
+* Having `is_singleton` read the children (as opposed to the height or weight)
+  might result overall in more efficient union, intersection, etc. Benchmark.
 
-* Could preserve sharing in `union` and `inter`.
+* In `join2` and `join2_siblings`,
+  could choose a side based on which tree seems smaller.
 
-* Should `inter`, `union`, etc. have a fast path based on physical equality?
-  (I.e., if the arguments are physically equal then there is nothing to do.)
-  Should this fast path be used only at the top level or also in depth?
+* Could better preserve sharing in `union`, `diff`, `xor`.
 
 * Is the complexity of `subset` and `disjoint` correct?
   Benchmark at large sizes.
