@@ -8,9 +8,9 @@ module C = struct
 
   include Bbst.WeightBalanced.Make(V)
 
-  (* [union] and [inter] guarantee the following property, which claims
-     that if the result is logically equal to one of the arguments then
-     it is physically equal to one of the arguments. *)
+  (* [union] and [inter] guarantee that if the result is logically equal
+     to one of the arguments then it is physically equal to one of the
+     arguments. *)
 
   (* This guarantee holds for weight-balanced trees, but not for
      height-balanced trees; indeed, a reliable way of comparing
@@ -26,6 +26,15 @@ module C = struct
     let result = inter t1 t2 in
     if equal result t1 || equal result t2 then
       assert (result == t1 || result == t2);
+    result
+
+  (* [diff] guarantees that if the result is logically equal to [t1]
+     then it is physically equal to [t1]. This holds regardless of
+     which balancing criterion is used. *)
+
+  let[@inline] diff t1 t2 =
+    let result = diff t1 t2 in
+    if equal result t1 then assert(result == t1);
     result
 
 end
