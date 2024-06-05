@@ -117,7 +117,7 @@ end) (P : PARAMS) = struct
   let benchmark = B.benchmark ~name ~quota ~basis ~run
 end
 
-let union u =
+let ad_hoc_union u =
   let module P = struct
     let seed = 123
     let n = n
@@ -304,6 +304,17 @@ let run_binary_benchmark (benchmark : quadruple -> B.benchmark list) =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Union. *)
+
+let union (u1, u2, c, cm) =
+  let module P = struct
+    let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
+  end in
+  let module R = Binary(R)(struct include P let binary = R.union type result = R.t let candidate = "union (reference)" end) in
+  let module F = Binary(F)(struct include P let binary = F.union type result = F.t let candidate = "union (height/flat)" end) in
+  let module W = Binary(W)(struct include P let binary = W.union type result = W.t let candidate = "union (weight/flat)" end) in
+  [ R.benchmark; F.benchmark; W.benchmark ]
+
 (* Intersection. *)
 
 let inter (u1, u2, c, cm) =
@@ -312,8 +323,8 @@ let inter (u1, u2, c, cm) =
   end in
   let module R = Binary(R)(struct include P let binary = R.inter type result = R.t let candidate = "inter (reference)" end) in
   let module F = Binary(F)(struct include P let binary = F.inter type result = F.t let candidate = "inter (height/flat)" end) in
-  let module W1 = Binary(W)(struct include P let binary = W.inter type result = W.t let candidate = "inter (weight/flat)" end) in
-  [ R.benchmark; F.benchmark; W1.benchmark ]
+  let module W = Binary(W)(struct include P let binary = W.inter type result = W.t let candidate = "inter (weight/flat)" end) in
+  [ R.benchmark; F.benchmark; W.benchmark ]
 
 (* Inclusion. *)
 
@@ -386,16 +397,21 @@ let () =
     eprintf "\n";
   end;
 
-  if false then begin
+  if true then begin
     eprintf "*** union\n";
     eprintf "\n";
-    run (union (1 lsl 8));
+    run (ad_hoc_union (1 lsl 8));
     eprintf "\n";
-    run (union (1 lsl 16));
+    run (ad_hoc_union (1 lsl 16));
     eprintf "\n";
   end;
 
   if true then begin
+    eprintf "*** union\n";
+    run_binary_benchmark union
+  end;
+
+  if false then begin
     eprintf "*** inter\n";
     run_binary_benchmark inter
   end;
