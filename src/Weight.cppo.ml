@@ -164,6 +164,7 @@ module[@inline] Make (E : OrderedType) = struct
      this new tree to be well-formed, [l] and [rl] must have like weights, and
      the combined weights of [l] and [rl] must be like the weight of [rr]. *)
 
+  (* TODO add [@inline] annotations *)
   let raw_rotate_left l v r =
     DESTRUCT(r, rl, rv, rr) ->
     raw_create (create l v rl) rv rr
