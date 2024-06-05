@@ -5,7 +5,15 @@ module B = Common.Benchmark
 let run benchmarks =
   List.iter B.drive_and_display benchmarks
 
-module R = Set.Make(Int)
+module R = struct
+
+  include Set.Make(Int)
+
+  let xor s1 s2 =
+    union (diff s1 s2) (diff s2 s1)
+
+end
+
 module C = BinarySearchTree.Make(Int)(Height.Make(Int))
 module F = HeightBalanced.Make(Int)
 module W = WeightBalanced.Make(Int)
@@ -337,6 +345,17 @@ let diff (u1, u2, c, cm) =
   let module W = Binary(W)(struct include P let binary = W.diff type result = W.t let candidate = "diff (weight/flat)" end) in
   [ R.benchmark; F.benchmark; W.benchmark ]
 
+(* Symmetric difference. *)
+
+let xor (u1, u2, c, cm) =
+  let module P = struct
+    let seed, n, u1, u2, c, cm = 123, n, u1, u2, c, cm
+  end in
+  let module R = Binary(R)(struct include P let binary = R.xor type result = R.t let candidate = "xor (reference)" end) in
+  let module F = Binary(F)(struct include P let binary = F.xor type result = F.t let candidate = "xor (height/flat)" end) in
+  let module W = Binary(W)(struct include P let binary = W.xor type result = W.t let candidate = "xor (weight/flat)" end) in
+  [ R.benchmark; F.benchmark; W.benchmark ]
+
 (* Inclusion. *)
 
 let subset (u1, u2, c, cm) =
@@ -430,6 +449,11 @@ let () =
   if false then begin
     eprintf "*** diff\n";
     run_binary_benchmark diff
+  end;
+
+  if true then begin
+    eprintf "*** xor\n";
+    run_binary_benchmark xor
   end;
 
   if false then begin
