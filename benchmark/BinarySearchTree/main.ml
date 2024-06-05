@@ -417,6 +417,41 @@ let eratosthenes u =
   [ R.benchmark1; F.benchmark1; W.benchmark1;
     R.benchmark2; F.benchmark2; W.benchmark2; ]
 
+module SillyFixedPoint (S : sig
+  type t
+  val empty : t
+  val singleton : int -> t
+  val union : t -> t -> t
+end) (P : sig
+  val u : int
+  val seed : int
+  val candidate : string
+end) = struct
+  open S
+  open P
+  let () = Random.init seed
+  let basis = 1
+  let name = sprintf "silly fixed point (universe size %d) (%s)" u candidate
+  let run () =
+    let p = 4*u in
+    let i = Array.init p (fun _ -> Random.int u) in
+    let j  = Array.init p (fun _ -> Random.int u) in
+    fun () ->
+      let a = Array.init u @@ singleton in
+      for k = 0 to p-1 do
+        let i = i.(k) and j = j.(k) in
+        a.(i) <- union a.(i) a.(j)
+      done
+  let benchmark = B.benchmark ~name ~quota ~basis ~run
+end
+
+let silly_fixed_point u =
+  let module P = struct let seed, u = 42, u end in
+  let module R = SillyFixedPoint(R)(struct include P let candidate = "reference" end) in
+  let module F = SillyFixedPoint(F)(struct include P let candidate = "height/flat" end) in
+  let module W = SillyFixedPoint(W)(struct include P let candidate = "weight/flat" end) in
+  [ R.benchmark; F.benchmark; W.benchmark ]
+
 (* -------------------------------------------------------------------------- *)
 
 (* Main. *)
@@ -481,7 +516,7 @@ let () =
     run_binary_benchmark equal
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** eratosthenes\n";
     eprintf "\n";
     run (eratosthenes 100);
@@ -491,6 +526,18 @@ let () =
     run (eratosthenes 10000);
     eprintf "\n";
     run (eratosthenes 100000)
+  end;
+
+  if true then begin
+    eprintf "*** silly fixed point\n";
+    eprintf "\n";
+    run (silly_fixed_point 100);
+    eprintf "\n";
+    run (silly_fixed_point 1000);
+    eprintf "\n";
+    run (silly_fixed_point 10000);
+    eprintf "\n";
+    run (silly_fixed_point 100000)
   end;
 
   ()
