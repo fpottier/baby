@@ -57,8 +57,17 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
 
  *)
 
-(* We wish to ensure that if the result is equal to [t2]
-   then the result is physically equal to [t2]. *)
+(* The recursive function [inter] ensures that if the result is
+   equal to [t2] then the result is physically equal to [t2]. *)
+
+(* Compared with the simple version (above),
+
+   + there is a fast path for the case where [t1 == t2] holds;
+   + there is specialized code for the case where [t2] is a
+     singleton; in that case there is no need to use [split];
+   + the code guarantees that if the result is equal to [t2]
+     then [t2] itself is returned. *)
+
 let rec inter (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _
@@ -82,6 +91,13 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
           join l k2 r
         else
           join2 l r
+
+(* This toplevel wrapper serves two purposes. First, it contains a fast path
+   for the case where [t1 == t2] holds. Second, it tests which of the two
+   arguments seems smaller. (With weight-balanced trees, this is an exact
+   test. With height-balanced trees, it is a heuristic test.) This argument,
+   one may hope, might also be the result. Therefore, the recursive function
+   [inter] (above) is invoked with this argument as its second argument. *)
 
 let inter t1 t2 =
   if t1 == t2 then t1 else (* fast path *)
