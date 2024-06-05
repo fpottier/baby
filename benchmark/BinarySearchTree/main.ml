@@ -312,8 +312,8 @@ let inter (u1, u2, c, cm) =
   end in
   let module R = Binary(R)(struct include P let binary = R.inter type result = R.t let candidate = "inter (reference)" end) in
   let module F = Binary(F)(struct include P let binary = F.inter type result = F.t let candidate = "inter (height/flat)" end) in
-  let module W = Binary(W)(struct include P let binary = W.inter type result = W.t let candidate = "inter (weight/flat)" end) in
-  [ R.benchmark; F.benchmark; W.benchmark ]
+  let module W1 = Binary(W)(struct include P let binary = W.inter type result = W.t let candidate = "inter (weight/flat)" end) in
+  [ R.benchmark; F.benchmark; W1.benchmark ]
 
 (* Inclusion. *)
 

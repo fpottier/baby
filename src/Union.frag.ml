@@ -42,6 +42,8 @@ let union (t1 : tree) (t2 : tree) : tree =
 
 (* Intersection. *)
 
+(* This is the simple, elegant version of [inter] given by BFS.
+
 let rec inter (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _
@@ -52,6 +54,41 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
       let l = inter l1 l2
       and r = inter r1 r2 in
       if b then join l k2 r else join2 l r
+
+ *)
+
+(* We wish to ensure that if the result is equal to [t2]
+   then the result is physically equal to [t2]. *)
+let rec inter (t1 : tree) (t2 : tree) : tree =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _
+  | _, LEAF ->
+      leaf
+  | NODE(_, _, _), NODE(l2, k2, r2) ->
+      if t1 == t2 then t2 else (* fast path *)
+      if is_singleton t2 then
+        (* The tree [t2] is [singleton k2]. *)
+        if mem k2 t1 then t2 else leaf
+      else
+        (* At least one of the subtrees [l2] and [r2] is nonempty. We
+           could specialize the following code for the cases where one
+           of them is empty, but the performance gain (a few percent)
+           is not worth the extra complexity. *)
+        let l1, b, r1 = split k2 t1 in
+        let l = inter l1 l2
+        and r = inter r1 r2 in
+        if b then
+          if l == l2 && r == r2 then t2 else (* preserve sharing *)
+          join l k2 r
+        else
+          join2 l r
+
+let inter t1 t2 =
+  if t1 == t2 then t1 else (* fast path *)
+  if seems_smaller t1 t2 then
+    inter t2 t1
+  else
+    inter t1 t2
 
 (* -------------------------------------------------------------------------- *)
 
