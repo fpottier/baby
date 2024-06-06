@@ -61,16 +61,14 @@ module[@inline] Make (E : OrderedType) = struct
      their experiments. *)
 
   let alpha =
-    0.29 (* TODO try various values *)
+    29 (* in percent *)
 
   (* [siblings l r] checks that [l] and [r] could be siblings in a valid
      tree. *)
 
   let[@inline] like_weights wl wr =
-    let wt = wl + wr in
-    let ratio = float wl /. float wt in
-    alpha <= ratio && ratio <= 1.0 -. alpha
-    (* TODO can be implemented using integer computations *)
+    alpha * wr <= (100-alpha) * wl &&
+    alpha * wl <= (100-alpha) * wr
 
   let[@inline] siblings l r =
     like_weights (weight l) (weight r)
