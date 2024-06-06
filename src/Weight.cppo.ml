@@ -149,7 +149,7 @@ module[@inline] Make (E : OrderedType) = struct
 
   let[@inline] rotate_left l v r =
     DESTRUCT(r, rl, rv, rr) ->
-    (* TODO once tested,remove these redundant assertions *)
+    (* TODO once tested, remove these redundant assertions *)
     if debug then assert (siblings l rl);
     if debug then assert (like_weights (weight l + weight rl) (weight rr));
     create (create l v rl) rv rr
@@ -162,18 +162,19 @@ module[@inline] Make (E : OrderedType) = struct
 
   let[@inline] rotate_right l v r =
     DESTRUCT(l, ll, lv, lr) ->
-    (* TODO once tested,remove these redundant assertions *)
+    (* TODO once tested, remove these redundant assertions *)
     if debug then assert (siblings lr r);
     if debug then assert (like_weights (weight ll) (weight lr + weight r));
     create ll lv (create lr v r)
 
-  (* [join_right] corresponds to [joinRightWB] in BFS, Figure 8. *)
+  (* [balance_right_heavy l v r] is invoked by [join_right]. If it finds that
+     the subtree [r] is slightly too heavy, then a rotation or a double
+     rotation is performed. *)
 
-  (* [join_right l v r] ... TODO In this recursive
-     function, the parameter [r] is invariant: the right branch of the tree
-     [l] is followed until a node with like weight to [r] is reached.*)
-
-  (* TODO keep [wr] at hand; avoiding repeated weight computations *)
+  (* The choice of the parameter [alpha] is supposed to ensure that this is
+     enough to re-establish the balancing invariant. However, I have not seen
+     the proof, and it is unclear to me exactly what is the precondition of
+     [balance_right_heavy]. *)
 
   let[@inline] balance_right_heavy l v r =
     if siblings l r then
@@ -196,22 +197,39 @@ module[@inline] Make (E : OrderedType) = struct
       else
         rotate_right (raw_rotate_left ll lv lr) v r
 
+  (* [join_right l v r] requires [l < v < r]. It assumes that the trees [l]
+     and [r] have like weights OR that the tree [l] is heavier. *)
+
+  (* [join_right] corresponds to [joinRightWB] in BFS, Figure 8. *)
+
+  (* In this recursive function, the parameter [r] is invariant: the right
+     branch of the tree [l] is followed until a node with like weight to [r]
+     is reached. Then, on the way back, rebalancing is performed by invoking
+     [balance_right_heavy]. *)
+
+  (* TODO keep [wr] at hand; avoiding repeated weight computations *)
+
   let rec join_right l v r =
-    (* [weight r <= weight l] does NOT necessarily hold here. *)
     if siblings l r then
       create l v r
-    else
+    else begin
+      if debug then assert (weight r <= weight l);
       DESTRUCT(l, ll, lv, lr) ->
       balance_right_heavy ll lv (join_right lr v r)
+    end
+
+  (* [join_left l v r] requires [l < v < r]. It assumes that the trees [l]
+     and [r] have like weights OR that the tree [r] is heavier. *)
 
   let rec join_left l v r =
-    (* [weight l <= weight r] does NOT necessarily hold here. *)
     if siblings l r then
       create l v r
-    else
+    else begin
+      if debug then assert (weight l <= weight r);
       DESTRUCT(r, rl, rv, rr) ->
       let t1 = join_left l v rl in
       balance_left_heavy t1 rv rr
+    end
 
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
