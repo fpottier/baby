@@ -1,9 +1,5 @@
-open Printf
 open Signatures
 open Profile
-
-let verbose =
-  false
 
 (* This function is not inlined, so as to reduce code size and produce
    more readable assembly code. *)
@@ -154,11 +150,7 @@ module[@inline] Make (E : OrderedType) = struct
   let[@inline] rotate_left l v r =
     DESTRUCT(r, rl, rv, rr) ->
     (* TODO once tested,remove these redundant assertions *)
-    if verbose then printf "rotate_left: weight(l) = %d, weight(rl) = %d\n%!" (weight l) (weight rl);
     if debug then assert (siblings l rl);
-    if verbose then printf "rotate_left: they are siblings (OK)\n%!";
-    if verbose then printf "rotate_left: weight(rr) = %d\n%!" (weight rr);
-    if verbose && rr = TLeaf then printf "rotate_left: rr is empty\n%!";
     if debug then assert (like_weights (weight l + weight rl) (weight rr));
     create (create l v rl) rv rr
 
@@ -204,35 +196,19 @@ module[@inline] Make (E : OrderedType) = struct
 
   let rec join_left l v r =
     (* [weight l <= weight r] does NOT necessarily hold here. *)
-    if verbose then printf "join_left: weight(l) = %d, weight(r) = %d\n%!" (weight l) (weight r);
-    if siblings l r then begin
-      if verbose then printf "join_left: like weights, happy\n%!";
+    if siblings l r then
       create l v r
-    end
-    else begin
-      if verbose then printf "join_left: unlike weights\n%!";
+    else
       DESTRUCT(r, rl, rv, rr) ->
       let t1 = join_left l v rl in
-      if debug then assert (weight t1 = weight l + weight rl); (* TODO *)
-      if verbose then printf "join_left: back from call, weight(t1) = %d, weight(rr) = %d\n%!" (weight t1) (weight rr);
-      if siblings t1 rr then begin
-        if verbose then printf "join_left: like weights, happy\n%!";
+      if siblings t1 rr then
         create t1 rv rr
-      end
-      else begin
-        if verbose then printf "join_left: unlike weights\n%!";
+      else
         DESTRUCT(t1, l1, v1, r1) ->
-        if verbose then printf "join_left: weight(l1) = %d, weight(r1) = %d\n%!" (weight l1) (weight r1);
-        if siblings r1 rr && like_weights (weight l1) (weight r1 + weight rr) then begin
-          if verbose then printf "join_left: a right rotation suffices\n%!";
+        if siblings r1 rr && like_weights (weight l1) (weight r1 + weight rr) then
           rotate_right t1 rv rr
-        end
-        else begin
-          if verbose then printf "join_left: double rotation is necessary\n%!";
+        else
           rotate_right (raw_rotate_left l1 v1 r1) rv rr
-        end
-      end
-    end
 
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
