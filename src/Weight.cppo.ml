@@ -186,6 +186,16 @@ module[@inline] Make (E : OrderedType) = struct
       else
         rotate_left l v (raw_rotate_right rl rv rr)
 
+  let[@inline] balance_left_heavy l v r =
+    if siblings l r then
+      create l v r
+    else
+      DESTRUCT(l, ll, lv, lr) ->
+      if siblings lr r && like_weights (weight ll) (weight lr + weight r) then
+        rotate_right l v r
+      else
+        rotate_right (raw_rotate_left ll lv lr) v r
+
   let rec join_right l v r =
     (* [weight r <= weight l] does NOT necessarily hold here. *)
     if siblings l r then
@@ -201,14 +211,7 @@ module[@inline] Make (E : OrderedType) = struct
     else
       DESTRUCT(r, rl, rv, rr) ->
       let t1 = join_left l v rl in
-      if siblings t1 rr then
-        create t1 rv rr
-      else
-        DESTRUCT(t1, l1, v1, r1) ->
-        if siblings r1 rr && like_weights (weight l1) (weight r1 + weight rr) then
-          rotate_right t1 rv rr
-        else
-          rotate_right (raw_rotate_left l1 v1 r1) rv rr
+      balance_left_heavy t1 rv rr
 
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
