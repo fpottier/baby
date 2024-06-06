@@ -235,8 +235,8 @@ module[@inline] Make (E : OrderedType) = struct
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
 
-  (* TODO compared with height-balanced trees, might wish to
-     treat empty [l] and empty [r] as special cases *)
+  (* TODO may wish to specialize join for the cases where [l] or [r]
+     is empty; this is [add_min_element] and [add_max_element] *)
 
   let join l v r =
     let wl = weight l
@@ -250,9 +250,6 @@ module[@inline] Make (E : OrderedType) = struct
 
   let join_neighbors =
     join
-
-  let add_min_element _ _ =
-    assert false (* TODO *)
 
   type view =
     | Leaf

@@ -24,8 +24,6 @@ module type BST = sig
   val join_weight_balanced : tree -> key -> tree -> tree
     (* assumes that the weights of the two trees differ by at most one *)
 
-  val add_min_element : key -> tree -> tree
-
   val weight : tree -> int
     (* If weight cannot be determined in constant time,
        OK to always return 0. Used in fast paths in subset and equality tests. *)

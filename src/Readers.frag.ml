@@ -182,15 +182,14 @@ module Enum = struct
   (* [elements] converts an enumeration back to a tree. *)
 
   (* It is the only function in this file that constructs a tree.
-     It exploits the construction functions [add_min_element] and
-     [join2]. *)
+     It exploits the construction functions [join] and [join2]. *)
 
   let rec elements (e : enum) : tree =
     match e with
     | End ->
         leaf
     | More (v, r, e) ->
-        add_min_element v (join2 r (elements e))
+        join leaf v (join2 r (elements e))
 
 end
 
