@@ -177,25 +177,25 @@ module[@inline] Make (E : OrderedType) = struct
 
   (* [join_right] corresponds to [joinRightWB] in BFS, Figure 8. *)
 
-  (* [join_right l v r] requires [weight r <= weight l]. In this recursive
+  (* [join_right l v r] ... TODO In this recursive
      function, the parameter [r] is invariant: the right branch of the tree
      [l] is followed until a node with like weight to [r] is reached.*)
 
   (* TODO keep [wr] at hand; avoiding repeated weight computations *)
 
-  let[@inline] balance_right_heavy ll lv t1 =
-    if siblings ll t1 then
-      create ll lv t1
+  let[@inline] balance_right_heavy l v r =
+    if siblings l r then
+      create l v r
     else
-      DESTRUCT(t1, l1, v1, r1) ->
+      DESTRUCT(r, rl, rv, rr) ->
       (* TODO can this complicated condition be simplified? *)
-      if siblings ll l1 && like_weights (weight ll + weight l1) (weight r1) then
-        rotate_left ll lv t1
+      if siblings l rl && like_weights (weight l + weight rl) (weight rr) then
+        rotate_left l v r
       else
-        rotate_left ll lv (raw_rotate_right l1 v1 r1)
+        rotate_left l v (raw_rotate_right rl rv rr)
 
   let rec join_right l v r =
-    (* if debug then assert (weight r <= weight l); TODO false *)
+    (* [weight r <= weight l] does NOT necessarily hold here. *)
     if siblings l r then
       create l v r
     else
@@ -203,8 +203,8 @@ module[@inline] Make (E : OrderedType) = struct
       balance_right_heavy ll lv (join_right lr v r)
 
   let rec join_left l v r =
+    (* [weight l <= weight r] does NOT necessarily hold here. *)
     if verbose then printf "join_left: weight(l) = %d, weight(r) = %d\n%!" (weight l) (weight r);
-    (* if debug then assert (weight l <= weight r); TODO false *)
     if siblings l r then begin
       if verbose then printf "join_left: like weights, happy\n%!";
       create l v r
