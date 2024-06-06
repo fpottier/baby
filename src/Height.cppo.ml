@@ -155,7 +155,8 @@ module[@inline] Make (E : OrderedType) = struct
   let join_neighbors =
     bal
 
-  (* [add_min_element x t] requires [x < t]. *)
+  (* [add_min_element x t] requires [x < t]. It is the special case of
+     [join] where the left-hand tree is empty. *)
 
   let rec add_min_element x t =
     match t with
@@ -164,7 +165,8 @@ module[@inline] Make (E : OrderedType) = struct
     | TNode { l; v; r; _ } ->
         bal (add_min_element x l) v r
 
-  (* [add_max_element x t] requires [t < x]. *)
+  (* [add_max_element x t] requires [t < x]. It is the special case of
+     [join] where the right-hand tree is empty. *)
 
   let rec add_max_element x t =
     match t with
