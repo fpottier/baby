@@ -419,7 +419,6 @@ let eratosthenes u =
 
 module SillyFixedPoint (S : sig
   type t
-  val empty : t
   val singleton : int -> t
   val union : t -> t -> t
 end) (P : sig
