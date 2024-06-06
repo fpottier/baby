@@ -164,12 +164,11 @@ module[@inline] Make (E : OrderedType) = struct
      this new tree to be well-formed, [l] and [rl] must have like weights, and
      the combined weights of [l] and [rl] must be like the weight of [rr]. *)
 
-  (* TODO add [@inline] annotations *)
-  let raw_rotate_left l v r =
+  let[@inline] raw_rotate_left l v r =
     DESTRUCT(r, rl, rv, rr) ->
     raw_create (create l v rl) rv rr
 
-  let rotate_left l v r =
+  let[@inline] rotate_left l v r =
     DESTRUCT(r, rl, rv, rr) ->
     (* TODO once tested,remove these redundant assertions *)
     if verbose then printf "rotate_left: weight(l) = %d, weight(rl) = %d\n%!" (weight l) (weight rl);
@@ -182,11 +181,11 @@ module[@inline] Make (E : OrderedType) = struct
 
   (* A right rotation. *)
 
-  let raw_rotate_right l v r =
+  let[@inline] raw_rotate_right l v r =
     DESTRUCT(l, ll, lv, lr) ->
     raw_create ll lv (create lr v r)
 
-  let rotate_right l v r =
+  let[@inline] rotate_right l v r =
     DESTRUCT(l, ll, lv, lr) ->
     (* TODO once tested,remove these redundant assertions *)
     if debug then assert (siblings lr r);
@@ -266,7 +265,7 @@ module[@inline] Make (E : OrderedType) = struct
     else
       join_left l v r  (* TODO same *)
 
-  let join_neighbors l v r =
+  let[@inline] join_neighbors l v r =
     join l v r (* TODO can we do better? *)
 
   let add_min_element _ _ =
