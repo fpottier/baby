@@ -85,21 +85,6 @@ module[@inline] Make (E : OrderedType) = struct
         assert (w = weight l + weight r);
         assert (siblings l r)
 
-  (* [neighbors l r] checks that [l] and [r] could be neighbors, that is,
-     siblings where one tree has been disturbed by removing or adding one
-     element. *)
-
-  let _neighbors l r =
-    let wl = weight l
-    and wr = weight r in
-    like_weights wl wr &&
-    like_weights (wl-1) wr &&
-    like_weights wl (wr-1) &&
-    like_weights (wl+1) wr &&
-    like_weights wl (wr+1)
-      (* TODO this should be simplifiable *)
-      (* TODO is this function used? *)
-
   (* [create l v r] requires [l < v < r]. It constructs a node with left child
      [l], value [v], and right child [r]. The subtrees [l] and [r] must be
      balanced and must have like weights. *)
@@ -263,8 +248,8 @@ module[@inline] Make (E : OrderedType) = struct
     else
       join_left l v r  (* TODO same *)
 
-  let[@inline] join_neighbors l v r =
-    join l v r (* TODO can we do better? *)
+  let join_neighbors =
+    join
 
   let add_min_element _ _ =
     assert false (* TODO *)
