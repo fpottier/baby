@@ -212,11 +212,13 @@ module[@inline] Make (E : OrderedType) = struct
   let rec join_right l v r =
     if siblings l r then
       create l v r
-    else begin
-      if debug then assert (weight r <= weight l);
-      DESTRUCT(l, ll, lv, lr) ->
-      balance_right_heavy ll lv (join_right lr v r)
-    end
+    else
+      join_right_not_siblings l v r
+
+  and join_right_not_siblings l v r =
+    if debug then assert (weight r <= weight l);
+    DESTRUCT(l, ll, lv, lr) ->
+    balance_right_heavy ll lv (join_right lr v r)
 
   (* [join_left l v r] requires [l < v < r]. It assumes that the trees [l]
      and [r] have like weights OR that the tree [r] is heavier. *)
@@ -224,12 +226,13 @@ module[@inline] Make (E : OrderedType) = struct
   let rec join_left l v r =
     if siblings l r then
       create l v r
-    else begin
-      if debug then assert (weight l <= weight r);
-      DESTRUCT(r, rl, rv, rr) ->
-      let t1 = join_left l v rl in
-      balance_left_heavy t1 rv rr
-    end
+    else
+      join_left_not_siblings l v r
+
+  and join_left_not_siblings l v r =
+    if debug then assert (weight l <= weight r);
+    DESTRUCT(r, rl, rv, rr) ->
+    balance_left_heavy (join_left l v rl) rv rr
 
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
@@ -243,12 +246,13 @@ module[@inline] Make (E : OrderedType) = struct
     if like_weights wl wr then
       create l v r
     else if wr <= wl then
-      join_right l v r (* TODO specialize [join_right] for the case where the siblings test will fail *)
+      join_right_not_siblings l v r
     else
-      join_left l v r  (* TODO same *)
+      join_left_not_siblings l v r
 
   let join_neighbors =
     join
+      (* TODO use balance_left_heavy / balance_right_heavy? *)
 
   type view =
     | Leaf
