@@ -183,22 +183,24 @@ module[@inline] Make (E : OrderedType) = struct
 
   (* TODO keep [wr] at hand; avoiding repeated weight computations *)
 
+  let[@inline] balance_right_heavy ll lv t1 =
+    if siblings ll t1 then
+      create ll lv t1
+    else
+      DESTRUCT(t1, l1, v1, r1) ->
+      (* TODO can this complicated condition be simplified? *)
+      if siblings ll l1 && like_weights (weight ll + weight l1) (weight r1) then
+        rotate_left ll lv t1
+      else
+        rotate_left ll lv (raw_rotate_right l1 v1 r1)
+
   let rec join_right l v r =
     (* if debug then assert (weight r <= weight l); TODO false *)
     if siblings l r then
       create l v r
     else
       DESTRUCT(l, ll, lv, lr) ->
-      let t1 = join_right lr v r in
-      if siblings ll t1 then
-        create ll lv t1
-      else
-        DESTRUCT(t1, l1, v1, r1) ->
-        (* TODO can this complicated condition be simplified? *)
-        if siblings ll l1 && like_weights (weight ll + weight l1) (weight r1) then
-          rotate_left ll lv t1
-        else
-          rotate_left ll lv (raw_rotate_right l1 v1 r1)
+      balance_right_heavy ll lv (join_right lr v r)
 
   let rec join_left l v r =
     if verbose then printf "join_left: weight(l) = %d, weight(r) = %d\n%!" (weight l) (weight r);
