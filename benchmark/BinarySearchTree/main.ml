@@ -457,7 +457,7 @@ let silly_fixed_point u =
 
 let () =
 
-  if false then begin
+  if true then begin
     eprintf "*** add\n";
     eprintf "\n";
     run (add (1 lsl 8));
@@ -466,7 +466,7 @@ let () =
     eprintf "\n";
   end;
 
-  if false then begin
+  if true then begin
     eprintf "*** remove\n";
     eprintf "\n";
     run (remove (1 lsl 8));
@@ -527,7 +527,7 @@ let () =
     run (eratosthenes 100000)
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** silly fixed point\n";
     eprintf "\n";
     run (silly_fixed_point 100);
