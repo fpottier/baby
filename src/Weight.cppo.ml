@@ -176,26 +176,34 @@ module[@inline] Make (E : OrderedType) = struct
      the proof, and it is unclear to me exactly what is the precondition of
      [balance_right_heavy]. *)
 
+  let[@inline] balance_right_heavy_not_siblings l v r =
+    if debug then assert (weight l <= weight r);
+    DESTRUCT(r, rl, rv, rr) ->
+    (* TODO can this complicated condition be simplified? *)
+    if siblings l rl && like_weights (weight l + weight rl) (weight rr) then
+      rotate_left l v r
+    else
+      rotate_left l v (raw_rotate_right rl rv rr)
+
   let[@inline] balance_right_heavy l v r =
     if siblings l r then
       create l v r
     else
-      DESTRUCT(r, rl, rv, rr) ->
-      (* TODO can this complicated condition be simplified? *)
-      if siblings l rl && like_weights (weight l + weight rl) (weight rr) then
-        rotate_left l v r
-      else
-        rotate_left l v (raw_rotate_right rl rv rr)
+      balance_right_heavy_not_siblings l v r
+
+  let[@inline] balance_left_heavy_not_siblings l v r =
+    if debug then assert (weight r <= weight l);
+    DESTRUCT(l, ll, lv, lr) ->
+    if siblings lr r && like_weights (weight ll) (weight lr + weight r) then
+      rotate_right l v r
+    else
+      rotate_right (raw_rotate_left ll lv lr) v r
 
   let[@inline] balance_left_heavy l v r =
     if siblings l r then
       create l v r
     else
-      DESTRUCT(l, ll, lv, lr) ->
-      if siblings lr r && like_weights (weight ll) (weight lr + weight r) then
-        rotate_right l v r
-      else
-        rotate_right (raw_rotate_left ll lv lr) v r
+      balance_left_heavy_not_siblings l v r
 
   (* [join_right l v r] requires [l < v < r]. It assumes that the trees [l]
      and [r] have like weights OR that the tree [l] is heavier. *)
@@ -250,9 +258,15 @@ module[@inline] Make (E : OrderedType) = struct
     else
       join_left_not_siblings l v r
 
-  let join_neighbors =
-    join
-      (* TODO use balance_left_heavy / balance_right_heavy? *)
+  let join_neighbors l v r =
+    let wl = weight l
+    and wr = weight r in
+    if like_weights wl wr then
+      create l v r
+    else if wr <= wl then
+      balance_left_heavy_not_siblings l v r
+    else
+      balance_right_heavy_not_siblings l v r
 
   type view =
     | Leaf
