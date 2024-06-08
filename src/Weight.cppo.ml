@@ -304,21 +304,29 @@ module[@inline] Make (E : OrderedType) = struct
 
   let join l v r =
     let wl = weight l and wr = weight r in
-    if like_weights wl wr then
-      create' wl l v wr r
-    else if wr <= wl then
-      join_right_not_siblings wl l v wr r
+    if not_left_heavy wl wr then
+      if not_right_heavy wl wr then
+        (* balanced *)
+        create' wl l v wr r
+      else
+        (* right heavy *)
+        join_left_not_siblings wl l v wr r
     else
-      join_left_not_siblings wl l v wr r
+      (* left heavy *)
+      join_right_not_siblings wl l v wr r
 
   let join_neighbors l v r =
     let wl = weight l and wr = weight r in
-    if like_weights wl wr then
-      create' wl l v wr r
-    else if wr <= wl then
-      balance_left_heavy_not_siblings wl l v wr r
+    if not_left_heavy wl wr then
+      if not_right_heavy wl wr then
+        (* balanced *)
+        create' wl l v wr r
+      else
+        (* right heavy *)
+        balance_right_heavy_not_siblings wl l v wr r
     else
-      balance_right_heavy_not_siblings wl l v wr r
+      (* left heavy *)
+      balance_left_heavy_not_siblings wl l v wr r
 
   type view =
     | Leaf
