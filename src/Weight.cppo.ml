@@ -207,7 +207,7 @@ module[@inline] Make (E : OrderedType) = struct
      the proof, and it is unclear to me exactly what is the precondition of
      [balance_right_heavy]. *)
 
-  let[@inline] balance_right_heavy_not_siblings wl l v wr r =
+  let balance_right_heavy_not_siblings wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight l <= weight r);
     DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
@@ -228,7 +228,7 @@ module[@inline] Make (E : OrderedType) = struct
     else
       balance_right_heavy_not_siblings wl l v wr r
 
-  let[@inline] balance_left_heavy_not_siblings wl l v wr r =
+  let balance_left_heavy_not_siblings wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight r <= weight l);
     DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
