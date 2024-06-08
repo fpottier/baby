@@ -95,21 +95,19 @@ module[@inline] Make (E : OrderedType) = struct
      [l], value [v], and right child [r]. The subtrees [l] and [r] must be
      balanced and must have like weights. *)
 
-  let[@inline] create l v r =
-    if debug then assert (siblings l r);
-    let w = weight l + weight r in
-    TNode { l; v; r; w }
-
-  let[@inline] create' wl l v wr r =
-    if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (siblings l r);
-    let w = wl + wr in
-    TNode { l; v; r; w }
-
   let[@inline] create'' w l v r =
     if debug then assert (w = weight l + weight r);
     if debug then assert (siblings l r);
     TNode { l; v; r; w }
+
+  let[@inline] create l v r =
+    let w = weight l + weight r in
+    create'' w l v r
+
+  let[@inline] create' wl l v wr r =
+    if debug then assert (wl = weight l && wr = weight r);
+    let w = wl + wr in
+    create'' w l v r
 
   let join_weight_balanced l v r =
     if debug then assert (siblings l r);
