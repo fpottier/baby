@@ -76,14 +76,14 @@ module[@inline] Make (E : OrderedType) = struct
   (* [siblings l r] checks that [l] and [r] could be siblings in a valid
      tree. *)
 
-  let[@inline] left_not_heavy wl wr =
+  let[@inline] not_left_heavy wl wr =
     alpha * wl <= (100-alpha) * wr
 
-  let[@inline] right_not_heavy wl wr =
+  let[@inline] not_right_heavy wl wr =
     alpha * wr <= (100-alpha) * wl
 
   let[@inline] like_weights wl wr =
-    left_not_heavy wl wr && right_not_heavy wl wr
+    not_left_heavy wl wr && not_right_heavy wl wr
 
   let[@inline] siblings l r =
     like_weights (weight l) (weight r)
@@ -228,7 +228,8 @@ module[@inline] Make (E : OrderedType) = struct
 
   let[@inline] balance_right_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
-    if like_weights wl wr then
+    if debug then assert (not_left_heavy wl wr);
+    if not_right_heavy wl wr then
       create' wl l v wr r
     else
       balance_right_heavy_not_siblings wl l v wr r
@@ -249,7 +250,8 @@ module[@inline] Make (E : OrderedType) = struct
 
   let[@inline] balance_left_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
-    if like_weights wl wr then
+    if debug then assert (not_right_heavy wl wr);
+    if not_left_heavy wl wr then
       create' wl l v wr r
     else
       balance_left_heavy_not_siblings wl l v wr r
@@ -267,8 +269,8 @@ module[@inline] Make (E : OrderedType) = struct
   let rec join_right l v wr r =
     if debug then assert (wr = weight r);
     let wl = weight l in
-    if debug then assert (siblings l r = left_not_heavy wl wr);
-    if left_not_heavy wl wr then
+    if debug then assert (not_right_heavy wl wr);
+    if not_left_heavy wl wr then
       create' wl l v wr r
     else
       join_right_not_siblings wl l v wr r
@@ -285,8 +287,8 @@ module[@inline] Make (E : OrderedType) = struct
   let rec join_left wl l v r =
     if debug then assert (wl = weight l);
     let wr = weight r in
-    if debug then assert (siblings l r = right_not_heavy wl wr);
-    if right_not_heavy wl wr then
+    if debug then assert (not_left_heavy wl wr);
+    if not_right_heavy wl wr then
       create' wl l v wr r
     else
       join_left_not_siblings wl l v wr r
