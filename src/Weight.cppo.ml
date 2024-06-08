@@ -25,12 +25,22 @@ module[@inline] Make (E : OrderedType) = struct
     | TLeaf
     | TNode of { l : tree; v : key; r : tree; w : int }
 
-  (* This macro destructs a tree [t] that is known not to be a leaf. *)
+  (* This macro destructs a tree [t] that is known not to be a leaf.
+     It binds the variables [tl], [tv], [tr]. *)
 
   #define DESTRUCT(t,tl,tv,tr) \
     match t with \
     | TLeaf -> impossible() \
     | TNode { l = tl; v = tv; r = tr; _ }
+
+  (* This macro destructs a tree [t] whose weight is [w].
+     It binds the variables [wtl], [tl], [tv], [wtr], [tr]. *)
+
+  #define DESTRUCTW(w,t,wtl,tl,tv,wtr,tr) \
+    DESTRUCT(t, tl, tv, tr) -> \
+    let wtl = weight tl in \
+    let wtr = w - wtl in \
+    if debug then assert (wtr = weight tr)
 
   (* [weight t] reads and returns the weight of the tree [t]. *)
 
@@ -185,11 +195,8 @@ module[@inline] Make (E : OrderedType) = struct
   let[@inline] balance_right_heavy_not_siblings wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight l <= weight r);
-    DESTRUCT(r, rl, rv, rr) ->
+    DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
     (* TODO can this complicated condition be simplified? *)
-    let wrl = weight rl in
-    let wrr = wr - wrl in
-    if debug then assert (wrr = weight rr);
     if like_weights wl wrl && like_weights (wl + wrl) wrr then
       (* [rotate_left l v r] *)
       create' (wl + wrl) (create' wl l v wrl rl) rv wrr rr
@@ -207,10 +214,7 @@ module[@inline] Make (E : OrderedType) = struct
   let[@inline] balance_left_heavy_not_siblings wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight r <= weight l);
-    DESTRUCT(l, ll, lv, lr) ->
-    let wll = weight ll in
-    let wlr = wl - wll in
-    if debug then assert (wlr = weight lr);
+    DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
     if like_weights wlr wr && like_weights wll (wlr + wr) then
       (* [rotate_right l v r] *)
       create' wll ll lv (wlr + wr) (create' wlr lr v wr r)
@@ -245,10 +249,7 @@ module[@inline] Make (E : OrderedType) = struct
   and join_right_not_siblings wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight r <= weight l);
-    DESTRUCT(l, ll, lv, lr) ->
-    let wll = weight ll in
-    let wlr = wl - wll in
-    if debug then assert (wlr = weight lr);
+    DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
     balance_right_heavy wll ll lv (wlr + wr) (join_right lr v r)
 
   (* [join_left l v r] requires [l < v < r]. It assumes that the trees [l]
@@ -264,10 +265,7 @@ module[@inline] Make (E : OrderedType) = struct
   and join_left_not_siblings wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight l <= weight r);
-    DESTRUCT(r, rl, rv, rr) ->
-    let wrl = weight rl in
-    let wrr = wr - wrl in
-    if debug then assert (wrr = weight rr);
+    DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
     balance_left_heavy (wl + wrl) (join_left l v rl) rv wrr rr
 
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
