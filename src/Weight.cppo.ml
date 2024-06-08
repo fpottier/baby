@@ -106,6 +106,11 @@ module[@inline] Make (E : OrderedType) = struct
     let w = wl + wr in
     TNode { l; v; r; w }
 
+  let[@inline] create'' w l v r =
+    if debug then assert (w = weight l + weight r);
+    if debug then assert (siblings l r);
+    TNode { l; v; r; w }
+
   let join_weight_balanced l v r =
     if debug then assert (siblings l r);
     create l v r
@@ -146,7 +151,10 @@ module[@inline] Make (E : OrderedType) = struct
     | TNode { w = w1; _ }, TNode { w = w2; _ } ->
         w1 < w2
 
-  (* A left rotation. *)
+  (* The following functions are unused, because they have been manually
+     inlined. They are kept for reference. *)
+
+  (* Left and right rotations. *)
 
   (* [rotate_left l v r] requires [l < v < r]. It applies a left rotation to
      the node [TNode { l; v; r }], without actually allocating this node. *)
@@ -156,27 +164,25 @@ module[@inline] Make (E : OrderedType) = struct
      this new tree to be well-formed, [l] and [rl] must have like weights, and
      the combined weights of [l] and [rl] must be like the weight of [rr]. *)
 
-  let[@inline] rotate_left l v r =
+  let _rotate_left l v r =
     DESTRUCT(r, rl, rv, rr) ->
     create (create l v rl) rv rr
 
-  (* A right rotation. *)
-
-  let[@inline] rotate_right l v r =
+  let _rotate_right l v r =
     DESTRUCT(l, ll, lv, lr) ->
     create ll lv (create lr v r)
 
-  let () = ignore (rotate_left, rotate_right)
+  (* Double rotations. *)
 
   (* [rotate_left l v (rotate_right rl rv rr)] *)
 
-  let[@inline] rotate_left_rotate_right l v rl rv rr =
+  let _rotate_left_rotate_right l v rl rv rr =
     DESTRUCT(rl, rll, rlv, rlr) ->
     create (create l v rll) rlv (create rlr rv rr)
 
   (* [rotate_right (rotate_left ll lv lr) v r] *)
 
-  let[@inline] rotate_right_rotate_left ll lv lr v r =
+  let _rotate_right_rotate_left ll lv lr v r =
     DESTRUCT(lr, lrl, lrv, lrr) ->
     create (create ll lv lrl) lrv (create lrr v r)
 
@@ -196,10 +202,13 @@ module[@inline] Make (E : OrderedType) = struct
     (* TODO can this complicated condition be simplified? *)
     if like_weights wl wrl && like_weights (wl + wrl) wrr then
       (* [rotate_left l v r] *)
-      create' (wl + wrl) (create' wl l v wrl rl) rv wrr rr
+      let w = wl + wr in
+      create'' w (create' wl l v wrl rl) rv rr
     else
       (* [rotate_left l v (rotate_right rl rv rr)] *)
-      rotate_left_rotate_right l v rl rv rr
+      DESTRUCTW(wrl, rl, wrll, rll, rlv, wrlr, rlr);
+      let w = wl + wr in
+      create'' w (create' wl l v wrll rll) rlv (create' wrlr rlr rv wrr rr)
 
   let[@inline] balance_right_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
@@ -214,10 +223,13 @@ module[@inline] Make (E : OrderedType) = struct
     DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
     if like_weights wlr wr && like_weights wll (wlr + wr) then
       (* [rotate_right l v r] *)
-      create' wll ll lv (wlr + wr) (create' wlr lr v wr r)
+      let w = wl + wr in
+      create'' w ll lv (create' wlr lr v wr r)
     else
       (* [rotate_right (rotate_left ll lv lr) v r] *)
-      rotate_right_rotate_left ll lv lr v r
+      DESTRUCTW(wlr, lr, wlrl, lrl, lrv, wlrr, lrr);
+      let w = wl + wr in
+      create'' w (create' wll ll lv wlrl lrl) lrv (create' wlrr lrr v wr r)
 
   let[@inline] balance_left_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
