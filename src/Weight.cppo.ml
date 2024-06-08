@@ -279,9 +279,6 @@ module[@inline] Make (E : OrderedType) = struct
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
 
-  (* TODO may wish to specialize join for the cases where [l] or [r]
-     is empty; this is [add_min_element] and [add_max_element] *)
-
   let join l v r =
     let wl = weight l and wr = weight r in
     if like_weights wl wr then
