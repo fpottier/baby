@@ -195,8 +195,8 @@ module[@inline] Make (E : OrderedType) = struct
     else
       rotate_left l v (raw_rotate_right rl rv rr)
 
-  let[@inline] balance_right_heavy l v r =
-    let wl = weight l and wr = weight r in
+  let[@inline] balance_right_heavy wl l v wr r =
+    if debug then assert (wl = weight l && wr = weight r);
     if like_weights wl wr then
       create' wl l v wr r
     else
@@ -214,8 +214,8 @@ module[@inline] Make (E : OrderedType) = struct
     else
       rotate_right (raw_rotate_left ll lv lr) v r
 
-  let[@inline] balance_left_heavy l v r =
-    let wl = weight l and wr = weight r in
+  let[@inline] balance_left_heavy wl l v wr r =
+    if debug then assert (wl = weight l && wr = weight r);
     if like_weights wl wr then
       create' wl l v wr r
     else
@@ -231,32 +231,40 @@ module[@inline] Make (E : OrderedType) = struct
      is reached. Then, on the way back, rebalancing is performed by invoking
      [balance_right_heavy]. *)
 
-  (* TODO keep [wr] at hand; avoiding repeated weight computations *)
-
   let rec join_right l v r =
-    if siblings l r then
-      create l v r
+    let wl = weight l and wr = weight r in
+    if like_weights wl wr then
+      create' wl l v wr r
     else
-      join_right_not_siblings l v r
+      join_right_not_siblings wl l v wr r
 
-  and join_right_not_siblings l v r =
+  and join_right_not_siblings wl l v wr r =
+    if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight r <= weight l);
     DESTRUCT(l, ll, lv, lr) ->
-    balance_right_heavy ll lv (join_right lr v r)
+    let wll = weight ll in
+    let wlr = wl - wll in
+    if debug then assert (wlr = weight lr);
+    balance_right_heavy wll ll lv (wlr + wr) (join_right lr v r)
 
   (* [join_left l v r] requires [l < v < r]. It assumes that the trees [l]
      and [r] have like weights OR that the tree [r] is heavier. *)
 
   let rec join_left l v r =
-    if siblings l r then
-      create l v r
+    let wl = weight l and wr = weight r in
+    if like_weights wl wr then
+      create' wl l v wr r
     else
-      join_left_not_siblings l v r
+      join_left_not_siblings wl l v wr r
 
-  and join_left_not_siblings l v r =
+  and join_left_not_siblings wl l v wr r =
+    if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight l <= weight r);
     DESTRUCT(r, rl, rv, rr) ->
-    balance_left_heavy (join_left l v rl) rv rr
+    let wrl = weight rl in
+    let wrr = wr - wrl in
+    if debug then assert (wrr = weight rr);
+    balance_left_heavy (wl + wrl) (join_left l v rl) rv wrr rr
 
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
@@ -269,9 +277,9 @@ module[@inline] Make (E : OrderedType) = struct
     if like_weights wl wr then
       create' wl l v wr r
     else if wr <= wl then
-      join_right_not_siblings l v r
+      join_right_not_siblings wl l v wr r
     else
-      join_left_not_siblings l v r
+      join_left_not_siblings wl l v wr r
 
   let join_neighbors l v r =
     let wl = weight l and wr = weight r in
