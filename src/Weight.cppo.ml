@@ -141,7 +141,7 @@ module[@inline] Make (E : OrderedType) = struct
     | TNode { w; _ } ->
         w = 2
 
-  (* [seems_smaller t1 t2] is equivalent to [weight t1 <= weight t2]. *)
+  (* [seems_smaller t1 t2] is equivalent to [weight t1 < weight t2]. *)
 
   let[@inline] seems_smaller t1 t2 =
     match t1, t2 with
