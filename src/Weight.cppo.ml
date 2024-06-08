@@ -25,6 +25,15 @@ module[@inline] Make (E : OrderedType) = struct
     | TLeaf
     | TNode of { l : tree; v : key; r : tree; w : int }
 
+  (* [weight t] reads and returns the weight of the tree [t]. *)
+
+  let[@inline] weight t =
+    match t with
+    | TLeaf ->
+        1
+    | TNode { w; _ } ->
+        w
+
   (* This macro destructs a tree [t] that is known not to be a leaf.
      It binds the variables [tl], [tv], [tr].
      It is intended to be followed with a semicolon. *)
@@ -35,7 +44,8 @@ module[@inline] Make (E : OrderedType) = struct
     | TNode { l = tl; v = tv; r = tr; _ } -> \
         ()
 
-  (* This macro destructs a tree [t] whose weight is [w].
+  (* This macro destructs a tree [t] that is known not to be a leaf
+     and whose weight is [w].
      It binds the variables [wtl], [tl], [tv], [wtr], [tr].
      It is intended to be followed with a semicolon. *)
 
@@ -44,15 +54,6 @@ module[@inline] Make (E : OrderedType) = struct
     let wtl = weight tl in \
     let wtr = w - wtl in \
     if debug then assert (wtr = weight tr)
-
-  (* [weight t] reads and returns the weight of the tree [t]. *)
-
-  let[@inline] weight t =
-    match t with
-    | TLeaf ->
-        1
-    | TNode { w; _ } ->
-        w
 
   (* Weight-balanced trees with parameter α maintain the following invariant:
      for every tree [t] whose children are [l] and [r],
@@ -94,9 +95,15 @@ module[@inline] Make (E : OrderedType) = struct
         assert (w = weight l + weight r);
         assert (siblings l r)
 
-  (* [create l v r] requires [l < v < r]. It constructs a node with left child
-     [l], value [v], and right child [r]. The subtrees [l] and [r] must be
-     balanced and must have like weights. *)
+  (* [create l v r] requires [l < v < r]. It constructs a node with left
+     child [l], value [v], and right child [r]. The subtrees [l] and [r]
+     must be balanced and must have like weights. *)
+
+  (* [create'' w l v r] is analogous, but requires the user to provide the
+     weight [w] of the new tree. *)
+
+  (* [create' wl l v wr r] is analogous, but requires the user to provide
+     the weights [wl] and [wr] of the trees [l] and [r]. *)
 
   let[@inline] create'' w l v r =
     if debug then assert (w = weight l + weight r);
@@ -112,9 +119,13 @@ module[@inline] Make (E : OrderedType) = struct
     let w = wl + wr in
     create'' w l v r
 
+  (* [create] is published under the name [join_weight_balanced]. *)
+
   let join_weight_balanced l v r =
     if debug then assert (siblings l r);
     create l v r
+
+  (* Trees of one, two, three elements. *)
 
   let[@inline] singleton x =
     (* This is equivalent to [create TLeaf x TLeaf]. *)
