@@ -235,7 +235,7 @@ module[@inline] Make (E : OrderedType) = struct
     else
       balance_left_heavy_not_siblings wl l v wr r
 
-  (* [join_right l v r] requires [l < v < r]. It assumes that the trees [l]
+  (* [join_right l v wr r] requires [l < v < r]. It assumes that the trees [l]
      and [r] have like weights OR that the tree [l] is heavier. *)
 
   (* [join_right] corresponds to [joinRightWB] in BFS, Figure 8. *)
@@ -245,8 +245,9 @@ module[@inline] Make (E : OrderedType) = struct
      is reached. Then, on the way back, rebalancing is performed by invoking
      [balance_right_heavy]. *)
 
-  let rec join_right l v r =
-    let wl = weight l and wr = weight r in
+  let rec join_right l v wr r =
+    if debug then assert (wr = weight r);
+    let wl = weight l in
     if like_weights wl wr then
       create' wl l v wr r
     else
@@ -256,13 +257,14 @@ module[@inline] Make (E : OrderedType) = struct
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight r <= weight l);
     DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
-    balance_right_heavy wll ll lv (wlr + wr) (join_right lr v r)
+    balance_right_heavy wll ll lv (wlr + wr) (join_right lr v wr r)
 
   (* [join_left l v r] requires [l < v < r]. It assumes that the trees [l]
      and [r] have like weights OR that the tree [r] is heavier. *)
 
-  let rec join_left l v r =
-    let wl = weight l and wr = weight r in
+  let rec join_left wl l v r =
+    if debug then assert (wl = weight l);
+    let wr = weight r in
     if like_weights wl wr then
       create' wl l v wr r
     else
@@ -272,7 +274,7 @@ module[@inline] Make (E : OrderedType) = struct
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight l <= weight r);
     DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
-    balance_left_heavy (wl + wrl) (join_left l v rl) rv wrr rr
+    balance_left_heavy (wl + wrl) (join_left wl l v rl) rv wrr rr
 
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
