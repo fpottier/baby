@@ -93,6 +93,12 @@ module[@inline] Make (E : OrderedType) = struct
     if debug then assert (siblings l r);
     raw_create l v r
 
+  let[@inline] create' wl l v wr r =
+    if debug then assert (wl = weight l && wr = weight r);
+    if debug then assert (siblings l r);
+    let w = wl + wr in
+    TNode { l; v; r; w }
+
   let join_weight_balanced l v r =
     if debug then assert (siblings l r);
     create l v r
@@ -176,34 +182,44 @@ module[@inline] Make (E : OrderedType) = struct
      the proof, and it is unclear to me exactly what is the precondition of
      [balance_right_heavy]. *)
 
-  let[@inline] balance_right_heavy_not_siblings l v r =
+  let[@inline] balance_right_heavy_not_siblings wl l v wr r =
+    if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight l <= weight r);
     DESTRUCT(r, rl, rv, rr) ->
     (* TODO can this complicated condition be simplified? *)
-    if siblings l rl && like_weights (weight l + weight rl) (weight rr) then
+    let wrl = weight rl in
+    let wrr = wr - wrl in
+    if debug then assert (wrr = weight rr);
+    if like_weights wl wrl && like_weights (wl + wrl) wrr then
       rotate_left l v r
     else
       rotate_left l v (raw_rotate_right rl rv rr)
 
   let[@inline] balance_right_heavy l v r =
-    if siblings l r then
-      create l v r
+    let wl = weight l and wr = weight r in
+    if like_weights wl wr then
+      create' wl l v wr r
     else
-      balance_right_heavy_not_siblings l v r
+      balance_right_heavy_not_siblings wl l v wr r
 
-  let[@inline] balance_left_heavy_not_siblings l v r =
+  let[@inline] balance_left_heavy_not_siblings wl l v wr r =
+    if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight r <= weight l);
     DESTRUCT(l, ll, lv, lr) ->
-    if siblings lr r && like_weights (weight ll) (weight lr + weight r) then
+    let wll = weight ll in
+    let wlr = wl - wll in
+    if debug then assert (wlr = weight lr);
+    if like_weights wlr wr && like_weights wll (wlr + wr) then
       rotate_right l v r
     else
       rotate_right (raw_rotate_left ll lv lr) v r
 
   let[@inline] balance_left_heavy l v r =
-    if siblings l r then
-      create l v r
+    let wl = weight l and wr = weight r in
+    if like_weights wl wr then
+      create' wl l v wr r
     else
-      balance_left_heavy_not_siblings l v r
+      balance_left_heavy_not_siblings wl l v wr r
 
   (* [join_right l v r] requires [l < v < r]. It assumes that the trees [l]
      and [r] have like weights OR that the tree [l] is heavier. *)
@@ -249,24 +265,22 @@ module[@inline] Make (E : OrderedType) = struct
      is empty; this is [add_min_element] and [add_max_element] *)
 
   let join l v r =
-    let wl = weight l
-    and wr = weight r in
+    let wl = weight l and wr = weight r in
     if like_weights wl wr then
-      create l v r
+      create' wl l v wr r
     else if wr <= wl then
       join_right_not_siblings l v r
     else
       join_left_not_siblings l v r
 
   let join_neighbors l v r =
-    let wl = weight l
-    and wr = weight r in
+    let wl = weight l and wr = weight r in
     if like_weights wl wr then
-      create l v r
+      create' wl l v wr r
     else if wr <= wl then
-      balance_left_heavy_not_siblings l v r
+      balance_left_heavy_not_siblings wl l v wr r
     else
-      balance_right_heavy_not_siblings l v r
+      balance_right_heavy_not_siblings wl l v wr r
 
   type view =
     | Leaf
