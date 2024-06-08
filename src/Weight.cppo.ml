@@ -197,7 +197,6 @@ module[@inline] Make (E : OrderedType) = struct
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight l <= weight r);
     DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
-    (* TODO can this complicated condition be simplified? *)
     if like_weights wl wrl && like_weights (wl + wrl) wrr then
       (* [rotate_left l v r] *)
       let w = wl + wr in
