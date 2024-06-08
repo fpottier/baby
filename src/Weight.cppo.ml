@@ -164,7 +164,7 @@ module[@inline] Make (E : OrderedType) = struct
         w1 < w2
 
   (* The following functions are unused, because they have been manually
-     inlined. They are kept for reference. *)
+     inlined and optimized. They are kept for reference. *)
 
   (* Left and right rotations. *)
 
