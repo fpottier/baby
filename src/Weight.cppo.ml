@@ -26,18 +26,21 @@ module[@inline] Make (E : OrderedType) = struct
     | TNode of { l : tree; v : key; r : tree; w : int }
 
   (* This macro destructs a tree [t] that is known not to be a leaf.
-     It binds the variables [tl], [tv], [tr]. *)
+     It binds the variables [tl], [tv], [tr].
+     It is intended to be followed with a semicolon. *)
 
   #define DESTRUCT(t,tl,tv,tr) \
     match t with \
     | TLeaf -> impossible() \
-    | TNode { l = tl; v = tv; r = tr; _ }
+    | TNode { l = tl; v = tv; r = tr; _ } -> \
+        ()
 
   (* This macro destructs a tree [t] whose weight is [w].
-     It binds the variables [wtl], [tl], [tv], [wtr], [tr]. *)
+     It binds the variables [wtl], [tl], [tv], [wtr], [tr].
+     It is intended to be followed with a semicolon. *)
 
   #define DESTRUCTW(w,t,wtl,tl,tv,wtr,tr) \
-    DESTRUCT(t, tl, tv, tr) -> \
+    DESTRUCT(t, tl, tv, tr); \
     let wtl = weight tl in \
     let wtr = w - wtl in \
     if debug then assert (wtr = weight tr)
@@ -163,11 +166,11 @@ module[@inline] Make (E : OrderedType) = struct
      the combined weights of [l] and [rl] must be like the weight of [rr]. *)
 
   let _rotate_left l v r =
-    DESTRUCT(r, rl, rv, rr) ->
+    DESTRUCT(r, rl, rv, rr);
     create (create l v rl) rv rr
 
   let _rotate_right l v r =
-    DESTRUCT(l, ll, lv, lr) ->
+    DESTRUCT(l, ll, lv, lr);
     create ll lv (create lr v r)
 
   (* Double rotations. *)
@@ -175,13 +178,13 @@ module[@inline] Make (E : OrderedType) = struct
   (* [rotate_left l v (rotate_right rl rv rr)] *)
 
   let _rotate_left_rotate_right l v rl rv rr =
-    DESTRUCT(rl, rll, rlv, rlr) ->
+    DESTRUCT(rl, rll, rlv, rlr);
     create (create l v rll) rlv (create rlr rv rr)
 
   (* [rotate_right (rotate_left ll lv lr) v r] *)
 
   let _rotate_right_rotate_left ll lv lr v r =
-    DESTRUCT(lr, lrl, lrv, lrr) ->
+    DESTRUCT(lr, lrl, lrv, lrr);
     create (create ll lv lrl) lrv (create lrr v r)
 
   (* [balance_right_heavy l v r] is invoked by [join_right]. If it finds that
