@@ -95,13 +95,10 @@ module[@inline] Make (E : OrderedType) = struct
      [l], value [v], and right child [r]. The subtrees [l] and [r] must be
      balanced and must have like weights. *)
 
-  let[@inline] raw_create l v r =
-    let w = weight l + weight r in
-    TNode { l; v; r; w }
-
   let[@inline] create l v r =
     if debug then assert (siblings l r);
-    raw_create l v r
+    let w = weight l + weight r in
+    TNode { l; v; r; w }
 
   let[@inline] create' wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
@@ -171,15 +168,15 @@ module[@inline] Make (E : OrderedType) = struct
 
   let () = ignore (rotate_left, rotate_right)
 
-  (* [rotate_left l v (raw_rotate_right rl rv rr)] *)
+  (* [rotate_left l v (rotate_right rl rv rr)] *)
 
-  let[@inline] rotate_left_raw_rotate_right l v rl rv rr =
+  let[@inline] rotate_left_rotate_right l v rl rv rr =
     DESTRUCT(rl, rll, rlv, rlr) ->
     create (create l v rll) rlv (create rlr rv rr)
 
-  (* [rotate_right (raw_rotate_left ll lv lr) v r] *)
+  (* [rotate_right (rotate_left ll lv lr) v r] *)
 
-  let[@inline] rotate_right_raw_rotate_left ll lv lr v r =
+  let[@inline] rotate_right_rotate_left ll lv lr v r =
     DESTRUCT(lr, lrl, lrv, lrr) ->
     create (create ll lv lrl) lrv (create lrr v r)
 
@@ -201,8 +198,8 @@ module[@inline] Make (E : OrderedType) = struct
       (* [rotate_left l v r] *)
       create' (wl + wrl) (create' wl l v wrl rl) rv wrr rr
     else
-      (* [rotate_left l v (raw_rotate_right rl rv rr)] *)
-      rotate_left_raw_rotate_right l v rl rv rr
+      (* [rotate_left l v (rotate_right rl rv rr)] *)
+      rotate_left_rotate_right l v rl rv rr
 
   let[@inline] balance_right_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
@@ -219,8 +216,8 @@ module[@inline] Make (E : OrderedType) = struct
       (* [rotate_right l v r] *)
       create' wll ll lv (wlr + wr) (create' wlr lr v wr r)
     else
-      (* [rotate_right (raw_rotate_left ll lv lr) v r] *)
-      rotate_right_raw_rotate_left ll lv lr v r
+      (* [rotate_right (rotate_left ll lv lr) v r] *)
+      rotate_right_rotate_left ll lv lr v r
 
   let[@inline] balance_left_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
