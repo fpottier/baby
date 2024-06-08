@@ -191,8 +191,10 @@ module[@inline] Make (E : OrderedType) = struct
     let wrr = wr - wrl in
     if debug then assert (wrr = weight rr);
     if like_weights wl wrl && like_weights (wl + wrl) wrr then
-      rotate_left l v r
+      (* [rotate_left l v r] *)
+      create' (wl + wrl) (create' wl l v wrl rl) rv wrr rr
     else
+      (* TODO manually compose these functions *)
       rotate_left l v (raw_rotate_right rl rv rr)
 
   let[@inline] balance_right_heavy wl l v wr r =
@@ -210,7 +212,8 @@ module[@inline] Make (E : OrderedType) = struct
     let wlr = wl - wll in
     if debug then assert (wlr = weight lr);
     if like_weights wlr wr && like_weights wll (wlr + wr) then
-      rotate_right l v r
+      (* [rotate_right l v r] *)
+      create' wll ll lv (wlr + wr) (create' wlr lr v wr r)
     else
       rotate_right (raw_rotate_left ll lv lr) v r
 
