@@ -19,12 +19,6 @@
 
 * Make sure everything is tested, including `Enum`.
 
-* Eliminate the duplication between the tests in Height/Weight.
-
-* Update the toplevel `make test` to test both height-balanced and
-  weight-balanced trees in parallel. Save a log of each test and
-  show both output streams in the console.
-
 * Benchmark.
 
 * Implement more functions from BFS.
