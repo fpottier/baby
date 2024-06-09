@@ -59,6 +59,14 @@ let join2 (l : tree) (r : tree) : tree =
 
  *)
 
+(* [join2 l r] is implemented by extracting the maximum element of [l]
+   or the minimum element of [r] and letting [join] do the rest of the
+   work. *)
+
+(* In order to maintain a better balance, one might wish to extract an
+   element from the tree that seems larger. However, this seems to
+   bring no improvement in practice, so we avoid this complication. *)
+
 let join2 (l : tree) (r : tree) : tree =
   match VIEW(l), VIEW(r) with
   | LEAF, _ ->
