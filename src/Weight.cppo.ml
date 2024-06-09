@@ -275,52 +275,60 @@ module[@inline] Make (E : OrderedType) = struct
     else
       balance_left_heavy wl l v wr r
 
-  (* [join_right l v wr r] requires [l < v < r]. It assumes that the trees [l]
-     and [r] have like weights OR that the tree [l] is heavier. In other words
-     it assumes that [NODE(l, v, r)] is not right heavy. *)
+  (* [join_maybe_left_heavy l v wr r] requires [l < v < r]. It assumes that
+     the trees [l] and [r] have like weights OR that the tree [l] is heavier.
+     In other words, it assumes that [NODE(l, v, r)] may be left heavy, but
+     is not right heavy. *)
 
-  (* [join_right] corresponds to [joinRightWB] in BFS, Figure 8. *)
+  (* [join_maybe_left_heavy] corresponds to [joinRightWB] in BFS, Figure 8. *)
 
   (* In this recursive function, the parameter [r] is invariant: the right
      branch of the tree [l] is followed until a node with like weight to [r]
      is reached. Then, on the way back, rebalancing is performed by invoking
      [balance_maybe_right_heavy]. *)
 
-  let rec join_right l v wr r =
+  let rec join_maybe_left_heavy l v wr r =
     if debug then assert (wr = weight r);
     let wl = weight l in
     if debug then assert (not_right_heavy wl wr);
     if not_left_heavy wl wr then
       create' wl l v wr r
     else
-      join_right_not_siblings wl l v wr r
+      join_left_heavy wl l v wr r
 
-  and join_right_not_siblings wl l v wr r =
+  (* [join_left_heavy] assumes that [NODE(l, v, r)] is left heavy. *)
+
+  and join_left_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (weight r <= weight l);
+    if debug then assert (left_heavy wl wr);
     DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
-    balance_maybe_right_heavy wll ll lv (wlr + wr) (join_right lr v wr r)
+    balance_maybe_right_heavy
+      wll ll
+      lv
+      (wlr + wr) (join_maybe_left_heavy lr v wr r)
 
-  (* [join_left l v r] requires [l < v < r]. It assumes that the trees [l]
-     and [r] have like weights OR that the tree [r] is heavier. *)
+  (* The following two functions are symmetric with the previous two. *)
 
-  let rec join_left wl l v r =
+  let rec join_maybe_right_heavy wl l v r =
     if debug then assert (wl = weight l);
     let wr = weight r in
     if debug then assert (not_left_heavy wl wr);
     if not_right_heavy wl wr then
       create' wl l v wr r
     else
-      join_left_not_siblings wl l v wr r
+      join_right_heavy wl l v wr r
 
-  and join_left_not_siblings wl l v wr r =
+  and join_right_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (weight l <= weight r);
+    if debug then assert (right_heavy wl wr);
     DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
-    balance_maybe_left_heavy (wl + wrl) (join_left wl l v rl) rv wrr rr
+    balance_maybe_left_heavy
+      (wl + wrl) (join_maybe_right_heavy wl l v rl)
+      rv
+      wrr rr
 
-  (* [join l v r] requires [l < v < r]. It makes no assumptions about
-     the weights of the subtrees [l] and [r]. *)
+  (* [join l v r] requires [l < v < r]. It makes no assumptions about the
+     weights of the subtrees [l] and [r]. *)
 
   let join l v r =
     let wl = weight l and wr = weight r in
@@ -330,10 +338,14 @@ module[@inline] Make (E : OrderedType) = struct
         create' wl l v wr r
       else
         (* right heavy *)
-        join_left_not_siblings wl l v wr r
+        join_right_heavy wl l v wr r
     else
       (* left heavy *)
-      join_right_not_siblings wl l v wr r
+      join_left_heavy wl l v wr r
+
+  (* [join_neighbors l v r] requires [l < v < r]. It assumes that the weights
+     of the subtrees [l] and [r] are close enough so that at most one step of
+     rebalancing suffices. (The exact precondition is unclear.) *)
 
   let join_neighbors l v r =
     let wl = weight l and wr = weight r in
@@ -347,7 +359,8 @@ module[@inline] Make (E : OrderedType) = struct
     else
       (* left heavy *)
       balance_left_heavy wl l v wr r
-        (* TODO rename these functions with more sensible names *)
+
+  (* A public view. *)
 
   type view =
     | Leaf
