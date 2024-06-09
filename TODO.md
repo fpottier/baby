@@ -10,9 +10,6 @@
 * Having `is_singleton` read the children (as opposed to the height or weight)
   might result overall in more efficient union, intersection, etc. Benchmark.
 
-* In `join2` and `join2_siblings`,
-  could choose a side based on which tree seems smaller.
-
 * Is the complexity of `subset` and `disjoint` correct?
   Benchmark at large sizes.
 
