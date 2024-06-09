@@ -6,7 +6,13 @@ module R = Reference.Make(V)
 
 module C = struct
 
+#ifdef WEIGHT
   include Bbst.WeightBalanced.Make(V)
+#else
+  include Bbst.HeightBalanced.Make(V)
+#endif
+
+#ifdef WEIGHT
 
   (* [union] and [inter] guarantee that if the result is logically equal
      to one of the arguments then it is physically equal to one of the
@@ -27,6 +33,8 @@ module C = struct
     if equal result t1 || equal result t2 then
       assert (result == t1 || result == t2);
     result
+
+#endif
 
   (* [diff] guarantees that if the result is logically equal to [t1]
      then it is physically equal to [t1]. This holds regardless of
@@ -202,7 +210,11 @@ let () =
 
 let () =
   let prologue () =
+#ifdef WEIGHT
     dprintf "          open Bbst.WeightBalanced.Make(Int);;\n";
+#else
+    dprintf "          open Bbst.HeightBalanced.Make(Int);;\n";
+#endif
     dprintf "          let flip f x y = f y x;;\n";
     ()
   in

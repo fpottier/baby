@@ -2,3 +2,10 @@
   (name test)
   (libraries bbst monolith)
 )
+
+;; Some files require preprocessing by cppo.
+
+(rule
+  (targets test.ml)
+  (deps test.cppo.ml)
+  (action (run %{bin:cppo} test.cppo.ml -D HEIGHT -o %{targets})))
