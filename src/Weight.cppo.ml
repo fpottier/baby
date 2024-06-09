@@ -1,6 +1,11 @@
 open Signatures
 open Profile
 
+(* This code implements weight-balancing, following Blelloch, Ferizovic and
+   Sun (2022), thereafter abbreviated as BFS. The balancing invariant and
+   algorithm are the same as in the paper, but this code is more aggressively
+   optimized; some redundant tests and memory allocations are avoided. *)
+
 (* This function is not inlined, so as to reduce code size and produce
    more readable assembly code. *)
 let impossible () =
