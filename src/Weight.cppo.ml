@@ -222,9 +222,8 @@ module[@inline] Make (E : OrderedType) = struct
 
   (* The choice of the parameter [alpha] is supposed to ensure that this is
      enough to re-establish the balancing invariant. However, I have not seen
-     the proof, so it is unclear to me exactly what is the precondition of
-     [balance_right_heavy]. Presumably the subtree [r] must not be excessively
-     heavy. *)
+     the proof, so the exact precondition of [balance_right_heavy] is unclear
+     to me. Presumably the subtree [r] must not be excessively heavy. *)
 
   let balance_right_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
