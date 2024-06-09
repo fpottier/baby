@@ -73,14 +73,21 @@ module[@inline] Make (E : OrderedType) = struct
   let alpha =
     29 (* in percent *)
 
-  (* [siblings l r] checks that [l] and [r] could be siblings in a valid
-     tree. *)
+  (* If [α * weight(l) <= (1-α) * weight(r)] holds, then the weight of the
+     subtree [l] is acceptable; in other words, the tree [NODE(l, v, r)]
+     is not left heavy. *)
 
   let[@inline] not_left_heavy wl wr =
     alpha * wl <= (100-alpha) * wr
 
+  (* Symmetrically, if [α * weight(r) <= (1-α) * weight(l)] holds, then the
+     the tree [NODE(l, v, r)] is not right heavy. *)
+
   let[@inline] not_right_heavy wl wr =
-    alpha * wr <= (100-alpha) * wl
+    not_left_heavy wr wl
+
+  (* If both inequalities hold, then the subtrees [l] and [r] have like
+     weights. This means that they can be siblings in a valid tree. *)
 
   let[@inline] like_weights wl wr =
     not_left_heavy wl wr && not_right_heavy wl wr
@@ -327,6 +334,7 @@ module[@inline] Make (E : OrderedType) = struct
     else
       (* left heavy *)
       balance_left_heavy_not_siblings wl l v wr r
+        (* TODO rename these functions with more sensible names *)
 
   type view =
     | Leaf
