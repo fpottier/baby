@@ -80,11 +80,17 @@ module[@inline] Make (E : OrderedType) = struct
   let[@inline] not_left_heavy wl wr =
     alpha * wl <= (100-alpha) * wr
 
+  let[@inline] left_heavy wl wr =
+    not (not_left_heavy wl wr)
+
   (* Symmetrically, if [α * weight(r) <= (1-α) * weight(l)] holds, then the
      the tree [NODE(l, v, r)] is not right heavy. *)
 
   let[@inline] not_right_heavy wl wr =
     not_left_heavy wr wl
+
+  let[@inline] right_heavy wl wr =
+    not (not_right_heavy wl wr)
 
   (* If both inequalities hold, then the subtrees [l] and [r] have like
      weights. This means that they can be siblings in a valid tree. *)
@@ -210,18 +216,19 @@ module[@inline] Make (E : OrderedType) = struct
     DESTRUCT(lr, lrl, lrv, lrr);
     create (create ll lv lrl) lrv (create lrr v r)
 
-  (* [balance_right_heavy l v r] is invoked by [join_right]. If it finds that
-     the subtree [r] is slightly too heavy, then a rotation or a double
-     rotation is performed. *)
+  (* [balance_right_heavy l v r] expects the tree [NODE(l, v, r)] to be right
+     heavy. It addresses this problem by performing a rotation or a double
+     rotation. *)
 
   (* The choice of the parameter [alpha] is supposed to ensure that this is
      enough to re-establish the balancing invariant. However, I have not seen
-     the proof, and it is unclear to me exactly what is the precondition of
-     [balance_right_heavy]. *)
+     the proof, so it is unclear to me exactly what is the precondition of
+     [balance_right_heavy]. Presumably the subtree [r] must not be excessively
+     heavy. *)
 
-  let balance_right_heavy_not_siblings wl l v wr r =
+  let balance_right_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (weight l <= weight r);
+    if debug then assert (right_heavy wl wr);
     DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
     if like_weights wl wrl && like_weights (wl + wrl) wrr then
       (* [rotate_left l v r] *)
@@ -233,17 +240,22 @@ module[@inline] Make (E : OrderedType) = struct
       let w = wl + wr in
       create'' w (create' wl l v wrll rll) rlv (create' wrlr rlr rv wrr rr)
 
-  let[@inline] balance_right_heavy wl l v wr r =
+  (* [balance_maybe_right_heavy l v r] expects the tree [NODE(l, v, r)] to be
+     either balanced or right heavy. *)
+
+  let[@inline] balance_maybe_right_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (not_left_heavy wl wr);
     if not_right_heavy wl wr then
       create' wl l v wr r
     else
-      balance_right_heavy_not_siblings wl l v wr r
+      balance_right_heavy wl l v wr r
 
-  let balance_left_heavy_not_siblings wl l v wr r =
+  (* The following two functions are symmetric with the previous two. *)
+
+  let balance_left_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (weight r <= weight l);
+    if debug then assert (left_heavy wl wr);
     DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
     if like_weights wlr wr && like_weights wll (wlr + wr) then
       (* [rotate_right l v r] *)
@@ -255,23 +267,24 @@ module[@inline] Make (E : OrderedType) = struct
       let w = wl + wr in
       create'' w (create' wll ll lv wlrl lrl) lrv (create' wlrr lrr v wr r)
 
-  let[@inline] balance_left_heavy wl l v wr r =
+  let[@inline] balance_maybe_left_heavy wl l v wr r =
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (not_right_heavy wl wr);
     if not_left_heavy wl wr then
       create' wl l v wr r
     else
-      balance_left_heavy_not_siblings wl l v wr r
+      balance_left_heavy wl l v wr r
 
   (* [join_right l v wr r] requires [l < v < r]. It assumes that the trees [l]
-     and [r] have like weights OR that the tree [l] is heavier. *)
+     and [r] have like weights OR that the tree [l] is heavier. In other words
+     it assumes that [NODE(l, v, r)] is not right heavy. *)
 
   (* [join_right] corresponds to [joinRightWB] in BFS, Figure 8. *)
 
   (* In this recursive function, the parameter [r] is invariant: the right
      branch of the tree [l] is followed until a node with like weight to [r]
      is reached. Then, on the way back, rebalancing is performed by invoking
-     [balance_right_heavy]. *)
+     [balance_maybe_right_heavy]. *)
 
   let rec join_right l v wr r =
     if debug then assert (wr = weight r);
@@ -286,7 +299,7 @@ module[@inline] Make (E : OrderedType) = struct
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight r <= weight l);
     DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
-    balance_right_heavy wll ll lv (wlr + wr) (join_right lr v wr r)
+    balance_maybe_right_heavy wll ll lv (wlr + wr) (join_right lr v wr r)
 
   (* [join_left l v r] requires [l < v < r]. It assumes that the trees [l]
      and [r] have like weights OR that the tree [r] is heavier. *)
@@ -304,7 +317,7 @@ module[@inline] Make (E : OrderedType) = struct
     if debug then assert (wl = weight l && wr = weight r);
     if debug then assert (weight l <= weight r);
     DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
-    balance_left_heavy (wl + wrl) (join_left wl l v rl) rv wrr rr
+    balance_maybe_left_heavy (wl + wrl) (join_left wl l v rl) rv wrr rr
 
   (* [join l v r] requires [l < v < r]. It makes no assumptions about
      the weights of the subtrees [l] and [r]. *)
@@ -330,10 +343,10 @@ module[@inline] Make (E : OrderedType) = struct
         create' wl l v wr r
       else
         (* right heavy *)
-        balance_right_heavy_not_siblings wl l v wr r
+        balance_right_heavy wl l v wr r
     else
       (* left heavy *)
-      balance_left_heavy_not_siblings wl l v wr r
+      balance_left_heavy wl l v wr r
         (* TODO rename these functions with more sensible names *)
 
   type view =
