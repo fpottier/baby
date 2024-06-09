@@ -38,8 +38,8 @@ let remove_max_elt (t : tree) : tree =
   | NODE(l, v, r) ->
       remove_max_elt_1 l v r
 
-(* [join2_siblings l r] requires [l] and [r] to be siblings in a valid
-   tree. *)
+(* [join2_siblings l r] is analogous to [join2 l r], but requires the
+   subtrees [l] and [r] to be siblings in a valid tree. *)
 
 (* [join2_siblings] is named [merge] in OCaml's Set library. *)
 
