@@ -20,9 +20,13 @@ all:
 clean:
 	@ git clean -fdX
 
+# [make test] tests both height-balanced and weight-balanced trees.
+# The output of the two tests is interleaved.
 .PHONY: test
-test:
-	@ make -C test/HeightBalanced random
+test: all
+	@ make -C test/HeightBalanced prepare
+	@ make -C test/WeightBalanced prepare
+	@ { make -C test/HeightBalanced random_nodep & make -C test/WeightBalanced random_nodep; }
 
 .PHONY: bench
 bench:
