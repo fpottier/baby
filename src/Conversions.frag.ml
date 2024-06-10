@@ -62,3 +62,31 @@ let of_list xs =
 
 let _of_list xs =
   List.fold_left (fun s x -> add x s) empty xs
+
+(* [to_array_slice t a i] writes the elements of the tree [t] to the
+   array slice determined by the array [a] and the start index [i].
+   It returns the end index of this slice. *)
+
+let rec to_array_slice (t : tree) a i : int =
+  if debug then assert (0 <= i && i + cardinal t <= Array.length a);
+  match VIEW(t) with
+  | LEAF ->
+      i
+  | NODE(l, v, r) ->
+      let i = to_array_slice l a i in
+      a.(i) <- v;
+      let i = i + 1 in
+      to_array_slice r a i
+
+(* [to_array] converts a set, in linear time, to a sorted array. *)
+
+let to_array (t : tree) : key array =
+  match VIEW(t) with
+  | LEAF ->
+      [||]
+  | NODE(_, dummy, _) ->
+      let n = cardinal t in
+      let a = Array.make n dummy in
+      let j = to_array_slice t a 0 in
+      if debug then assert (n = j);
+      a

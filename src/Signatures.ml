@@ -123,6 +123,7 @@ module type SET = sig
   val of_list : elt list -> set
   val of_array : elt array -> set
   val of_sorted_unique_array : elt array -> set
+  val to_array : set -> elt array
   val cardinal : set -> int
 
   module Enum : sig
