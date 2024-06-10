@@ -1,3 +1,11 @@
+(* [EMPTY(t)] determines whether the tree [t] is empty, that is, a leaf. *)
+
+#define EMPTY(t)        (match VIEW(t) with LEAF -> true | _ -> false)
+
+(* [BOTH_EMPTY(l,r)] determines whether the trees [l] and [r] are both empty. *)
+
+#define BOTH_EMPTY(l,r) (EMPTY(l) && EMPTY(r))
+
 (* -------------------------------------------------------------------------- *)
 
 (* Intersection. *)
@@ -35,7 +43,7 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
       leaf
   | NODE(_, _, _), NODE(l2, k2, r2) ->
       if t1 == t2 then t2 else (* fast path *)
-      if is_singleton t2 then
+      if BOTH_EMPTY(l2, r2) then
         (* The tree [t2] is [singleton k2]. *)
         if mem k2 t1 then t2 else leaf
       else
@@ -102,8 +110,8 @@ let rec union (t1 : tree) (t2 : tree) : tree =
       t2
   | _, LEAF ->
       t1
-  | NODE(_, k1, _), NODE(l2, k2, r2) ->
-      if is_singleton t1 then add k1 t2 else
+  | NODE(l1, k1, r1), NODE(l2, k2, r2) ->
+      if BOTH_EMPTY(l1, r1) then add k1 t2 else
       let l1, r1 = split13 k2 t1 in
       let l = union l1 l2
       and r = union r1 r2 in
@@ -154,10 +162,13 @@ let rec diff (t1 : tree) (t2 : tree) : tree =
       leaf
   | _, LEAF ->
       t1
-  | NODE(l1, k1, r1), NODE(_, k2, _) ->
-      (* TODO test [is_singleton t1] *)
+  | NODE(l1, k1, r1), NODE(l2, k2, r2) ->
       if t1 == t2 then leaf else (* fast path *)
-      if is_singleton t2 then
+      if BOTH_EMPTY(l1, r1) then
+        (* [t1] is [singleton k1]. *)
+        if mem k1 t2 then leaf else t1
+      else if BOTH_EMPTY(l2, r2) then
+        (* [t2] is [singleton k2]. *)
         remove k2 t1
       else
         let l2, b, r2 = split k1 t2 in
@@ -197,7 +208,8 @@ let rec xor (t1 : tree) (t2 : tree) : tree =
       t1
   | NODE(_, _, _), NODE(l2, k2, r2) ->
       if t1 == t2 then leaf else (* fast path *)
-      if is_singleton t2 then
+      if BOTH_EMPTY(l2, r2) then
+        (* [t2] is [singleton k2]. *)
         if mem k2 t1 then
           remove k2 t1
         else
