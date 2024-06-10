@@ -1,14 +1,9 @@
 # To Do
 
-* Remove all TODOs in the code.
-
 * Reduce the duplication between HeightBalanced, WeightBalanced,
   and the general case.
 
 * Benchmark weight-balanced trees. (Vary α.)
-
-* Having `is_singleton` read the children (as opposed to the height or weight)
-  might result overall in more efficient union, intersection, etc. Benchmark.
 
 * Is the complexity of `subset` and `disjoint` correct?
   Benchmark at large sizes.
