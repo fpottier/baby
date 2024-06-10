@@ -127,6 +127,12 @@ versions:
 	  done) > dune-workspace.versions
 	@ dune build --workspace dune-workspace.versions
 
+.PHONY: handiwork
+handiwork:
+	@ for v in $(VERSIONS) ; do \
+	    opam install --switch $$v cppo monolith ; \
+	  done
+
 # ------------------------------------------------------------------------------
 
 # [make headache] updates the headers.
