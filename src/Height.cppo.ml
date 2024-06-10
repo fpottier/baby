@@ -94,18 +94,6 @@ module[@inline] Make (E : OrderedType) = struct
     if debug then assert (E.compare y z < 0);
     TNode { l = singleton x; v = y; r = singleton z; h = 2 }
 
-  (* [is_singleton t] is equivalent to [height t = 1]. *)
-
-  (* Instead of testing whether the height is 1, we could test whether
-     both children are [TLeaf]. This makes essentially no difference. *)
-
-  let[@inline] is_singleton t =
-    match t with
-    | TLeaf ->
-        false
-    | TNode { h; _ } ->
-        h = 1
-
   (* [seems_smaller t1 t2] is equivalent to [height t1 < height t2]. *)
 
   let[@inline] seems_smaller t1 t2 =

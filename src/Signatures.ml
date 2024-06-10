@@ -76,10 +76,6 @@ module type BST = sig
      elements are [x], [y], and [z]. *)
   val tripleton : key -> key -> key -> tree
 
-  (**[is_singleton t] determines whether the tree [t] is a singleton, that
-     is, whether it contains just one element. *)
-  val is_singleton : tree -> bool
-
   (**[seems_smaller t1 t2] indicates which of the trees [t1] and [t2] seems
      smaller, based on height or weight. This function is used as part of a
      heuristic choice, so no correctness obligation bears on it; its

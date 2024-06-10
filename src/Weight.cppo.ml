@@ -163,18 +163,6 @@ module[@inline] Make (E : OrderedType) = struct
     if debug then assert (E.compare y z < 0);
     TNode { l = singleton x; v = y; r = singleton z; w = 4 }
 
-  (* [is_singleton t] is equivalent to [weight t = 2]. *)
-
-  (* Instead of testing whether the weight is 2, we could test whether
-     both children are [TLeaf]. This makes essentially no difference. *)
-
-  let[@inline] is_singleton t =
-    match t with
-    | TLeaf ->
-        false
-    | TNode { w; _ } ->
-        w = 2
-
   (* [seems_smaller t1 t2] is equivalent to [weight t1 < weight t2]. *)
 
   let[@inline] seems_smaller t1 t2 =
