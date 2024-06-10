@@ -1,14 +1,11 @@
 # To Do
 
-* Reduce the duplication between HeightBalanced, WeightBalanced,
-  and the general case.
-
 * Benchmark weight-balanced trees. (Vary α.)
 
 * Is the complexity of `subset` and `disjoint` correct?
   Benchmark at large sizes.
 
-* Weight balance gives gives us constant-time cardinal,
+* Weight balance gives us efficient
   random access and splitting by index.
   It also facilitates conversion to a sorted array.
 
