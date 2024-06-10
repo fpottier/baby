@@ -63,12 +63,18 @@ pin:
 unpin:
 	@ opam pin remove $(THIS) --yes
 
-ASSEMBLY=$(shell find . -name "*BinarySearchTree.s")
+ASSEMBLY=$(shell find . -name "bbst__WeightBalanced.s")
 .PHONY: assembly
 assembly:
 	@ dune clean && dune build --profile=release
-	@ echo Opening $(ASSEMBLY)...
-	@ open -a /Applications/Emacs.app/ $(ASSEMBLY)
+	@ cat $(ASSEMBLY) \
+	| grep -vw "\.loc" \
+	| grep -vw "\.long" \
+	| grep -vw "\.short" \
+	| grep -vw "\.asciz" \
+	| gsed "s/L[[:digit:]]\+/L/g" \
+	> WeightBalanced.s
+	@ open -a /Applications/Emacs.app/ WeightBalanced.s
 
 # ------------------------------------------------------------------------------
 
