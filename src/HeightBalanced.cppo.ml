@@ -9,13 +9,13 @@ open Profile
 
 module[@inline] Make (E : OrderedType) = struct
 
-include Height.Make(E)
+  include Height.Make(E)
 
-#define VIEW(t)       (t)
-#define LEAF          TLeaf
-#define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
+  #define VIEW(t)       (t)
+  #define LEAF          TLeaf
+  #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
-#include "Common.frag.ml"
-#include "Cardinal.frag.ml"
+  #include "Cardinal.frag.ml"
+  #include "Common.frag.ml"
 
 end

@@ -9,11 +9,11 @@ module[@inline] Make
 = struct
 include T
 
-#define VIEW(t)       (view t)
-#define LEAF          Leaf
-#define NODE(x, y, z) Node (x, y, z)
+  #define VIEW(t)       (view t)
+  #define LEAF          Leaf
+  #define NODE(x, y, z) Node (x, y, z)
 
-#include "Common.frag.ml"
-#include "Cardinal.frag.ml"
+  #include "Cardinal.frag.ml"
+  #include "Common.frag.ml"
 
 end

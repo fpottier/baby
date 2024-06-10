@@ -9,17 +9,17 @@ open Profile
 
 module[@inline] Make (E : OrderedType) = struct
 
-include Weight.Make(E)
+  include Weight.Make(E)
 
-#define VIEW(t)       (t)
-#define LEAF          TLeaf
-#define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
+  #define VIEW(t)       (t)
+  #define LEAF          TLeaf
+  #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
-#include "Common.frag.ml"
+  (* Weight-balanced trees offer a constant time [cardinal] function. *)
 
-(* Weight-balanced trees offer a constant time [cardinal] function. *)
+  let[@inline] cardinal (t : tree) : int =
+    weight t - 1
 
-let[@inline] cardinal (t : tree) : int =
-  weight t - 1
+  #include "Common.frag.ml"
 
 end
