@@ -65,12 +65,11 @@ module Enum = struct
   let[@inline] enum (t : tree) : enum =
     enum_1 t empty
 
-  (* [enum_from_aux low t e] constructs an enumeration whose elements are:
+  (* [enum_from_1 low t e] constructs an enumeration whose elements are:
      1- the elements [x] of the tree [t] such that [low <= x] holds,
      followed with 2- the elements of the enumeration [e]. *)
-  (* TODO rename *)
 
-  let rec enum_from_aux (low : key) (t : tree) (e : enum) : enum =
+  let rec enum_from_1 (low : key) (t : tree) (e : enum) : enum =
     match VIEW(t) with
     | LEAF ->
         e
@@ -79,12 +78,12 @@ module Enum = struct
         if c = 0 then
           More (v, r, e)
         else if c < 0 then
-          enum_from_aux low r e
+          enum_from_1 low r e
         else
-          enum_from_aux low l (More (v, r, e))
+          enum_from_1 low l (More (v, r, e))
 
   let[@inline] enum_from (low : key) (t : tree) : enum =
-    enum_from_aux low t empty
+    enum_from_1 low t empty
 
   (* [from_more low r e] extracts from an enumeration [More (v, r, e)],
      where the value [v] is known to lie below the threshold [low],
@@ -108,11 +107,11 @@ module Enum = struct
           (* [v'] is above the threshold. *)
           (* No part of [e] must be discarded. *)
           (* Keep part of [r], followed with [e]. *)
-          enum_from_aux low r e
+          enum_from_1 low r e
     | End ->
         (* [e] is empty. Keep part of [r]. *)
         enum_from low r
-          (* this is equivalent to [enum_from_aux low r e] *)
+          (* this is equivalent to [enum_from_1 low r e] *)
 
   (* [from low e] extracts from the enumeration [e]
      the elements that lie at or above the threshold [low] . *)
