@@ -32,7 +32,7 @@ let rec of_sorted_unique_array_slice a i j =
    contain no duplicate elements. It converts this array, in linear time,
    to a set. *)
 
-let of_sorted_unique_array a =
+let[@inline] of_sorted_unique_array a =
   of_sorted_unique_array_slice a 0 (Array.length a)
 
 (* [of_array_destructive a] converts the array, in linear time, to a set.
