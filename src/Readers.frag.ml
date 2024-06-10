@@ -199,6 +199,86 @@ module Enum = struct
     | More (v, r, e) ->
         elements v r e
 
+  (* Disjointness. *)
+
+  exception NotDisjoint
+
+  (* [enum_from_disjoint_1 low t e] returns the same result as [enum_from_1
+     low t e], except that it raises [NotDisjoint] if the key [low] appears
+     in its result. *)
+
+  let rec enum_from_disjoint_1 (low : key) (t : tree) (e : enum) : enum =
+    match VIEW(t) with
+    | LEAF ->
+        e
+    | NODE(l, v, r) ->
+        let c = E.compare v low in
+        if c = 0 then
+          raise NotDisjoint
+        else if c < 0 then
+          enum_from_disjoint_1 low r e
+        else
+          enum_from_disjoint_1 low l (More (v, r, e))
+
+  (* [from_more_disjoint low r e] returns the same result as [from_more low r
+     e], except that it raises [NotDisjoint] if the key [low] appears in its
+     result. *)
+
+  let rec from_more_disjoint (low : key) (r : tree) (e : enum) : enum =
+    match e with
+    | More (v', r', e') ->
+        let c = E.compare low v' in
+        if c > 0 then
+          from_more_disjoint low r' e'
+        else if c = 0 then
+          raise NotDisjoint
+        else
+          enum_from_disjoint_1 low r e
+    | End ->
+        enum_from_disjoint_1 low r e
+
+  (* [disjoint_more_more v1 r1 e1 v2 r2 e2] requires [v1 < v2]. It determines
+     whether the enumerations [More(v1, r1, e1)] and [More(v2, r2, e2)] are
+     disjoint. It either returns [true] or raises [NotDisjoint]. *)
+
+  (* This is Veldhuizen's leapfrog join algorithm. *)
+
+  let rec disjoint_more_more v1 r1 e1 v2 r2 e2 =
+    if debug then assert (E.compare v1 v2 < 0);
+    (* Skip past [v2] in the enumeration [e1]. *)
+    (* If [v2] appears in [e1], fail. *)
+    let e1 = from_more_disjoint v2 r1 e1 in
+    match e1 with
+    | End ->
+        (* If [e1] is now empty, we are done. *)
+        true
+    | More (v1, r1, e1) ->
+        (* If [e1] is nonempty, then its front value [v1] must be greater than
+           [v2]. Exchange the roles of the two enumerations and continue. *)
+        if debug then assert (E.compare v2 v1 < 0);
+        disjoint_more_more v2 r2 e2 v1 r1 e1
+
+  (* [disjoint e1 e2] determines whether the enumerations [e1] and [e2] are
+     disjoint. *)
+
+  let disjoint (e1 : enum) (e2 : enum) : bool =
+    match e1, e2 with
+    | End, _
+    | _, End ->
+        true
+    | More (v1, r1, e1), More (v2, r2, e2) ->
+        let c = E.compare v1 v2 in
+        if c = 0 then
+          false
+        else
+          try
+            if c < 0 then
+              disjoint_more_more v1 r1 e1 v2 r2 e2
+            else
+              disjoint_more_more v2 r2 e2 v1 r1 e1
+          with NotDisjoint ->
+            false
+
 end
 
 (* Conversion of a tree to an OCaml sequence. *)
