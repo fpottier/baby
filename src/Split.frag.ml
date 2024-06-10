@@ -1,5 +1,8 @@
 (* [split] is implemented in the same way in OCaml's Set library and by BFS. *)
 
+(* We use the same code, but add a physical equality test that allows us to
+   preserve sharing (and avoid memory allocation) in some cases. *)
+
 let rec split (k : key) (t : tree) : tree * bool * tree =
   match VIEW(t) with
   | LEAF ->
@@ -10,10 +13,10 @@ let rec split (k : key) (t : tree) : tree * bool * tree =
         l, true, r
       else if c < 0 then
         let ll, b, lr = split k l in
-        ll, b, join lr m r
+        ll, b, (if lr == l then t else join lr m r)
       else
         let rl, b, rr = split k r in
-        join l m rl, b, rr
+        (if rl == r then t else join l m rl), b, rr
 
 (* A specialized version of [split] that returns just the Boolean component
    of the result is [mem]. *)
@@ -31,10 +34,10 @@ let rec split13 (k : key) (t : tree) : tree * tree =
         l, r
       else if c < 0 then
         let ll, lr = split13 k l in
-        ll, join lr m r
+        ll, (if lr == l then t else join lr m r)
       else
         let rl, rr = split13 k r in
-        join l m rl, rr
+        (if rl == r then t else join l m rl), rr
 
 (* [join2] is known as [concat] in OCaml's Set library. *)
 
