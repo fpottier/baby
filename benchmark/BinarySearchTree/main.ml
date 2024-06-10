@@ -34,6 +34,18 @@ let n = 1000
 
 (* -------------------------------------------------------------------------- *)
 
+(* [Array.shuffle] *)
+
+let shuffle a =
+  for i = Array.length a - 1 downto 1 do
+    let j = Random.int (i + 1) in
+    let v = Array.get a i in
+    Array.set a i (Array.get a j);
+    Array.set a j v
+  done
+
+(* -------------------------------------------------------------------------- *)
+
 (* Insertion benchmark. *)
 
 module Add (S : sig
@@ -189,7 +201,7 @@ end) = struct
              of the same set, [c1] and [c2]. *)
           let c1 = mk_random_set random_integer c in
           let a2 = Array.of_list (S.elements c1) in
-          Array.shuffle ~rand:Random.int a2;
+          shuffle a2;
           let c2 = Array.fold_left (fun accu x -> S.add x accu) S.empty a2 in
           let s1 = union u1 c1
           and s2 = union u2 c2 in
