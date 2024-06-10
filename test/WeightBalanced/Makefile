@@ -1,5 +1,5 @@
-# The switch that is used for testing is named in the file default.switch.
-SWITCH := $(shell cat default.switch)
+# The switch that is used for testing is the current switch.
+SWITCH := default
 
 EXE := test.exe
 
