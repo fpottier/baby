@@ -16,5 +16,6 @@ include Height.Make(E)
 #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
 #include "Common.frag.ml"
+#include "Cardinal.frag.ml"
 
 end

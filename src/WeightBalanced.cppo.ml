@@ -17,4 +17,9 @@ include Weight.Make(E)
 
 #include "Common.frag.ml"
 
+(* Weight-balanced trees offer a constant time [cardinal] function. *)
+
+let[@inline] cardinal (t : tree) : int =
+  weight t - 1
+
 end

@@ -202,6 +202,9 @@ let () =
   let spec = sorted_unique_array_value ^> set in
   declare "of_sorted_unique_array" spec R.of_array C.of_array;
 
+  let spec = set ^> int in
+  declare "cardinal" spec R.cardinal C.cardinal;
+
   ()
 
 (* -------------------------------------------------------------------------- *)
