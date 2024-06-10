@@ -1,4 +1,4 @@
-(* A reference implementation of hash sets. *)
+(* A reference implementation of sets. *)
 
 open Bbst.Signatures
 
