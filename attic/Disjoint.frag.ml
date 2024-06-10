@@ -134,3 +134,66 @@ let disjoint2 t1 t2 =
     disjoint2 t1 t2
   with NotDisjoint ->
     false
+
+(* -------------------------------------------------------------------------- *)
+
+(* Enumerations. *)
+
+(* [disjoint e1 e2] determines whether the enumerations [e1] and [e2] are
+   disjoint. *)
+
+let disjoint (e1 : enum) (e2 : enum) : bool =
+  match e1, e2 with
+  | End, _
+  | _, End ->
+      true
+  | More (v1, r1, e1), More (v2, r2, e2) ->
+      let c = E.compare v1 v2 in
+      if c = 0 then
+        false
+      else
+        try
+          if c < 0 then
+            disjoint_more_more v1 r1 e1 v2 r2 e2
+          else
+            disjoint_more_more v2 r2 e2 v1 r1 e1
+        with NotDisjoint ->
+          false
+
+(* [disjoint_et e1 t2] determines whether the enumeration [e1] and the tree
+   [t2] are disjoint. It can be more efficient than [disjoint e1 (enum t2)]
+   because it seeks [v1] inside [t2]. It can also be slower, because building
+   [enum t2] requires no comparisons, whereas [enum_from_disjoint_1 v1 t2
+   empty] does involve comparisons. *)
+
+let disjoint_et (e1 : enum) (t2 : tree) : bool =
+  match e1 with
+  | End ->
+      true
+  | More (v1, r1, e1) ->
+      try
+        let e2 = enum_from_disjoint_1 v1 t2 empty in
+        match e2 with
+        | End ->
+            true
+        | More (v2, r2, e2) ->
+            if debug then assert (E.compare v1 v2 < 0);
+            disjoint_more_more v1 r1 e1 v2 r2 e2
+      with NotDisjoint ->
+        false
+
+(* This version of [disjoint t1 t2] converts only one tree (the smaller tree)
+   to an enumeration, then uses [disjoint_et]. It can be a bit faster or a bit
+   slower than the more straightforward definition based on [Enum.disjoint]. *)
+
+let disjoint t1 t2 =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _
+  | _, LEAF ->
+      true (* fast path *)
+  | _, _ ->
+      t1 != t2 && (* fast path *)
+      if seems_smaller t1 t2 then
+        Enum.(disjoint_et (enum t1) t2)
+      else
+        Enum.(disjoint_et (enum t2) t1)
