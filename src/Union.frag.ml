@@ -243,41 +243,27 @@ let rec disjoint (t1 : tree) (t2 : tree) : bool =
 
  *)
 
-(* This more complex version of [disjoint] does not use [split],
-   therefore does not construct new trees; it does not allocate
-   memory or perform rebalancing work. *)
+(* The above code can be improved by adding a fast path (based on physical
+   equality), by adding special cases for singletons, and by using a copy of
+   [split] that does not construct the subtrees [l] and [r] if the Boolean
+   result [b] is true. *)
 
-(* In comparison with [disjoint] in OCaml's Set library, this version
-   of [disjoint] can be twice faster and up to 40% slower. *)
+(* I have played with these variations, but I find them to be consistently
+   slower than the following approach, which is based on [Enum.disjoint]. *)
 
-(* [disjoint_node t1 l2 v2 r2] tests whether the trees [t1]
-   and [NODE(l2, v2, r2)] are disjoint. *)
-
-let rec disjoint_node t1 l2 v2 r2 =
-  match VIEW(t1) with
-  | LEAF ->
-      true
-  | NODE(l1, v1, r1) ->
-      let c = E.compare v2 v1 in
-      if c = 0 then
-        false
-      else if c < 0 then
-        not (mem v1 r2) &&
-        disjoint r1 r2 &&
-        disjoint_node l1 l2 v2 r2
-      else
-        not (mem v1 l2) &&
-        disjoint l1 l2 &&
-        disjoint_node r1 l2 v2 r2
-
-and disjoint (t1 : tree) (t2 : tree) : bool =
+let disjoint t1 t2 =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _
   | _, LEAF ->
-      true
-  | NODE(_, _, _), NODE(l2, v2, r2) ->
+      true (* fast path *)
+  | _, _ ->
       t1 != t2 && (* fast path *)
-      disjoint_node t1 l2 v2 r2
+      Enum.(disjoint (enum t1) (enum t2))
+
+(* I have also played with a version of [disjoint] that does not use [split],
+   therefore does not construct new trees; it does not allocate memory or
+   perform rebalancing work. It can be fast, but I believe that its worst-case
+   time complexity is not optimal. *)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -327,41 +313,3 @@ let rec subset (t1 : tree) (t2 : tree) : bool =
         weight t1 <= weight t2 && (* fast path *)
         let l1, r1 = split13 k2 t1 in
         subset l1 l2 && subset r1 r2
-
-(* This alternative version of [subset] does not allocate any memory.
-   Unfortunately, I believe that its worst-case time complexity may
-   be suboptimal, because of the calls to [mem]. In practice, I have
-   observed that it can be 3x faster or 3x slower than the above
-   definition of [subset]. *)
-
-(* (Disabled.)
-
-let rec subset_node t1 l2 v2 r2 =
-  match VIEW(t1) with
-  | LEAF ->
-      true
-  | NODE(l1, v1, r1) ->
-      let c = E.compare v2 v1 in
-      if c = 0 then
-        subset l1 l2 && subset r1 r2
-      else if c < 0 then
-        mem v1 r2 &&
-        subset r1 r2 &&
-        subset_node l1 l2 v2 r2
-      else
-        mem v1 l2 &&
-        subset l1 l2 &&
-        subset_node r1 l2 v2 r2
-
-and subset (t1 : tree) (t2 : tree) : bool =
-  match VIEW(t1), VIEW(t2) with
-  | LEAF, _ ->
-      true
-  | _, LEAF ->
-      false
-  | NODE(_, _, _), NODE(l2, v2, r2) ->
-      t1 == t2 || (* fast path *)
-      weight t1 <= weight t2 && (* fast path *)
-      subset_node t1 l2 v2 r2
-
- *)
