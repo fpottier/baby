@@ -40,3 +40,4 @@ type t = set
 #include "Subset.frag.ml"
 #include "Conversions.frag.ml"
 #include "Map.frag.ml"
+#include "Filter.frag.ml"

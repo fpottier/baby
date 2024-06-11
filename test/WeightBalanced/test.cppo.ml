@@ -249,6 +249,7 @@ let () =
   (* not tested: [map] *)
   (* TODO test [filter_map] with identity (test physical equality),
        with monotone function, with non-monotone function *)
+  (* not tested: [filter] *)
 
   ()
 

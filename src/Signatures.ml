@@ -146,6 +146,7 @@ module type SET = sig
 
   val map : (elt -> elt) -> set -> set
   val filter_map : (elt -> elt option) -> set -> set
+  val filter : (elt -> bool) -> set -> set
 
   module Enum : sig
 
