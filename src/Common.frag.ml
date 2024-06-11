@@ -1,3 +1,15 @@
+(* -------------------------------------------------------------------------- *)
+
+(* Types. *)
+
+type elt = key
+type set = tree
+type t = set
+
+(* -------------------------------------------------------------------------- *)
+
+(* Macros. *)
+
 (* [EMPTY(t)] determines whether the tree [t] is empty, that is, a leaf. *)
 
 #define EMPTY(t)        (match VIEW(t) with LEAF -> true | _ -> false)
@@ -6,7 +18,11 @@
 
 #define BOTH_EMPTY(l,r) (EMPTY(l) && EMPTY(r))
 
-#include "Basics.frag.ml"
+(* -------------------------------------------------------------------------- *)
+
+(* Operations. *)
+
+#include "Empty.frag.ml"
 #include "MinMax.frag.ml"
 #include "Add.frag.ml"
 #include "Remove.frag.ml"
