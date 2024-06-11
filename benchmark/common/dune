@@ -1,5 +1,5 @@
 ;; This is a support library for our benchmarks.
 (library
   (name common)
-  (libraries core core_unix.time_stamp_counter)
+  (libraries unix core core_unix.time_stamp_counter)
 )
