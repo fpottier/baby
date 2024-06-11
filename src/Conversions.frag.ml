@@ -95,8 +95,8 @@ let[@inline] of_sorted_unique_array a =
 
 (* -------------------------------------------------------------------------- *)
 
-(* [of_array_destructive a] converts the array, in linear time, to a set.
-   The array is modified (it is sorted and compressed). *)
+(* [of_array_destructive a] converts the array, in time O(n.log n), to
+   a set. The array is modified (it is sorted and compressed). *)
 
 let of_array_destructive a =
   (* Sort the array. *)
@@ -110,7 +110,7 @@ let of_array_destructive a =
 
 (* -------------------------------------------------------------------------- *)
 
-(* [of_array] converts an array, in linear time, to a set. *)
+(* [of_array] converts an array, in time O(n.log n), to a set. *)
 
 let of_array a =
   a |> Array.copy |> of_array_destructive
