@@ -28,9 +28,42 @@ let rec map f (t : tree) =
   | LEAF ->
       leaf
   | NODE(l, v, r) ->
-     (* We enforce left-to-right evaluation order. *)
+     (* Enforce left-to-right evaluation order. *)
      let l' = map f l in
      let v' = f v in
      let r' = map f r in
      if l == l' && v == v' && r == r' then t (* preserve sharing *)
      else lax_join l' v' r'
+
+(* [lax_join2] plays the role of [try_concat] in OCaml's Set library,
+   but is implemented in a slightly better way. *)
+
+let lax_join2 t1 t2 =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _ ->
+      t2
+  | _, LEAF ->
+      t1
+  | _, _ ->
+      if E.compare (max_elt t1) (min_elt t2) < 0 then
+        join2 t1 t2
+      else
+        union t1 t2
+
+(* [filter_map] is defined in the same way as in OCaml's Set library. *)
+
+let rec filter_map f (t : tree) =
+  match VIEW(t) with
+  | LEAF ->
+      leaf
+  | NODE(l, v, r) ->
+     (* Enforce left-to-right evaluation order. *)
+     let l' = filter_map f l in
+     let v' = f v in
+     let r' = filter_map f r in
+     match v' with
+     | Some v' ->
+         if l == l' && v == v' && r == r' then t (* preserve sharing *)
+         else lax_join l' v' r'
+     | None ->
+         lax_join2 l' r'

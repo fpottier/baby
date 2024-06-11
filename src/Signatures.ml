@@ -145,6 +145,7 @@ module type SET = sig
   val find_last_opt : (elt -> bool) -> t -> elt option
 
   val map : (elt -> elt) -> set -> set
+  val filter_map : (elt -> elt option) -> set -> set
 
   module Enum : sig
 
