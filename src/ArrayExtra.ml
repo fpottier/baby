@@ -31,3 +31,49 @@ let compress equal a =
       assert (equal !last a.(src));
     done;
     !dst
+
+type run =
+  int * int
+
+let rec foreach_increasing_run_in_slice compare yield accu a i n =
+  assert (0 <= i && i <= n && n <= length a);
+  if i = n then
+    (* There are no more runs. *)
+    accu
+  else
+    (* A new run begins at index [i]. *)
+    let last = a.(i)
+    and j = i + 1 in
+    scan compare yield accu a i last j n
+
+and scan compare yield accu a i last j n =
+  assert (0 <= i && i <= j && j <= n && n <= length a);
+  if j = n then
+    (* The run [i, j] ends here,
+       and the loop ends as well. *)
+    yield accu (i, j)
+  else
+    let current = a.(j) in
+    if compare last current < 0 then
+      (* The current run continues. *)
+      let last = current
+      and j = j + 1 in
+      scan compare yield accu a i last j n
+    else
+      (* The run [i, j] ends here,
+         and the loop continues. *)
+      let accu = yield accu (i, j) in
+      let last = current
+      and i = j
+      and j = j + 1 in
+      scan compare yield accu a i last j n
+
+let foreach_increasing_run compare yield accu a =
+  let i = 0
+  and n = length a in
+  foreach_increasing_run_in_slice compare yield accu a i n
+
+let increasing_runs compare a =
+  let yield runs run = (run :: runs) in
+  foreach_increasing_run compare yield [] a
+  |> List.rev
