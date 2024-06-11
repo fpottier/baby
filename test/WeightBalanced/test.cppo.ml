@@ -154,8 +154,16 @@ let () =
   let spec = set ^!> option value in
   declare "max_elt_opt" spec R.max_elt_opt C.max_elt_opt;
 
+  (* not tested: [choose], [choose_opt] *)
+
   let spec = value ^> set ^> bool in
   declare "mem" spec R.mem C.mem;
+
+  let spec = value ^> set ^!> value in
+  declare "find" spec R.find C.find;
+
+  let spec = value ^> set ^> option value in
+  declare "find_opt" spec R.find_opt C.find_opt;
 
   let spec = value ^> set ^> set in
   declare "add" spec R.add C.add;

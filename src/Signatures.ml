@@ -116,6 +116,8 @@ module type SET = sig
   val choose : set -> elt
   val choose_opt : set -> elt option
   val mem : elt -> set -> bool
+  val find : elt -> set -> elt
+  val find_opt : elt -> set -> elt option
   val add : elt -> set -> set
   val remove : elt -> set -> set
   val remove_min_elt : set -> set

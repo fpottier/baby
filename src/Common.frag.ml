@@ -25,6 +25,7 @@ type t = set
 #include "Empty.frag.ml"
 #include "MinMax.frag.ml"
 #include "Mem.frag.ml"
+#include "Find.frag.ml"
 #include "Add.frag.ml"
 #include "Remove.frag.ml"
 #include "Split.frag.ml"
