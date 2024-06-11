@@ -126,6 +126,7 @@ module type SET = sig
   val to_array : set -> elt array
   val cardinal : set -> int
   val get : set -> int -> elt
+  val split_at_2 : set -> int -> set * set
   val split_at_3 : set -> int -> set * elt * set
 
   module Enum : sig

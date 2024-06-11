@@ -361,6 +361,38 @@ let get (t : tree) (i : int) : key =
 
 (* Splitting by index. *)
 
+let rec split_at_2 (t : tree) (i : int) : tree * tree =
+  if debug then assert (0 <= i && i <= cardinal t);
+  if i = 0 then
+    leaf, t
+  else if i = cardinal t then
+    t, leaf
+  else
+    match VIEW(t) with
+    | LEAF ->
+        assert false
+    | NODE(l, v, r) ->
+        let cl = cardinal l in
+        if i <= cl then
+          let ll, lr = split_at_2 l i in
+          if debug then assert (lr != l);
+          ll, join lr v r
+        else (* [cl < i] *)
+          let rl, rr = split_at_2 r (i - (cl + 1)) in
+          if debug then assert (rl != r);
+          join l v rl, rr
+
+let split_at_2 (t : tree) (i : int) : tree * tree =
+  if constant_time_cardinal then
+    if 0 <= i && i <= cardinal t then
+      split_at_2 t i
+    else
+      Printf.sprintf "split_at_2: index %d is out of expected range [0, %d]"
+        i (cardinal t)
+      |> invalid_arg
+  else
+    failwith "split_at_2: operation is not available"
+
 let rec split_at_3 (t : tree) (i : int) : tree * key * tree =
   if debug then assert (0 <= i && i < cardinal t);
   match VIEW(t) with

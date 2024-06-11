@@ -84,11 +84,6 @@ let inhabits s =
     assert (mem z s);
     z
 
-(* Generating an index that is in range. *)
-
-let index s =
-  lt (R.cardinal s)
-
 (* Deconstructing a triple. *)
 
 let nest (x, y, z) =
@@ -227,13 +222,17 @@ let () =
   declare "cardinal" spec R.cardinal C.cardinal;
 
 #ifdef WEIGHT
-  let spec = set ^>> fun s -> index s ^> value in
+
+  let spec = set ^>> fun s -> lt (R.cardinal s) ^> value in
   declare "get" spec R.get C.get;
 
-  let spec = set ^>> fun s -> index s ^> triple set value set in
+  let spec = set ^>> fun s -> le (R.cardinal s) ^> set *** set in
+  declare "split_at_2" spec R.split_at_2 C.split_at_2;
+
+  let spec = set ^>> fun s -> lt (R.cardinal s) ^> triple set value set in
   declare "split_at_3" spec R.split_at_3 C.split_at_3;
+
 #else
-  ignore index;
   ignore triple;
 #endif
 
