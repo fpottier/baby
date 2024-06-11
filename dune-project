@@ -16,5 +16,6 @@
     dune
     cppo
     (monolith :with-test)
+    (ocamlfind :with-test)
   )
 )
