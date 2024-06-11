@@ -26,4 +26,10 @@ module Make (E : OrderedType) = struct
   let get s i =
     List.nth (elements s) i
 
+  let split_at s i =
+    let a = Array.of_list (elements s) in
+    of_array (Array.sub a 0 i),
+    a.(i),
+    of_array (Array.sub a (i+1) (Array.length a - (i+1)))
+
 end

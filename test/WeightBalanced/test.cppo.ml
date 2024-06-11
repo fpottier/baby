@@ -89,6 +89,17 @@ let inhabits s =
 let index s =
   lt (R.cardinal s)
 
+(* Deconstructing a triple. *)
+
+let nest (x, y, z) =
+  (x, (y, z))
+
+let triple spec1 spec2 spec3 =
+  map_into
+    nest
+    (nest, constant "nest")
+    (spec1 *** (spec2 *** spec3))
+
 (* Generating arrays. *)
 
 let array_value =
@@ -218,8 +229,12 @@ let () =
 #ifdef WEIGHT
   let spec = set ^>> fun s -> index s ^> value in
   declare "get" spec R.get C.get;
+
+  let spec = set ^>> fun s -> index s ^> triple set value set in
+  declare "split_at" spec R.split_at C.split_at;
 #else
   ignore index;
+  ignore triple;
 #endif
 
   ()
@@ -236,6 +251,7 @@ let () =
     dprintf "          open Bbst.HeightBalanced.Make(Int);;\n";
 #endif
     dprintf "          let flip f x y = f y x;;\n";
+    dprintf "          let nest (x, y, z) = (x, (y, z));;\n";
     ()
   in
   let fuel = 16 in
