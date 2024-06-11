@@ -155,6 +155,8 @@ let () =
   declare "max_elt_opt" spec R.max_elt_opt C.max_elt_opt;
 
   (* not tested: [choose], [choose_opt] *)
+  (* not tested: [find_first], [find_first_opt] *)
+  (* not tested: [find_last], [find_last_opt] *)
 
   let spec = value ^> set ^> bool in
   declare "mem" spec R.mem C.mem;

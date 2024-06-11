@@ -139,6 +139,11 @@ module type SET = sig
   val to_array : set -> elt array
   val cardinal : set -> int
 
+  val find_first : (elt -> bool) -> t -> elt
+  val find_first_opt : (elt -> bool) -> t -> elt option
+  val find_last : (elt -> bool) -> t -> elt
+  val find_last_opt : (elt -> bool) -> t -> elt option
+
   module Enum : sig
 
     type set = t
