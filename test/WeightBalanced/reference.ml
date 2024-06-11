@@ -23,4 +23,7 @@ module Make (E : OrderedType) = struct
   let of_sorted_unique_array =
     of_array
 
+  let get s i =
+    List.nth (elements s) i
+
 end

@@ -17,6 +17,9 @@ module[@inline] Make (E : OrderedType) = struct
 
   (* Weight-balanced trees offer a constant time [cardinal] function. *)
 
+  let constant_time_cardinal =
+    true
+
   let[@inline] cardinal (t : tree) : int =
     weight t - 1
 

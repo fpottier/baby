@@ -319,3 +319,40 @@ let compare (t1 : tree) (t2 : tree) : int =
 let[@inline] equal t1 t2 =
   weight t1 = weight t2 && (* fast path *)
   compare t1 t2 = 0
+
+(* -------------------------------------------------------------------------- *)
+
+(* Random access. *)
+
+(* This implementation assumes that we have a constant-time [cardinal]
+   function. Its complexity is logarithmic. *)
+
+(* If [cardinal] requires linear time then this implementation of [get] has
+   quadratic time complexity, which is unacceptable. In that case, it is
+   preferable to just use [to_array], which has linear time complexity,
+   followed with [Array.get]. *)
+
+let rec get (t : tree) (i : int) : key =
+  if debug then assert (0 <= i && i < cardinal t);
+  match VIEW(t) with
+  | LEAF ->
+      assert false
+  | NODE(l, v, r) ->
+      let cl = cardinal l in
+      if i = cl then
+        v
+      else if i < cl then
+        get l i
+      else
+        get r (i - (cl + 1))
+
+let get (t : tree) (i : int) : key =
+  if constant_time_cardinal then
+    if 0 <= i && i < cardinal t then
+      get t i
+    else
+      Printf.sprintf "get: index %d is out of expected range [0, %d)"
+        i (cardinal t)
+      |> invalid_arg
+  else
+    failwith "get: operation is not available"

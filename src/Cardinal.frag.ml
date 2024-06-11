@@ -1,5 +1,8 @@
 (* A linear-time [cardinal] function. *)
 
+let constant_time_cardinal =
+  false
+
 let rec cardinal accu (t : tree) : int =
   match VIEW(t) with
   | LEAF ->

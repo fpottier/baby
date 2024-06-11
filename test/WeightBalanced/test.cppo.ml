@@ -84,6 +84,11 @@ let inhabits s =
     assert (mem z s);
     z
 
+(* Generating an index that is in range. *)
+
+let index s =
+  lt (R.cardinal s)
+
 (* Generating arrays. *)
 
 let array_value =
@@ -209,6 +214,13 @@ let () =
 
   let spec = set ^> int in
   declare "cardinal" spec R.cardinal C.cardinal;
+
+#ifdef WEIGHT
+  let spec = set ^>> fun s -> index s ^> value in
+  declare "get" spec R.get C.get;
+#else
+  ignore index;
+#endif
 
   ()
 

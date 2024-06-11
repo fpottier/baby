@@ -125,6 +125,7 @@ module type SET = sig
   val of_sorted_unique_array : elt array -> set
   val to_array : set -> elt array
   val cardinal : set -> int
+  val get : set -> int -> elt
 
   module Enum : sig
 
