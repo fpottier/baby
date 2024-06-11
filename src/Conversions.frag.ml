@@ -1,6 +1,6 @@
 (* -------------------------------------------------------------------------- *)
 
-(* Conversion to a sorted list. *)
+(* [elements] converts a set, in linear time, to a sorted list. *)
 
 let rec elements (t : tree) (k : elt list) : elt list =
   match VIEW(t) with
@@ -12,10 +12,47 @@ let rec elements (t : tree) (k : elt list) : elt list =
 let[@inline] elements (t : tree) : elt list =
   elements t []
 
-(* Conversion of a tree to an OCaml sequence. *)
+(* -------------------------------------------------------------------------- *)
+
+(* [to_seq] converts a set to a sorted OCaml sequence (whose total
+   cost is linear). *)
 
 let to_seq (t : tree) : key Seq.t =
   fun () -> Enum.(to_seq_node (enum t))
+
+(* -------------------------------------------------------------------------- *)
+
+(* [to_array_slice t a i] writes the elements of the tree [t] to the
+   array slice determined by the array [a] and the start index [i].
+   It returns the end index of this slice. *)
+
+let rec to_array_slice (t : tree) a i : int =
+  if debug then assert (0 <= i && i + cardinal t <= Array.length a);
+  match VIEW(t) with
+  | LEAF ->
+      i
+  | NODE(l, v, r) ->
+      let i = to_array_slice l a i in
+      a.(i) <- v;
+      let i = i + 1 in
+      to_array_slice r a i
+
+(* -------------------------------------------------------------------------- *)
+
+(* [to_array] converts a set, in linear time, to a sorted array. *)
+
+let to_array (t : tree) : key array =
+  match VIEW(t) with
+  | LEAF ->
+      [||]
+  | NODE(_, dummy, _) ->
+      let n = cardinal t in
+      let a = Array.make n dummy in
+      let j = to_array_slice t a 0 in
+      if debug then assert (n = j);
+      a
+
+(* -------------------------------------------------------------------------- *)
 
 (* [of_sorted_unique_array_slice a i j] requires the array slice defined by
    array [a], start index [i], and end index [j] to be sorted and to contain
@@ -47,6 +84,8 @@ let rec of_sorted_unique_array_slice a i j =
       and r = of_sorted_unique_array_slice a (k+1) j in
       join_weight_balanced l v r
 
+(* -------------------------------------------------------------------------- *)
+
 (* [of_sorted_unique_array a] requires the array [a] to be sorted and to
    contain no duplicate elements. It converts this array, in linear time,
    to a set. *)
@@ -54,8 +93,10 @@ let rec of_sorted_unique_array_slice a i j =
 let[@inline] of_sorted_unique_array a =
   of_sorted_unique_array_slice a 0 (Array.length a)
 
+(* -------------------------------------------------------------------------- *)
+
 (* [of_array_destructive a] converts the array, in linear time, to a set.
-   The array is modified (it is sorted). *)
+   The array is modified (it is sorted and compressed). *)
 
 let of_array_destructive a =
   (* Sort the array. *)
@@ -67,45 +108,16 @@ let of_array_destructive a =
   (* Convert this array slice to a tree. *)
   of_sorted_unique_array_slice a 0 n
 
+(* -------------------------------------------------------------------------- *)
+
 (* [of_array] converts an array, in linear time, to a set. *)
 
 let of_array a =
   a |> Array.copy |> of_array_destructive
 
+(* -------------------------------------------------------------------------- *)
+
 (* [of_list] converts a list, in linear time, to a set. *)
 
 let of_list xs =
   xs |> Array.of_list |> of_array_destructive
-
-(* A naïve generic [of_list], whose complexity is O(n.log n). *)
-
-let _of_list xs =
-  List.fold_left (fun s x -> add x s) empty xs
-
-(* [to_array_slice t a i] writes the elements of the tree [t] to the
-   array slice determined by the array [a] and the start index [i].
-   It returns the end index of this slice. *)
-
-let rec to_array_slice (t : tree) a i : int =
-  if debug then assert (0 <= i && i + cardinal t <= Array.length a);
-  match VIEW(t) with
-  | LEAF ->
-      i
-  | NODE(l, v, r) ->
-      let i = to_array_slice l a i in
-      a.(i) <- v;
-      let i = i + 1 in
-      to_array_slice r a i
-
-(* [to_array] converts a set, in linear time, to a sorted array. *)
-
-let to_array (t : tree) : key array =
-  match VIEW(t) with
-  | LEAF ->
-      [||]
-  | NODE(_, dummy, _) ->
-      let n = cardinal t in
-      let a = Array.make n dummy in
-      let j = to_array_slice t a 0 in
-      if debug then assert (n = j);
-      a
