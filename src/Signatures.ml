@@ -144,6 +144,8 @@ module type SET = sig
   val find_last : (elt -> bool) -> t -> elt
   val find_last_opt : (elt -> bool) -> t -> elt option
 
+  val map : (elt -> elt) -> set -> set
+
   module Enum : sig
 
     type set = t
