@@ -113,6 +113,8 @@ module type SET = sig
   val min_elt_opt : set -> elt option
   val max_elt : set -> elt
   val max_elt_opt : set -> elt option
+  val choose : set -> elt
+  val choose_opt : set -> elt option
   val mem : elt -> set -> bool
   val add : elt -> set -> set
   val remove : elt -> set -> set

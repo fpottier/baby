@@ -53,3 +53,9 @@ let max_elt_opt (t : tree) : key option =
       None
   | NODE(_, v, r) ->
       max_elt_opt_1 v r
+
+let choose =
+  min_elt
+
+let choose_opt =
+  min_elt_opt
