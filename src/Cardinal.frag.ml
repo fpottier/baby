@@ -4,10 +4,10 @@ let constant_time_cardinal =
   false
 
 let rec cardinal accu (t : tree) : int =
-  match VIEW(t) with
-  | LEAF ->
+  match t with
+  | TLeaf ->
       accu
-  | NODE(l, _, r) ->
+  | TNode { l; r; _ } ->
       let accu = accu + 1 in
       let accu = cardinal accu l in
       cardinal accu r

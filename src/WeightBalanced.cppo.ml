@@ -15,14 +15,6 @@ module[@inline] Make (E : OrderedType) = struct
   #define LEAF          TLeaf
   #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
-  (* Weight-balanced trees offer a constant time [cardinal] function. *)
-
-  let constant_time_cardinal =
-    true
-
-  let[@inline] cardinal (t : tree) : int =
-    weight t - 1
-
   #include "Common.frag.ml"
 
 end

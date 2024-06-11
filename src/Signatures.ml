@@ -65,6 +65,15 @@ module type BST = sig
      implies [weight t1 <= weight t2]. *)
   val weight : tree -> int
 
+  (**[cardinal t] returns the number of elements in the tree. Depending on the
+     internal representation of trees, the function [cardinal] may have time
+     complexity O(1) or O(n). This is indicated by [constant_time_cardinal]. *)
+  val cardinal : tree -> int
+
+  (**[constant_time_cardinal] indicates whether [cardinal] constant time
+     complexity. *)
+  val constant_time_cardinal : bool
+
   (**[singleton x] constructs a tree whose sole element is [x]. *)
   val singleton : key -> tree
 

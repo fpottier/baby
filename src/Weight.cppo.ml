@@ -39,6 +39,14 @@ module[@inline] Make (E : OrderedType) = struct
     | TNode { w; _ } ->
         w
 
+  (* Weight-balanced trees offer a constant time [cardinal] function. *)
+
+  let constant_time_cardinal =
+    true
+
+  let[@inline] cardinal (t : tree) : int =
+    weight t - 1
+
   (* This macro destructs a tree [t] that is known not to be a leaf.
      It binds the variables [tl], [tv], [tr].
      It is intended to be followed with a semicolon. *)

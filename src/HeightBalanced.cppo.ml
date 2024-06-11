@@ -15,7 +15,6 @@ module[@inline] Make (E : OrderedType) = struct
   #define LEAF          TLeaf
   #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
-  #include "Cardinal.frag.ml"
   #include "Common.frag.ml"
 
 end
