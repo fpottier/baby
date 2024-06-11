@@ -1,3 +1,22 @@
+(* -------------------------------------------------------------------------- *)
+
+(* Conversion to a sorted list. *)
+
+let rec elements (t : tree) (k : elt list) : elt list =
+  match VIEW(t) with
+  | LEAF ->
+      k
+  | NODE(l, v, r) ->
+      elements l (v :: elements r k)
+
+let[@inline] elements (t : tree) : elt list =
+  elements t []
+
+(* Conversion of a tree to an OCaml sequence. *)
+
+let to_seq (t : tree) : key Seq.t =
+  fun () -> Enum.(to_seq_node (enum t))
+
 (* [of_sorted_unique_array_slice a i j] requires the array slice defined by
    array [a], start index [i], and end index [j] to be sorted and to contain
    no duplicate elements. It converts this array slice, in linear time, to a
