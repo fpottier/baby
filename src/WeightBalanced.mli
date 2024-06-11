@@ -1,3 +1,3 @@
 open Signatures
 
-module Make (E : OrderedType) : SET with type elt = E.t
+module Make (E : OrderedType) : SET' with type elt = E.t

@@ -16,5 +16,6 @@ module[@inline] Make (E : OrderedType) = struct
   #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
   #include "Common.frag.ml"
+  #include "RandomAccess.frag.ml"
 
 end

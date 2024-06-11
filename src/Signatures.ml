@@ -134,9 +134,6 @@ module type SET = sig
   val of_sorted_unique_array : elt array -> set
   val to_array : set -> elt array
   val cardinal : set -> int
-  val get : set -> int -> elt
-  val split_at_2 : set -> int -> set * set
-  val split_at_3 : set -> int -> set * elt * set
 
   module Enum : sig
 
@@ -196,4 +193,11 @@ module type SET = sig
 
   end (* Enum *)
 
+end
+
+module type SET' = sig
+  include SET
+  val get : set -> int -> elt
+  val split_at_2 : set -> int -> set * set
+  val split_at_3 : set -> int -> set * elt * set
 end
