@@ -130,7 +130,7 @@ versions:
 .PHONY: handiwork
 handiwork:
 	@ for v in $(VERSIONS) ; do \
-	    opam install --switch $$v cppo monolith ; \
+	    opam install --switch $$v cppo monolith core core_unix ; \
 	  done
 
 # ------------------------------------------------------------------------------
