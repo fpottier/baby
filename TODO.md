@@ -1,12 +1,15 @@
 # To Do
 
-* Should `from_more` be renamed to `cons_enum_from`?
+* Split `Union.frag.ml` and `Readers.frag.ml` into multiple files.
+
+* Better document the difference between `enum_from_1` and `from_more`,
+  as they have the same type, but different specs.
+  Rename them?
 
 * Benchmark weight-balanced trees. (Vary α.)
 
-* Weight balance gives us efficient
-  random access and splitting by index.
-  It also facilitates conversion to a sorted array.
+* The functor `BinarySearchTree` should require `cardinal` and
+  `constant_time_cardinal` instead of defining them in a pessimistic way.
 
 * Make sure everything is tested, including `Enum`.
 
