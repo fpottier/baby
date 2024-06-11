@@ -26,7 +26,7 @@ module Make (E : OrderedType) = struct
   let get s i =
     List.nth (elements s) i
 
-  let split_at s i =
+  let split_at_3 s i =
     let a = Array.of_list (elements s) in
     of_array (Array.sub a 0 i),
     a.(i),

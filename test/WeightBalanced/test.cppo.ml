@@ -231,7 +231,7 @@ let () =
   declare "get" spec R.get C.get;
 
   let spec = set ^>> fun s -> index s ^> triple set value set in
-  declare "split_at" spec R.split_at C.split_at;
+  declare "split_at_3" spec R.split_at_3 C.split_at_3;
 #else
   ignore index;
   ignore triple;
