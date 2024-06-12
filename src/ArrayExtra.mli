@@ -15,7 +15,7 @@ type run =
    is [accu], is threaded through the sequence of calls to [yield]. *)
 val foreach_increasing_run :
   ('a -> 'a -> int) ->
-  ('b -> run -> 'b) ->
+  ('b -> int -> int -> 'b) ->
   'b -> 'a array -> 'b
 
 (**[increasing_run compare a] returns a list of the consecutive increasing

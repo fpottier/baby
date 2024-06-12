@@ -51,7 +51,7 @@ and scan compare yield accu a i last j n =
   if j = n then
     (* The run [i, j] ends here,
        and the loop ends as well. *)
-    yield accu (i, j)
+    yield accu i j
   else
     let current = a.(j) in
     if compare last current < 0 then
@@ -62,7 +62,7 @@ and scan compare yield accu a i last j n =
     else
       (* The run [i, j] ends here,
          and the loop continues. *)
-      let accu = yield accu (i, j) in
+      let accu = yield accu i j in
       let last = current
       and i = j
       and j = j + 1 in
@@ -74,6 +74,6 @@ let foreach_increasing_run compare yield accu a =
   foreach_increasing_run_in_slice compare yield accu a i n
 
 let increasing_runs compare a =
-  let yield runs run = (run :: runs) in
+  let yield runs i j = ((i, j) :: runs) in
   foreach_increasing_run compare yield [] a
   |> List.rev

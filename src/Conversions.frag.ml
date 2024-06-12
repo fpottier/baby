@@ -104,7 +104,7 @@ let[@inline] of_sorted_unique_array a =
    is computed. *)
 
 let of_array a =
-  let yield accu (i, j) = union accu (of_sorted_unique_array_slice a i j) in
+  let yield accu i j = union accu (of_sorted_unique_array_slice a i j) in
   ArrayExtra.foreach_increasing_run E.compare yield empty a
 
 (* -------------------------------------------------------------------------- *)
