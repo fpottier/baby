@@ -118,7 +118,7 @@ let sorted_unique_array_value =
     Gen.(sorted_unique_array Int.compare (int 16) (semi_open_interval (-16) (15)))
     Print.(array int)
 
-(* Consuming a sequence. *)
+(* Generating or consuming sequences of values. *)
 
 let seq_value =
   declare_seq value
@@ -209,8 +209,14 @@ let () =
   let spec = set ^> list value in
   declare "elements" spec R.elements C.elements;
 
+  let spec = seq_value ^> set in
+  declare "of_seq" spec R.of_seq C.of_seq;
+
   let spec = set ^> seq_value in
   declare "to_seq" spec R.to_seq C.to_seq;
+
+  let spec = seq_value ^> set ^> set in
+  declare "add_seq" spec R.add_seq C.add_seq;
 
   (* [of_list] is important in this test because it offers a cheap way
      of creating nontrivial sets. It consumes just one unit of fuel. *)

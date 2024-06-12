@@ -132,6 +132,8 @@ module type SET = sig
   val compare : set -> set -> int
   val split : elt -> set -> set * bool * set
   val elements : set -> elt list
+  val of_seq : elt Seq.t -> set
+  val add_seq : elt Seq.t -> set -> set
   val to_seq : set -> elt Seq.t
   val of_list : elt list -> set
   val of_array : elt array -> set

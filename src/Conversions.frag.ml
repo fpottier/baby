@@ -109,7 +109,29 @@ let of_array a =
 
 (* -------------------------------------------------------------------------- *)
 
-(* [of_list] converts a list to a set. *)
+(* [of_list] converts a list to a set. It is adaptive. *)
+
+(* OCaml's Set library constructs a sorted list (using [List.sort_uniq]) and
+   converts it directly to a tree. Instead, we convert the list to an array
+   and use [of_array]. On random data, our approach seems slower by about 50%.
+   On sorted data, our approach can be 2x or 3x faster. One drawback of our
+   approach is that it requires linear auxiliary storage. *)
 
 let of_list xs =
   xs |> Array.of_list |> of_array
+
+(* -------------------------------------------------------------------------- *)
+
+(* [of_seq] converts a sequence to a set. It is adaptive. *)
+
+(* [of_seq] in OCaml's Set library is implemented using [add_seq], which
+   itself is naively implemented by iterated insertions, so its complexity
+   is O(n.log n), whereas it could be O(n). *)
+
+let of_seq xs =
+  xs |> Array.of_seq |> of_array
+
+(* [add_seq] inserts a sequence into a set. *)
+
+let add_seq xs t =
+  union (of_seq xs) t
