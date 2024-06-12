@@ -3,7 +3,7 @@ module type OrderedType = sig
   val compare : t -> t -> int
 end
 
-(**The signature [BST] describes the interface offer by the balancing code.
+(**The signature [BST] describes the interface offered by the balancing code.
    The remaining operations on binary search tree are built on top of this
    interface, and are oblivious to the balancing criterion. *)
 module type BST = sig
