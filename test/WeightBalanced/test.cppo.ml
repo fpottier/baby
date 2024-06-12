@@ -167,6 +167,7 @@ let () =
   let spec = value ^> set ^> set in
   declare "remove" spec R.remove C.remove;
 
+  (* TODO do the same for [mem], [find], [add], etc. *)
   (* Specifically remove a value that is in the set. *)
   let spec = set ^>> fun s -> (inhabits s) ^> set in
   declare "flip remove" spec (flip R.remove) (flip C.remove);
