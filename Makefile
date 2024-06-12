@@ -5,7 +5,7 @@
 DATE     := $(shell /bin/date +%Y%m%d)
 
 # The project's name.
-THIS     := bbst
+THIS     := bistro
 
 # The archive's URL (https).
 ARCHIVE  := https://github.com/fpottier/$(THIS)/archive/$(DATE).tar.gz
@@ -53,7 +53,7 @@ reinstall: uninstall
 
 .PHONY: show
 show: reinstall
-	@ echo "#require \"bbst\";;\n#show Bbst;;" | ocaml
+	@ echo "#require \"bistro\";;\n#show Bistro;;" | ocaml
 
 .PHONY: pin
 pin:
@@ -63,7 +63,7 @@ pin:
 unpin:
 	@ opam pin remove $(THIS) --yes
 
-ASSEMBLY=$(shell find . -name "bbst__WeightBalanced.s")
+ASSEMBLY=$(shell find . -name "bistro__WeightBalanced.s")
 .PHONY: assembly
 assembly:
 	@ dune clean && dune build --profile=release

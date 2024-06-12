@@ -7,9 +7,9 @@ module R = Reference.Make(V)
 module C = struct
 
 #ifdef WEIGHT
-  include Bbst.WeightBalanced.Make(V)
+  include Bistro.WeightBalanced.Make(V)
 #else
-  include Bbst.HeightBalanced.Make(V)
+  include Bistro.HeightBalanced.Make(V)
 #endif
 
 #ifdef WEIGHT
@@ -110,7 +110,7 @@ let sorted_array compare n element () =
 let sorted_unique_array compare n element () =
   let a = sorted_array compare n element () in
   let equal x y = compare x y = 0 in
-  let n = Bbst.ArrayExtra.compress equal a in
+  let n = Bistro.ArrayExtra.compress equal a in
   Array.sub a 0 n
 
 let sorted_unique_array_value =
@@ -267,9 +267,9 @@ let () =
 let () =
   let prologue () =
 #ifdef WEIGHT
-    dprintf "          open Bbst.WeightBalanced.Make(Int);;\n";
+    dprintf "          open Bistro.WeightBalanced.Make(Int);;\n";
 #else
-    dprintf "          open Bbst.HeightBalanced.Make(Int);;\n";
+    dprintf "          open Bistro.HeightBalanced.Make(Int);;\n";
 #endif
     dprintf "          let flip f x y = f y x;;\n";
     dprintf "          let nest (x, y, z) = (x, (y, z));;\n";

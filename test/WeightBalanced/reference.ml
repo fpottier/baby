@@ -1,6 +1,6 @@
 (* A reference implementation of sets. *)
 
-open Bbst.Signatures
+open Bistro.Signatures
 
 module Make (E : OrderedType) = struct
 

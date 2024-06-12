@@ -1,6 +1,6 @@
 (executable
   (name test)
-  (libraries bbst monolith)
+  (libraries bistro monolith)
 )
 
 ;; Some files require preprocessing by cppo.

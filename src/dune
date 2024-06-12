@@ -1,7 +1,7 @@
 ;; This is a library.
 (library
-  (name bbst)
-  (public_name bbst)
+  (name bistro)
+  (public_name bistro)
 )
 
 ;; Warnings are enabled in development builds and disabled in release builds.

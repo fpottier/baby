@@ -1,5 +1,5 @@
 open Printf
-open Bbst
+open Bistro
 
 module B = Common.Benchmark
 let run benchmarks =

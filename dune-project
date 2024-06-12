@@ -1,14 +1,14 @@
 (lang dune 3.11)
 (generate_opam_files true)
 (package
-  (name bbst)
+  (name bistro)
   (authors
     "François Pottier"
   )
   (maintainers
     "François Pottier"
   )
-  (homepage https://github.com/fpottier/bbst/)
+  (homepage https://github.com/fpottier/bistro/)
   (bug_reports francois.pottier@inria.fr)
   (synopsis "Several kinds of balanced binary search trees")
   (depends
