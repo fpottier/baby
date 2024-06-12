@@ -426,6 +426,48 @@ let of_array u =
 
 (* -------------------------------------------------------------------------- *)
 
+(* [of_list] benchmark. *)
+
+module OfList (S : sig
+  type t
+  val of_list : int list -> t
+end) (P : sig
+  val u : int
+  val candidate : string
+end) = struct
+  open S
+  open P
+  let basis = 1
+
+  let name = sprintf "of_list (random data) (size %d) (%s)" u candidate
+  let run () =
+    let a = Array.init u (fun i -> i) in
+    shuffle a;
+    let xs = Array.to_list a in
+    fun () ->
+      of_list xs
+      |> ignore
+  let benchmark1 = B.benchmark ~name ~quota ~basis ~run
+
+  let name = sprintf "of_list (sorted data) (size %d) (%s)" u candidate
+  let run () =
+    let xs = List.init u (fun i -> i) in
+    fun () ->
+      of_list xs
+      |> ignore
+  let benchmark2 = B.benchmark ~name ~quota ~basis ~run
+
+end
+
+let of_list u =
+  let module P = struct let u = u end in
+  let module R = OfList(R)(struct include P let candidate = "reference" end) in
+  let module W = OfList(W)(struct include P let candidate = "weight/of_list" end) in
+  [ R.benchmark1; W.benchmark1;
+    R.benchmark2; W.benchmark2 ]
+
+(* -------------------------------------------------------------------------- *)
+
 (* Synthetic benchmarks. *)
 
 module Eratosthenes (S : sig
@@ -573,7 +615,7 @@ let () =
     run_binary_benchmark equal
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** of_array\n";
     eprintf "\n";
     run (of_array 100);
@@ -583,6 +625,18 @@ let () =
     run (of_array 10000);
     eprintf "\n";
     run (of_array 100000);
+  end;
+
+  if false then begin
+    eprintf "*** of_list\n";
+    eprintf "\n";
+    run (of_list 100);
+    eprintf "\n";
+    run (of_list 1000);
+    eprintf "\n";
+    run (of_list 10000);
+    eprintf "\n";
+    run (of_list 100000);
   end;
 
   if false then begin
