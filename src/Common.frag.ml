@@ -41,3 +41,4 @@ type t = set
 #include "Conversions.frag.ml"
 #include "Map.frag.ml"
 #include "Filter.frag.ml"
+#include "RandomAccess.frag.ml"

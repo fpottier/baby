@@ -24,7 +24,7 @@ end
 module W : sig
 
   module Set : sig
-    module Make (E : OrderedType) : SET' with type elt = E.t
+    module Make (E : OrderedType) : SET with type elt = E.t
   end
 
 end
@@ -32,7 +32,7 @@ end
 module Make
 (E : OrderedType)
 (_ : BST with type key = E.t)
-: SET' with type elt = E.t
+: SET with type elt = E.t
 
 module Height : sig
   (** @inline *)

@@ -1,11 +1,5 @@
 (executable
   (name test)
-  (libraries bistro monolith)
+  (libraries height_candidate monolith)
+  (flags (:standard "-open" "Height_candidate"))
 )
-
-;; Some files require preprocessing by cppo.
-
-(rule
-  (targets test.ml)
-  (deps test.cppo.ml)
-  (action (run %{bin:cppo} test.cppo.ml -D HEIGHT -o %{targets})))

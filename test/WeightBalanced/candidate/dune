@@ -1,0 +1,4 @@
+(library
+  (name weight_candidate)
+  (libraries bistro)
+)

@@ -153,6 +153,12 @@ module type SET = sig
   val filter : (elt -> bool) -> set -> set
   val partition : (elt -> bool) -> set -> set * set
 
+  (* The random access functions -- not implemented by height-balanced trees. *)
+  val get : set -> int -> elt
+  val index : elt -> set -> int
+  val split_at_2 : set -> int -> set * set
+  val split_at_3 : set -> int -> set * elt * set
+
   module Enum : sig
 
     type set = t
@@ -216,13 +222,4 @@ module type SET = sig
 
   end (* Enum *)
 
-end
-
-module type SET' = sig
-  (** @closed *)
-  include SET
-  val get : set -> int -> elt
-  val index : elt -> set -> int
-  val split_at_2 : set -> int -> set * set
-  val split_at_3 : set -> int -> set * elt * set
 end

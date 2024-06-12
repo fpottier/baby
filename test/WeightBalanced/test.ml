@@ -1,51 +1,12 @@
 open Monolith
 
-module V = Int
+(* This is the reference implementation. *)
+module R = Reference.Make(Int)
 
-module R = Reference.Make(V)
-
-module C = struct
-
-#ifdef WEIGHT
-  include Bistro.W.Set.Make(V)
-#else
-  include Bistro.H.Set.Make(V)
-#endif
-
-#ifdef WEIGHT
-
-  (* [union] and [inter] guarantee that if the result is logically equal
-     to one of the arguments then it is physically equal to one of the
-     arguments. *)
-
-  (* This guarantee holds for weight-balanced trees, but not for
-     height-balanced trees; indeed, a reliable way of comparing
-     the cardinals of the two sets is needed. *)
-
-  let union t1 t2 =
-    let result = union t1 t2 in
-    if equal result t1 || equal result t2 then
-      assert (result == t1 || result == t2);
-    result
-
-  let inter t1 t2 =
-    let result = inter t1 t2 in
-    if equal result t1 || equal result t2 then
-      assert (result == t1 || result == t2);
-    result
-
-#endif
-
-  (* [diff] guarantees that if the result is logically equal to [t1]
-     then it is physically equal to [t1]. This holds regardless of
-     which balancing criterion is used. *)
-
-  let[@inline] diff t1 t2 =
-    let result = diff t1 t2 in
-    if equal result t1 then assert (result == t1);
-    result
-
-end
+(* The candidate implementation is supplied by a separate library,
+   which is either [Weight_candidate] or [Height_candidate]. Both
+   of these libraries offer a module named [Candidate]. *)
+module C = Candidate
 
 (* -------------------------------------------------------------------------- *)
 
@@ -232,27 +193,25 @@ let () =
   let spec = set ^> int in
   declare "cardinal" spec R.cardinal C.cardinal;
 
-#ifdef WEIGHT
+  if C.has_random_access_functions then begin
 
-  let spec = set ^>> fun s -> lt (R.cardinal s) ^> value in
-  declare "get" spec R.get C.get;
+    let spec = set ^>> fun s -> lt (R.cardinal s) ^> value in
+    declare "get" spec R.get C.get;
 
-  let spec = value ^> set ^!> int in
-  declare "index" spec R.index C.index;
+    let spec = value ^> set ^!> int in
+    declare "index" spec R.index C.index;
 
-  (* Specifically query a value that is in the set. *)
-  let spec = set ^>> fun s -> (inhabits s) ^> int in
-  declare "flip index" spec (flip R.index) (flip C.index);
+    (* Specifically query a value that is in the set. *)
+    let spec = set ^>> fun s -> (inhabits s) ^> int in
+    declare "flip index" spec (flip R.index) (flip C.index);
 
-  let spec = set ^>> fun s -> le (R.cardinal s) ^> set *** set in
-  declare "split_at_2" spec R.split_at_2 C.split_at_2;
+    let spec = set ^>> fun s -> le (R.cardinal s) ^> set *** set in
+    declare "split_at_2" spec R.split_at_2 C.split_at_2;
 
-  let spec = set ^>> fun s -> lt (R.cardinal s) ^> triple set value set in
-  declare "split_at_3" spec R.split_at_3 C.split_at_3;
+    let spec = set ^>> fun s -> lt (R.cardinal s) ^> triple set value set in
+    declare "split_at_3" spec R.split_at_3 C.split_at_3;
 
-#else
-  ignore triple;
-#endif
+  end;
 
   (* not tested: [map] *)
   (* TODO test [filter_map] with identity (test physical equality),
@@ -268,11 +227,7 @@ let () =
 
 let () =
   let prologue () =
-#ifdef WEIGHT
-    dprintf "          open Bistro.W.Set.Make(Int);;\n";
-#else
-    dprintf "          open Bistro.H.Set.Make(Int);;\n";
-#endif
+    dprintf "          open %s;;\n" C.name;
     dprintf "          let flip f x y = f y x;;\n";
     dprintf "          let nest (x, y, z) = (x, (y, z));;\n";
     ()
