@@ -2,8 +2,6 @@
 
 * Add `index` and `Enum.cardinal`.
 
-* Rename the project to `bistro`.
-
 * Make sure every file is clean and documented.
 
 * Hide or clearly mark all unsafe operations.
@@ -19,8 +17,6 @@
 
 * Make sure that we have every function from BFS
   and from OCaml's `Set` API.
-
-* If possible, hide `Signatures` from the end user.
 
 * Make sure assertions are erased in release mode (ArrayExtra).
 
