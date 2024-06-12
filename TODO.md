@@ -17,14 +17,6 @@
 
 * Make sure everything is tested, including `Enum`.
 
-* Benchmark `map` versus `map_adaptive`.
-  Decide which one to keep, or keep both.
-    (`map_adaptive` need not preserve sharing.)
-  Note that the original `map` will preserve sharing of subtrees
-  when possible, which `map_adaptive` cannot do.
-
-* Same question for `filter_map`.
-
 * Make sure that we have every function from BFS
   and from OCaml's `Set` API.
 
