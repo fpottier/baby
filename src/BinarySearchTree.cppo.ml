@@ -1,4 +1,4 @@
-(* BFS = Blelloch, Ferizovic and Sun (2016). *)
+(* BFS = Blelloch, Ferizovic and Sun (2022). *)
 
 open Signatures
 open Profile
