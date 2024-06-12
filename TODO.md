@@ -1,7 +1,5 @@
 # To Do
 
-* Add `index` and `Enum.cardinal`.
-
 * Make sure every file is clean and documented.
 
 * Hide or clearly mark all unsafe operations.
@@ -10,6 +8,8 @@
 * Better document the difference between `enum_from_1` and `from_more`,
   as they have the same type, but different specs.
   Rename them?
+
+* Implement `to_rev_seq`.
 
 * Benchmark weight-balanced trees. (Vary α.)
 
@@ -26,6 +26,8 @@
   then which element is retained is unspecified.
   (A difference with `Set` can be observed only if the equivalence relation
    on elements is coarser than equality.)
+
+* Add README, AUTHORS, LICENSE, CHANGES, etc. Add headers.
 
 * Implement maps on top of sets,
   without an indirection,
