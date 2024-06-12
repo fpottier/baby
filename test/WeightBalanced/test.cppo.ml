@@ -102,16 +102,10 @@ let array_value =
     Gen.(array (int range) (semi_open_interval (-range) (range-1)))
     Print.(array int)
 
-let sorted_array compare n element () =
-  let a = Gen.array n element () in
-  Array.sort compare a;
-  a
-
 let sorted_unique_array compare n element () =
-  let a = sorted_array compare n element () in
-  let equal x y = compare x y = 0 in
-  let n = Bistro.ArrayExtra.compress equal a in
-  Array.sub a 0 n
+  Gen.list n element ()
+  |> List.sort_uniq compare
+  |> Array.of_list
 
 let sorted_unique_array_value =
   easily_constructible
