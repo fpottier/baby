@@ -15,9 +15,6 @@
 
 * Make sure everything is tested, including `Enum`.
 
-* Make sure that we have every function from BFS
-  and from OCaml's `Set` API.
-
 * Make sure assertions are erased in release mode (ArrayExtra).
 
 * Document the potential departures from OCaml's Set library.
@@ -34,5 +31,18 @@
   and without code duplication.
 
 * Explore parallel computation.
+  Add `reduce` and `map_reduce`.
 
-* Enumerations could support the random access functions (`get`, etc.).
+# Not To Do
+
+* Blelloch et al. discuss multi-insert and multi-delete operations, which
+  insert or remove an array of elements at once. These can be simulated by
+  converting the array to a set (using `of_array`) and using a set union or
+  set difference (`union`, `diff`). Some time is wasted in the conversion of
+  the array to a balanced binary tree, but (for now, at least) this seems
+  acceptable.
+
+* Blelloch et al. offers variations on `split`, such as `range`, `up_to`,
+  `down_to`, which allow selecting a subset of elements, based on ordering
+  constraints. These can be simulated using `split` (at the cost of
+  constructing and throwing away useless subtrees).
