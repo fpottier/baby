@@ -1,10 +1,12 @@
 (* A reference implementation of sets. *)
 
-open Bistro
+module Make (E : sig
+  type t
+  val compare : t -> t -> int
+end) = struct
 
-module Make (E : OrderedType) = struct
-
-  include Stdlib.Set.Make(E)
+  (* This implementation is based on OCaml's Set library. *)
+  include Set.Make(E)
 
   let remove_min_elt s =
     let x = min_elt s in
@@ -26,9 +28,16 @@ module Make (E : OrderedType) = struct
   let get s i =
     List.nth (elements s) i
 
+  (* This is [List.find_index], which appears in OCaml 5.2. *)
+  let find_index p =
+    let rec aux i = function
+      [] -> None
+      | a::l -> if p a then Some i else aux (i+1) l in
+    aux 0
+
   let index x s =
     let equal x y = E.compare x y = 0 in
-    match List.find_index (equal x) (elements s) with
+    match find_index (equal x) (elements s) with
     | Some i ->
         i
     | None ->
