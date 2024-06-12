@@ -12,8 +12,7 @@
   (bug_reports francois.pottier@inria.fr)
   (synopsis "Several kinds of balanced binary search trees")
   (depends
-    ocaml
-    dune
+    (ocaml (>= 4.14))
     cppo
     (monolith :with-test)
     (ocamlfind :with-test)
