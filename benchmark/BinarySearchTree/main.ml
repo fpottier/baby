@@ -1,5 +1,4 @@
 open Printf
-open Bistro
 
 module B = Common.Benchmark
 let run benchmarks =
@@ -17,9 +16,9 @@ module R = struct
 
 end
 
-module C = BinarySearchTree.Make(Int)(Height.Make(Int))
-module F = HeightBalanced.Make(Int)
-module W = WeightBalanced.Make(Int)
+module F = Bistro.H.Set.Make(Int)
+module W = Bistro.W.Set.Make(Int)
+module C = Bistro.Make(Int)(Bistro.Height.Make(Int))
 
 module type PARAMS = sig
   val seed : int

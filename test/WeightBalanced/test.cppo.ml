@@ -7,9 +7,9 @@ module R = Reference.Make(V)
 module C = struct
 
 #ifdef WEIGHT
-  include Bistro.WeightBalanced.Make(V)
+  include Bistro.W.Set.Make(V)
 #else
-  include Bistro.HeightBalanced.Make(V)
+  include Bistro.H.Set.Make(V)
 #endif
 
 #ifdef WEIGHT
@@ -261,9 +261,9 @@ let () =
 let () =
   let prologue () =
 #ifdef WEIGHT
-    dprintf "          open Bistro.WeightBalanced.Make(Int);;\n";
+    dprintf "          open Bistro.W.Make(Int);;\n";
 #else
-    dprintf "          open Bistro.HeightBalanced.Make(Int);;\n";
+    dprintf "          open Bistro.H.Make(Int);;\n";
 #endif
     dprintf "          let flip f x y = f y x;;\n";
     dprintf "          let nest (x, y, z) = (x, (y, z));;\n";

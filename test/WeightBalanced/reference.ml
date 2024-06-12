@@ -1,10 +1,10 @@
 (* A reference implementation of sets. *)
 
-open Bistro.Signatures
+open Bistro
 
 module Make (E : OrderedType) = struct
 
-  include Set.Make(E)
+  include Stdlib.Set.Make(E)
 
   let remove_min_elt s =
     let x = min_elt s in
