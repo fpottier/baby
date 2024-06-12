@@ -1,6 +1,13 @@
 # To Do
 
-* Split `Union.frag.ml` and `Readers.frag.ml` into multiple files.
+* Add `index` and `Enum.cardinal`.
+
+* Rename the project to `bistro`.
+
+* Make sure every file is clean and documented.
+
+* Hide or clearly mark all unsafe operations.
+    (`of_sorted_unique_array` should probably be hidden.)
 
 * Better document the difference between `enum_from_1` and `from_more`,
   as they have the same type, but different specs.
@@ -8,18 +15,34 @@
 
 * Benchmark weight-balanced trees. (Vary α.)
 
-* The functor `BinarySearchTree` should require `cardinal` and
-  `constant_time_cardinal` instead of defining them in a pessimistic way.
-
 * Make sure everything is tested, including `Enum`.
 
-* Benchmark.
+* Benchmark `map` versus `map_adaptive`.
+  Decide which one to keep, or keep both.
+    (`map_adaptive` need not preserve sharing.)
+  Note that the original `map` will preserve sharing of subtrees
+  when possible, which `map_adaptive` cannot do.
+
+* Same question for `filter_map`.
 
 * Make sure that we have every function from BFS
   and from OCaml's `Set` API.
 
 * If possible, hide `Signatures` from the end user.
 
-* Implement maps without code duplication.
+* Make sure assertions are erased in release mode (ArrayExtra).
+
+* Document the potential departures from OCaml's Set library.
+  In `of_list`, `of_seq`, `add_seq`,
+  if the list or sequence contains duplicate elements,
+  then which element is retained is unspecified.
+  (A difference with `Set` can be observed only if the equivalence relation
+   on elements is coarser than equality.)
+
+* Implement maps on top of sets,
+  without an indirection,
+  and without code duplication.
 
 * Explore parallel computation.
+
+* Enumerations could support the random access functions (`get`, etc.).
