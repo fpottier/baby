@@ -209,6 +209,11 @@ module type SET = sig
     val elements : enum -> set
     (** [elements] converts an enumeration into a set. *)
 
+    val length : enum -> int
+    (**[length e] returns the length of the enumeration [e]. If {!cardinal}
+       has constant time complexity, then {!length} has logarithmic time
+       complexity. Otherwise, {!length} has linear time complexity. *)
+
   end (* Enum *)
 
 end

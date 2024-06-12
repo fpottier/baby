@@ -253,4 +253,18 @@ module Enum = struct
           with NotDisjoint ->
             false
 
+  (* [length e] computes the length of the enumeration [e]. If we have
+     a constant-time [cardinal] function on sets, then its complexity
+     is logarithmic. Otherwise, its complexity is linear. *)
+
+  let rec length_aux accu (e : enum) : int =
+    match e with
+    | End ->
+        accu
+    | More (_, r, e) ->
+        length_aux (accu + cardinal r) e
+
+  let[@inline] length (e : enum) : int =
+    length_aux 0 e
+
 end (* Enum *)
