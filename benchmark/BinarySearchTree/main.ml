@@ -468,6 +468,65 @@ let of_list u =
 
 (* -------------------------------------------------------------------------- *)
 
+(* [map] benchmark. *)
+
+module Map (S : sig
+  type t
+  val of_array : int array -> t
+  val map : (int -> int) -> t -> t
+end) (P : sig
+  val u : int
+  val candidate : string
+end) = struct
+  open S
+  open P
+  let basis = 1
+
+  let name = sprintf "map (identity function) (size %d) (%s)" u candidate
+  let run () =
+    let a = Array.init u (fun i -> i) in
+    let s = of_array a in
+    let id x = x in
+    fun () ->
+      map id s
+      |> ignore
+  let benchmark1 = B.benchmark ~name ~quota ~basis ~run
+
+  let name = sprintf "map (monotone function) (size %d) (%s)" u candidate
+  let run () =
+    let a = Array.init u (fun i -> i) in
+    let s = of_array a in
+    let f x = 2 * x in
+    fun () ->
+      map f s
+      |> ignore
+  let benchmark2 = B.benchmark ~name ~quota ~basis ~run
+
+  let name = sprintf "map (random function) (size %d) (%s)" u candidate
+  let run () =
+    let a = Array.init u (fun i -> i) in
+    let s = of_array a in
+    let b = Array.copy a in
+    shuffle b;
+    let f x = b.(x) in
+    fun () ->
+      map f s
+      |> ignore
+  let benchmark3 = B.benchmark ~name ~quota ~basis ~run
+
+end
+
+let map u =
+  let module P = struct let u = u end in
+  let module R = Map(R)(struct include P let candidate = "reference" end) in
+  let module W = Map(W)(struct include P let candidate = "weight/map" end) in
+  [ R.benchmark1; W.benchmark1;
+    R.benchmark2; W.benchmark2;
+    R.benchmark3; W.benchmark3;
+  ]
+
+(* -------------------------------------------------------------------------- *)
+
 (* Synthetic benchmarks. *)
 
 module Eratosthenes (S : sig
@@ -637,6 +696,18 @@ let () =
     run (of_list 10000);
     eprintf "\n";
     run (of_list 100000);
+  end;
+
+  if true then begin
+    eprintf "*** map\n";
+    eprintf "\n";
+    run (map 100);
+    eprintf "\n";
+    run (map 1000);
+    eprintf "\n";
+    run (map 10000);
+    eprintf "\n";
+    run (map 100000);
   end;
 
   if false then begin
