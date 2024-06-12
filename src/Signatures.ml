@@ -139,6 +139,7 @@ module type SET = sig
   val add_seq : elt Seq.t -> set -> set
   val to_seq : set -> elt Seq.t
   val to_seq_from : elt -> set -> elt Seq.t
+  val to_rev_seq : set -> elt Seq.t
   val of_list : elt list -> set
   val of_array : elt array -> set
   val of_sorted_unique_array : elt array -> set

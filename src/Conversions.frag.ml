@@ -17,16 +17,23 @@ let to_list =
 
 (* -------------------------------------------------------------------------- *)
 
-(* [to_seq] constructs the sequence of the elements of the tree [t]. *)
+(* [to_seq] constructs the increasing sequence of the elements of the
+   tree [t]. *)
 
 let to_seq (t : tree) : key Seq.t =
   fun () -> Enum.(to_seq_node (enum t))
 
-(* [to_seq_from low t] constructs a sequence of the elements [x] of
-   the tree [t] such that [low <= x] holds. *)
+(* [to_seq_from low t] constructs the increasing sequence of the
+   elements [x] of the tree [t] such that [low <= x] holds. *)
 
 let to_seq_from (low : key) (t : tree) : key Seq.t =
   fun () -> Enum.(to_seq_node (enum_from low t))
+
+(* [to_rev_seq] constructs the decreasing sequence of the elements of
+   the tree [t]. *)
+
+let to_rev_seq (_t : tree) : key Seq.t =
+  failwith "NOT YET IMPLEMENTED" (* TODO *)
 
 (* -------------------------------------------------------------------------- *)
 

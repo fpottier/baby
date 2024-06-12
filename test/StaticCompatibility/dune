@@ -1,0 +1,15 @@
+;; This library provides no functionality. It offers a static sanity
+;; check: by compiling it, we check that Bistro offers the same API as
+;; OCaml's Set library.
+
+;; This library should be compiled only in development mode, not in
+;; release mode, for forward compatibility: if new functions are added
+;; to OCaml's Set library, then this library will fail to compile.
+;; That's the point: we want to know about this problem, but we do not
+;; want this problem to prevent people from installing Bistro.
+
+(library
+  (enabled_if (= %{profile} dev))
+  (name static_compatibility_test)
+  (libraries bistro)
+)
