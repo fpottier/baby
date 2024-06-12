@@ -262,9 +262,9 @@ let () =
 let () =
   let prologue () =
 #ifdef WEIGHT
-    dprintf "          open Bistro.W.Make(Int);;\n";
+    dprintf "          open Bistro.W.Set.Make(Int);;\n";
 #else
-    dprintf "          open Bistro.H.Make(Int);;\n";
+    dprintf "          open Bistro.H.Set.Make(Int);;\n";
 #endif
     dprintf "          let flip f x y = f y x;;\n";
     dprintf "          let nest (x, y, z) = (x, (y, z));;\n";
