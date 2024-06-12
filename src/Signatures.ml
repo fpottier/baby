@@ -105,7 +105,9 @@ module type SET = sig
   type elt
   type set
   type t = set
+  (**/**)
   val check : set -> unit
+  (**/**)
   val empty : set
   val is_empty : set -> bool
   val singleton : elt -> t
@@ -212,6 +214,7 @@ module type SET = sig
 end
 
 module type SET' = sig
+  (** @closed *)
   include SET
   val get : set -> int -> elt
   val split_at_2 : set -> int -> set * set
