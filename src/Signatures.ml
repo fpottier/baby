@@ -134,9 +134,11 @@ module type SET = sig
   val compare : set -> set -> int
   val split : elt -> set -> set * bool * set
   val elements : set -> elt list
+  val to_list : set -> elt list
   val of_seq : elt Seq.t -> set
   val add_seq : elt Seq.t -> set -> set
   val to_seq : set -> elt Seq.t
+  val to_seq_from : elt -> set -> elt Seq.t
   val of_list : elt list -> set
   val of_array : elt array -> set
   val of_sorted_unique_array : elt array -> set
@@ -152,6 +154,11 @@ module type SET = sig
   val filter_map : (elt -> elt option) -> set -> set
   val filter : (elt -> bool) -> set -> set
   val partition : (elt -> bool) -> set -> set * set
+
+  val iter: (elt -> unit) -> set -> unit
+  val fold: (elt -> 'a -> 'a) -> set -> 'a -> 'a
+  val for_all: (elt -> bool) -> set -> bool
+  val exists: (elt -> bool) -> set -> bool
 
   (* The random access functions -- not implemented by height-balanced trees. *)
   val get : set -> int -> elt

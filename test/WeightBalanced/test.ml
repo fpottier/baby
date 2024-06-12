@@ -171,6 +171,9 @@ let () =
   let spec = set ^> seq_value in
   declare "to_seq" spec R.to_seq C.to_seq;
 
+  let spec = value ^> set ^> seq_value in
+  declare "to_seq_from" spec R.to_seq_from C.to_seq_from;
+
   let spec = seq_value ^> set ^> set in
   declare "add_seq" spec R.add_seq C.add_seq;
 
@@ -218,6 +221,11 @@ let () =
        with monotone function, with non-monotone function *)
   (* not tested: [filter] *)
   (* TODO test [partition] *)
+
+  (* not tested: [iter] *)
+  (* not tested: [fold] *)
+  (* not tested: [for_all] *)
+  (* not tested: [exists] *)
 
   ()
 

@@ -12,13 +12,21 @@ let rec elements (t : tree) (k : elt list) : elt list =
 let[@inline] elements (t : tree) : elt list =
   elements t []
 
+let to_list =
+  elements
+
 (* -------------------------------------------------------------------------- *)
 
-(* [to_seq] converts a set to a sorted OCaml sequence (whose total
-   cost is linear). *)
+(* [to_seq] constructs the sequence of the elements of the tree [t]. *)
 
 let to_seq (t : tree) : key Seq.t =
   fun () -> Enum.(to_seq_node (enum t))
+
+(* [to_seq_from low t] constructs a sequence of the elements [x] of
+   the tree [t] such that [low <= x] holds. *)
+
+let to_seq_from (low : key) (t : tree) : key Seq.t =
+  fun () -> Enum.(to_seq_node (enum_from low t))
 
 (* -------------------------------------------------------------------------- *)
 
