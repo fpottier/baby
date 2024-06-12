@@ -1,9 +1,11 @@
+(* The functions in this file assume that we have a constant-time [cardinal]
+   function. *)
+
 (* -------------------------------------------------------------------------- *)
 
-(* Random access. *)
+(* Access to an element, based on its index. *)
 
-(* This implementation assumes that we have a constant-time [cardinal]
-   function. Its complexity is logarithmic. *)
+(* [get] has logarithmic complexity. *)
 
 (* If [cardinal] requires linear time then this implementation of [get] has
    quadratic time complexity, which is unacceptable. In that case, it is
@@ -34,6 +36,44 @@ let get (t : tree) (i : int) : key =
       |> invalid_arg
   else
     failwith "get: operation is not available"
+
+(* -------------------------------------------------------------------------- *)
+
+(* Discovering the index of an element, based on its value. *)
+
+(* [index] has logarithmic complexity. *)
+
+(* [index] is roughly analogous to [List.find_index], but has a different
+   type; [index] expects an element [x], whereas [List.find_index] expects
+   a predicate of type [elt -> bool]. *)
+
+(* We could offer [find_index] on sets, with linear time complexity, but
+   this seems pointless. The user can implement this function using an
+   enumeration, if she so wishes. *)
+
+let rec index (i : int) (x : key) (t : tree) : int =
+  match VIEW(t) with
+  | LEAF ->
+      raise Not_found
+  | NODE(l, v, r) ->
+      let c = E.compare x v in
+      if c < 0 then
+        index i x l
+      else
+        let i = i + cardinal l in
+        if c = 0 then
+          i
+        else
+          index (i + 1) x r
+
+let[@inline] index x t =
+  index 0 x t
+
+let index x t =
+  if constant_time_cardinal then
+    index x t
+  else
+    failwith "index: operation is not available"
 
 (* -------------------------------------------------------------------------- *)
 

@@ -237,6 +237,13 @@ let () =
   let spec = set ^>> fun s -> lt (R.cardinal s) ^> value in
   declare "get" spec R.get C.get;
 
+  let spec = value ^> set ^!> int in
+  declare "index" spec R.index C.index;
+
+  (* Specifically query a value that is in the set. *)
+  let spec = set ^>> fun s -> (inhabits s) ^> int in
+  declare "flip index" spec (flip R.index) (flip C.index);
+
   let spec = set ^>> fun s -> le (R.cardinal s) ^> set *** set in
   declare "split_at_2" spec R.split_at_2 C.split_at_2;
 

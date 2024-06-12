@@ -217,6 +217,7 @@ module type SET' = sig
   (** @closed *)
   include SET
   val get : set -> int -> elt
+  val index : elt -> set -> int
   val split_at_2 : set -> int -> set * set
   val split_at_3 : set -> int -> set * elt * set
 end

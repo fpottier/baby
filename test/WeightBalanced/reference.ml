@@ -26,6 +26,14 @@ module Make (E : OrderedType) = struct
   let get s i =
     List.nth (elements s) i
 
+  let index x s =
+    let equal x y = E.compare x y = 0 in
+    match List.find_index (equal x) (elements s) with
+    | Some i ->
+        i
+    | None ->
+        raise Not_found
+
   let split_at_2 s i =
     let a = Array.of_list (elements s) in
     of_array (Array.sub a 0 i),
