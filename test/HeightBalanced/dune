@@ -2,4 +2,5 @@
   (name test)
   (libraries height_candidate monolith)
   (flags (:standard "-open" "Height_candidate"))
+  (enabled_if (= %{profile} dev))
 )
