@@ -95,29 +95,21 @@ let[@inline] of_sorted_unique_array a =
 
 (* -------------------------------------------------------------------------- *)
 
-(* [of_array_destructive a] converts the array, in time O(n.log n), to
-   a set. The array is modified (it is sorted and compressed). *)
+(* [of_array] converts an array to a set. This algorithm is adaptive. If the
+   array is sorted, then its time complexity is O(n). If the array is not
+   sorted, then its time complexity gradually degenerates to O(n.log n). *)
 
-let of_array_destructive a =
-  (* Sort the array. *)
-  Array.sort E.compare a;
-  (* Remove duplicate elements. The unique elements remain in the
-     slice of index 0 to index [n]. *)
-  let equal x1 x2 = E.compare x1 x2 = 0 in
-  let n = ArrayExtra.compress equal a in
-  (* Convert this array slice to a tree. *)
-  of_sorted_unique_array_slice a 0 n
-
-(* -------------------------------------------------------------------------- *)
-
-(* [of_array] converts an array, in time O(n.log n), to a set. *)
+(* Each run of consecutive increasing elements is converted to a set, in
+   linear time in the length of this run. Then, the union of these sets
+   is computed. *)
 
 let of_array a =
-  a |> Array.copy |> of_array_destructive
+  let yield accu (i, j) = union accu (of_sorted_unique_array_slice a i j) in
+  ArrayExtra.foreach_increasing_run E.compare yield empty a
 
 (* -------------------------------------------------------------------------- *)
 
-(* [of_list] converts a list, in linear time, to a set. *)
+(* [of_list] converts a list to a set. *)
 
 let of_list xs =
-  xs |> Array.of_list |> of_array_destructive
+  xs |> Array.of_list |> of_array

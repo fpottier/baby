@@ -12,6 +12,9 @@ module R = struct
   let xor s1 s2 =
     union (diff s1 s2) (diff s2 s1)
 
+  let of_array a =
+    of_list (Array.to_list a)
+
 end
 
 module C = BinarySearchTree.Make(Int)(Height.Make(Int))
@@ -380,6 +383,49 @@ let equal (u1, u2, c, cm) =
 
 (* -------------------------------------------------------------------------- *)
 
+(* [of_array] benchmark. *)
+
+module OfArray (S : sig
+  type t
+  val of_array : int array -> t
+end) (P : sig
+  val u : int
+  val candidate : string
+end) = struct
+  open S
+  open P
+  let basis = 1
+
+  let name = sprintf "of_array (random data) (size %d) (%s)" u candidate
+  let run () =
+    let a = Array.init u (fun i -> i) in
+    shuffle a;
+    fun () ->
+      of_array a
+      |> ignore
+  let benchmark1 = B.benchmark ~name ~quota ~basis ~run
+
+  let name = sprintf "of_array (sorted data) (size %d) (%s)" u candidate
+  let run () =
+    let a = Array.init u (fun i -> i) in
+    fun () ->
+      of_array a
+      |> ignore
+  let benchmark2 = B.benchmark ~name ~quota ~basis ~run
+
+end
+
+let of_array u =
+  let module P = struct let u = u end in
+  let module R = OfArray(R)(struct include P let candidate = "reference" end) in
+  let module W1 = OfArray(W)(struct include P let candidate = "weight/of_array" end) in
+  let module WS = OfArray(struct include W let of_array = of_sorted_unique_array end)
+                         (struct include P let candidate = "weight/of_sorted_unique_array" end) in
+  [ R.benchmark1; W1.benchmark1;
+    R.benchmark2; W1.benchmark2; WS.benchmark2 ]
+
+(* -------------------------------------------------------------------------- *)
+
 (* Synthetic benchmarks. *)
 
 module Eratosthenes (S : sig
@@ -525,6 +571,18 @@ let () =
   if false then begin
     eprintf "*** equal\n";
     run_binary_benchmark equal
+  end;
+
+  if true then begin
+    eprintf "*** of_array\n";
+    eprintf "\n";
+    run (of_array 100);
+    eprintf "\n";
+    run (of_array 1000);
+    eprintf "\n";
+    run (of_array 10000);
+    eprintf "\n";
+    run (of_array 100000);
   end;
 
   if false then begin
