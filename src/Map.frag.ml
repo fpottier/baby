@@ -1,3 +1,5 @@
+(* -------------------------------------------------------------------------- *)
+
 (* [map] is defined in the same way as in OCaml's Set library. *)
 
 let[@inline] tree_below_key (t : tree) (x : key) : bool =
@@ -34,6 +36,8 @@ let rec map f (t : tree) =
      let r' = map f r in
      if l == l' && v == v' && r == r' then t (* preserve sharing *)
      else lax_join l' v' r'
+
+(* -------------------------------------------------------------------------- *)
 
 (* [lax_join2] plays the role of [try_concat] in OCaml's Set library,
    but is implemented in a slightly better way. *)
