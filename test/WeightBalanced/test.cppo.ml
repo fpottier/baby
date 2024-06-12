@@ -42,7 +42,7 @@ module C = struct
 
   let[@inline] diff t1 t2 =
     let result = diff t1 t2 in
-    if equal result t1 then assert(result == t1);
+    if equal result t1 then assert (result == t1);
     result
 
 end
