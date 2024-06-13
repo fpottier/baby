@@ -54,6 +54,11 @@ let max_elt_opt (t : tree) : key option =
   | NODE(_, v, r) ->
       max_elt_opt_1 v r
 
+(* As in OCaml's Set library, [choose] and [choose_opt] choose the minimum
+   element of the set. This is slow (logarithmic time), but guarantees that
+   [choose] respects equality: that is, if the sets [s1] and [s2] are equal
+   then [choose s1] and [choose s2] are equal. *)
+
 let choose =
   min_elt
 
