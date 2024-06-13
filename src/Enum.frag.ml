@@ -39,9 +39,15 @@ module Enum = struct
   let[@inline] enum (t : tree) : enum =
     enum_1 t empty
 
-  (* [from_enum_1 low t e] constructs an enumeration whose elements are:
-     1- the elements [x] of the tree [t] such that [low <= x] holds,
-     followed with 2- all elements of the enumeration [e]. *)
+  (* [from_enum_1 low t e] constructs an enumeration whose elements are: 1-
+     the elements [x] of the tree [t] such that [low <= x] holds, followed
+     with 2- all elements of the enumeration [e]. *)
+
+  (* In [from_enum_1 low t e], only the tree [t] is filtered by the constraint
+     [low <= x]. The enumeration [e] is not filtered (typically because it is
+     already known that all of its elements satisfy this constraint). This is
+     in contrast with [from_more low t e] (below), where both [t] and [e] are
+     filtered. *)
 
   let rec from_enum_1 (low : key) (t : tree) (e : enum) : enum =
     match VIEW(t) with
