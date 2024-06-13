@@ -13,9 +13,10 @@ module type OrderedType = sig
 
 end
 
-(**The signature [BST] describes the interface offered by the balancing code.
-   The remaining operations on binary search tree are built on top of this
-   interface, and are oblivious to the balancing criterion. *)
+(**The signature [BST] describes the interface that must be offered by
+   the balancing code to the rest of the balanced binary search tree
+   library. Most operations on binary search tree are built on top of
+   this interface, and are oblivious to the balancing criterion. *)
 module type BST = sig
 
   (**Keys, or elements. *)
