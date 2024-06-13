@@ -189,8 +189,8 @@ module Enum = struct
   exception NotDisjoint
 
   (* [filter_tree_disjoint low t e] returns the same result as
-     [filter_tree low t e], except that it raises [NotDisjoint] if
-     the key [low] appears in its result. *)
+     [filter_tree low t e], except that it raises [NotDisjoint]
+     if the key [low] appears in its result. *)
 
   let rec filter_tree_disjoint (low : key) (t : tree) (e : enum) : enum =
     match VIEW(t) with
@@ -206,8 +206,8 @@ module Enum = struct
           filter_tree_disjoint low l (More (v, r, e))
 
   (* [filter_tree_enum_disjoint low r e] returns the same result as
-     [filter_tree_enum low r e], except that it raises [NotDisjoint] if the
-     key [low] appears in its result. *)
+     [filter_tree_enum low r e], except that it raises [NotDisjoint]
+     if the key [low] appears in its result. *)
 
   let rec filter_tree_enum_disjoint (low : key) (r : tree) (e : enum) : enum =
     match e with
@@ -223,7 +223,7 @@ module Enum = struct
         filter_tree_disjoint low r e
 
   (* [disjoint_more_more v1 r1 e1 v2 r2 e2] requires [v1 < v2]. It determines
-     whether the enumerations [More(v1, r1, e1)] and [More(v2, r2, e2)] are
+     whether the enumerations [More (v1, r1, e1)] and [More (v2, r2, e2)] are
      disjoint. It either returns [true] or raises [NotDisjoint]. *)
 
   (* This is Veldhuizen's leapfrog join algorithm. *)
