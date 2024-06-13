@@ -189,8 +189,8 @@ module type SET = sig
     (** [enum s] returns an enumeration of the set [s]. This enumeration
         contains all of the elements of the set [s], in increasing order. *)
 
-    val enum_from : elt -> set -> enum
-    (** [enum_from x s] returns an enumeration of the subset of [s]
+    val from_enum : elt -> set -> enum
+    (** [from_enum x s] returns an enumeration of the subset of [s]
         formed of just the elements that are no less than [x].
         It is equivalent to [from x (enum s)]. *)
 

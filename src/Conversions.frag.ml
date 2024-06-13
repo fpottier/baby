@@ -27,7 +27,7 @@ let to_seq (t : tree) : key Seq.t =
    elements [x] of the tree [t] such that [low <= x] holds. *)
 
 let to_seq_from (low : key) (t : tree) : key Seq.t =
-  fun () -> Enum.(to_seq_node (enum_from low t))
+  fun () -> Enum.(to_seq_node (from_enum low t))
 
 (* [to_rev_seq] constructs the decreasing sequence of the elements of
    the tree [t]. *)
