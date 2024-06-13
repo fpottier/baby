@@ -1,5 +1,7 @@
 # To Do
 
+* Name the signature `S` instead of `SET`? Or both.
+
 * Make sure every file is clean and documented.
 
 * Hide or clearly mark all unsafe operations.
@@ -11,6 +13,20 @@
 
 * Make sure assertions are erased in release mode (ArrayExtra).
 
+* Document what this library offers over OCaml's Set library.
+  In the weight-balanced implementation,
+  a constant time `cardinal` function;
+  efficient random access functions;
+  fast negative paths (based on cardinal) for `subset` and `equal`.
+  In `union`, `inter`, and possibly a few other functions,
+  better preservation of sharing.
+  New function `xor`.
+  In `of_list`, `of_array`, `of_seq`, adaptive complexity.
+  New functions `of_array` and `to_array`.
+  New functions `remove_min_elt` and `remove_max_elt`.
+  Enumerations.
+  Clear documentation of the time complexity of every operation.
+
 * Document the potential departures from OCaml's Set library.
   In `of_list`, `of_seq`, `add_seq`,
   if the list or sequence contains duplicate elements,
@@ -18,7 +34,15 @@
   (A difference with `Set` can be observed only if the equivalence relation
    on elements is coarser than equality.)
 
+* Implement a variant of `choose` that runs in time O(1),
+  and does not promise to respect equality of sets.
+
 * Add README, AUTHORS, LICENSE, CHANGES, etc. Add headers.
+
+* In the documentation `Seq` shows up as `Stdlib.Seq`,
+  and the hyperlink does not work.
+
+# Later
 
 * Implement maps on top of sets,
   without an indirection,
