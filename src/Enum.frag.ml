@@ -22,22 +22,22 @@ module Enum = struct
     | End -> true
     | More _ -> false
 
-  (* [enum_1 t e] concatenates the tree [t] in front of the
+  (* [cat_tree_enum t e] concatenates the tree [t] in front of the
      enumeration [e]. *)
 
   (* This function is named [cons_enum] in OCaml's Set library. *)
 
-  let rec enum_1 (t : tree) (e : enum) : enum =
+  let rec cat_tree_enum (t : tree) (e : enum) : enum =
     match VIEW(t) with
     | LEAF ->
         e
     | NODE(l, v, r) ->
-        enum_1 l (More (v, r, e))
+        cat_tree_enum l (More (v, r, e))
 
   (* [enum] converts a tree to an enumeration. *)
 
   let[@inline] enum (t : tree) : enum =
-    enum_1 t empty
+    cat_tree_enum t empty
 
   (* [from_enum_1 low t e] constructs an enumeration whose elements are: 1-
      the elements [x] of the tree [t] such that [low <= x] holds, followed
@@ -119,7 +119,7 @@ module Enum = struct
   let tail (e : enum) : enum =
     match e with
     | End            -> raise Not_found
-    | More (_, r, e) -> enum_1 r e
+    | More (_, r, e) -> cat_tree_enum r e
 
   let head_opt (e : enum) : key option =
     match e with
@@ -129,7 +129,7 @@ module Enum = struct
   let tail_opt (e : enum) : enum option =
     match e with
     | End            -> None
-    | More (_, r, e) -> Some (enum_1 r e)
+    | More (_, r, e) -> Some (cat_tree_enum r e)
 
   (* [compare e1 e2] compares the enumerations [e1] and [e2]
      according to a lexicographic ordering. *)
@@ -145,7 +145,7 @@ module Enum = struct
     | More (v1, r1, e1), More (v2, r2, e2) ->
         let c = E.compare v1 v2 in
         if c <> 0 then c else
-        compare (enum_1 r1 e1) (enum_1 r2 e2)
+        compare (cat_tree_enum r1 e1) (cat_tree_enum r2 e2)
 
   (* [to_seq] converts an enumeration to an OCaml sequence. *)
 
@@ -154,7 +154,7 @@ module Enum = struct
     | End ->
         Seq.Nil
     | More (v, r, e) ->
-        Seq.Cons (v, fun () -> to_seq_node (enum_1 r e))
+        Seq.Cons (v, fun () -> to_seq_node (cat_tree_enum r e))
 
   let to_seq (e : enum) : key Seq.t =
     fun () -> to_seq_node e
