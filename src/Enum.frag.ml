@@ -101,7 +101,7 @@ module Enum = struct
   (* [from low e] extracts from the enumeration [e]
      the elements that lie at or above the threshold [low] . *)
 
-  (* One could define [from low e] as [filter_tree_enum low Empty e].
+  (* One could define [from low e] as [filter_tree_enum low leaf e].
      However, the following code is slightly more efficient. *)
 
   let from (low : key) (e : enum) : enum =
