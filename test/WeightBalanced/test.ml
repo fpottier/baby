@@ -174,6 +174,9 @@ let () =
   let spec = value ^> set ^> seq_value in
   declare "to_seq_from" spec R.to_seq_from C.to_seq_from;
 
+  let spec = set ^> seq_value in
+  declare "to_rev_seq" spec R.to_rev_seq C.to_rev_seq;
+
   let spec = seq_value ^> set ^> set in
   declare "add_seq" spec R.add_seq C.add_seq;
 

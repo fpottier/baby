@@ -279,3 +279,57 @@ module Enum = struct
     length_aux 0 e
 
 end (* Enum *)
+
+(* -------------------------------------------------------------------------- *)
+
+(* Enumerations in reverse (decreasing order). *)
+
+(* I would rather avoid this code duplication, but we must provide at least
+   [to_rev_seq], for compatibility with OCaml's Set library. *)
+
+module RevEnum = struct
+
+  type tree = t
+
+  (* In the enumeration [More (e, l, v)], we have [e < l < v], but the
+     enumeration is consumed (by the user) from the right to the left,
+     so [v] is produced first, followed with the elements of the tree
+     [l], followed with the elements of the enumeration [e]. *)
+
+  type enum =
+    | End
+    | More of enum * t * elt
+
+  let empty : enum =
+    End
+
+  (* [cat_enum_tree e t] concatenates the enumeration [e] in front of
+     the tree [t]. It requires [e < t]. *)
+
+  (* This function corresponds to [snoc_enum] in OCaml's Set library. *)
+
+  let rec cat_enum_tree (e : enum) (t : tree) : enum =
+    match VIEW(t) with
+    | LEAF ->
+        e
+    | NODE(l, v, r) ->
+        cat_enum_tree (More (e, l, v)) r
+
+  (* [enum] converts a tree to an enumeration. *)
+
+  let[@inline] enum (t : tree) : enum =
+    cat_enum_tree empty t
+
+  (* [to_seq] converts an enumeration to an OCaml sequence. *)
+
+  let rec to_seq_node (e : enum) : key Seq.node =
+    match e with
+    | End ->
+        Seq.Nil
+    | More (e, l, v) ->
+        Seq.Cons (v, fun () -> to_seq_node (cat_enum_tree e l))
+
+  (* let to_seq (e : enum) : key Seq.t = *)
+  (*   fun () -> to_seq_node e *)
+
+end

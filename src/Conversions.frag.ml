@@ -32,8 +32,8 @@ let to_seq_from (low : key) (t : tree) : key Seq.t =
 (* [to_rev_seq] constructs the decreasing sequence of the elements of
    the tree [t]. *)
 
-let to_rev_seq (_t : tree) : key Seq.t =
-  failwith "NOT YET IMPLEMENTED" (* TODO *)
+let to_rev_seq (t : tree) : key Seq.t =
+  fun () -> RevEnum.(to_seq_node (enum t))
 
 (* -------------------------------------------------------------------------- *)
 
