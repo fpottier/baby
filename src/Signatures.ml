@@ -240,20 +240,136 @@ module type SET = sig
 
   (** {1:query Querying sets} *)
 
+  (**[is_empty s] determines whether the set [s] is the empty set.
+
+     Time complexity: {i O(1)}. *)
   val is_empty : set -> bool
+
+  (**If the set [s] is nonempty, [min_elt s] returns the minimum
+     element of this set. Otherwise, it raises [Not_found].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val min_elt : set -> elt
+
+  (**If the set [s] is nonempty, [min_elt_opt s] returns [Some x],
+     where [x] is the minimum element of this set. Otherwise, it
+     returns [None].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val min_elt_opt : set -> elt option
+
+  (**If the set [s] is nonempty, [max_elt s] returns the maximum
+     element of this set. Otherwise, it raises [Not_found].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val max_elt : set -> elt
+
+  (**If the set [s] is nonempty, [max_elt_opt s] returns [Some x],
+     where [x] is the maximum element of this set. Otherwise, it
+     returns [None].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val max_elt_opt : set -> elt option
+
+  (**If the set [s] is nonempty, [choose s] returns an arbitrary
+     element of this set. Otherwise, it raises [Not_found].
+
+     [choose] respects equality: if the sets [s1] and [s2] are equal
+     then [choose s1] and [choose s2] are equal.
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val choose : set -> elt
+
+  (**If the set [s] is nonempty, [choose_opt s] returns [Some x],
+     where [x] is an arbitrary element of this set.
+     Otherwise, it returns [None].
+
+     [choose_opt] respects equality: if the sets [s1] and [s2] are equal
+     then [choose_opt s1] and [choose_opt s2] are equal.
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val choose_opt : set -> elt option
+
+  (**[mem x s] determines whether the element [x] is a member of the
+     set [s].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val mem : elt -> set -> bool
+
+  (**If [x] is a member of the set [s], then [find x s] returns the unique
+     element [x'] of the set [s] such that [x] and [x'] are equivalent. (We
+     say that [x] and [x'] are equivalent if [compare x x' = 0] holds.)
+     Otherwise, it raises [Not_found].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val find : elt -> set -> elt
+    (* The specification of [find] feels weird, because we have assumed and
+       indicated everywhere that [compare] must be an order, as opposed to a
+       preorder. Yet, [find] is useful only if [compare] is a preorder, so
+       that the equivalence relation [compare x x' = 0] is coarser than
+       equality. *)
+
+  (**If [x] is a member of the set [s], then [find_opt x s] returns [Some x'],
+     where [x'] is the unique element of the set [s] such that [x] and [x']
+     are equivalent. (We say that [x] and [x'] are equivalent if
+     [compare x x' = 0] holds.) Otherwise, it returns [None].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val find_opt : elt -> set -> elt option
+
+  (**[disjoint s1 s2] determines whether the sets [s1] and [s2] are
+     disjoint, that is, whether their intersection is empty. It is
+     equivalent to [is_empty (inter s1 s2)].
+
+     Time complexity: {i O(m.log (n/m))},
+     where {i m} is the size of the smaller set
+     and {i n} is the size of the larger set. *)
   val disjoint : set -> set -> bool
+
+  (**[subset s1 s2] determines whether the set [s1] is a subset of the set
+     [s2], that is, whether their difference is empty. It is equivalent to
+     [is_empty (diff s1 s2)].
+
+     Time complexity: {i O(m.log (n/m))},
+     where {i m} is the size of the smaller set
+     and {i n} is the size of the larger set. *)
   val subset : set -> set -> bool
+
+  (**[equal s1 s2] determines whether the sets [s1] and [s2] are equal, that
+     is, whether their symmetric difference is empty. It is equivalent to
+     [is_empty (xor s1 s2)].
+
+     Time complexity: {i O(m)},
+     where {i m} is the size of the smaller set
+     and {i n} is the size of the larger set. *)
   val equal : set -> set -> bool
+
+  (**[compare] is a total ordering function over sets. (Which specific
+     ordering is used is unspecified.)
+
+     Time complexity: {i O(m)},
+     where {i m} is the size of the smaller set
+     and {i n} is the size of the larger set. *)
   val compare : set -> set -> int
+
+  (**[cardinal s] returns the cardinal of the set [s], that is,
+     the number of its elements.
+
+     Time complexity:
+     in the weight-balanced-tree implementation ({!Bistro.W}),
+       {i O(1)};
+     in the height-balanced-tree implementation ({!Bistro.H}),
+       {i O(n)},
+     where {i n} is the size of the set [s]. *)
   val cardinal : set -> int
 
   (** {1:conversions Conversions to and from sets} *)
