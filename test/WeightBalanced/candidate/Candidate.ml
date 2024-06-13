@@ -56,3 +56,15 @@ let[@inline] diff t1 t2 =
   let result = diff t1 t2 in
   if equal result t1 then assert (result == t1);
   result
+
+(* [add] and [remove] offers similar guarantees. *)
+
+let[@inline] add x t =
+  let result = add x t in
+  if mem x t then assert (result == t);
+  result
+
+let[@inline] remove x t =
+  let result = remove x t in
+  if not (mem x t) then assert (result == t);
+  result
