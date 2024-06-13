@@ -65,9 +65,15 @@ module Enum = struct
   let[@inline] from_enum (low : key) (t : tree) : enum =
     filter_tree low t empty
 
-  (* [filter_tree_enum low r e] extracts from an enumeration [More (v, r, e)],
-     where the value [v] is known to lie below the threshold [low],
-     the elements that lie at or above the threshold [low]. *)
+  (* [filter_tree_enum low r e] extracts the elements [x] that satisfy the
+     constraint [low <= x] out of the sequence of the elements of the tree [r]
+     and of the enumeration [e]. *)
+
+  (* Thus, it is equivalent to [from low (cat_tree_enum r e)],
+     but the function [from] has not been defined yet.
+     [filter_tree_enum] is in fact used to define [from]. *)
+
+  (* Both the tree [r] and the enumeration [e] are filtered. *)
 
   let rec filter_tree_enum (low : key) (r : tree) (e : enum) : enum =
     (* Peek past [r] at the first element [v'] of [e], if there is one. *)
