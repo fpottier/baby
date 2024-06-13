@@ -118,24 +118,124 @@ module type SET = sig
   (**The type of elements. *)
   type elt
 
-  (**The abstract type of sets. **)
+  (**The abstract type of sets. *)
   type set
 
-  (**[t] is a synonym for [set]. *)
+  (**A synonym for the type [set]. *)
   type t = set
 
   (** {1:construct Constructing sets} *)
 
+  (**[empty] is the empty set. *)
   val empty : set
+
+  (**[singleton x] returns a set whose sole element is [x]. *)
   val singleton : elt -> t
+
+  (**[add x s] returns a set that contains all elements of the set
+     [s], plus [x].
+     Thus, it is logically equal to [union (singleton x) s].
+
+     If the result is logically equal to [s], then
+     the result is physically equal to [s].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val add : elt -> set -> set
+
+  (**[remove x s] returns a set that contains all elements of the set
+     [s], except [x].
+     It is equivalent to [diff s (singleton x)].
+
+     If the result is logically equal to [s], then
+     the result is physically equal to [s].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val remove : elt -> set -> set
+
+  (**If the set [s] is nonempty, then [remove_min_elt s] returns the
+     set [s], deprived of its minimum element. Otherwise, it raises
+     [Not_found].
+
+     It is equivalent to [remove (min_elt s) s].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val remove_min_elt : set -> set
+
+  (**If the set [s] is nonempty, then [remove_max_elt s] returns the
+     set [s], deprived of its maximum element. Otherwise, it raises
+     [Not_found].
+
+     It is equivalent to [remove (max_elt s) s].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val remove_max_elt : set -> set
+
+  (**[union s1 s2] returns the union of the sets [s1] and [s2], that
+     is, a set that contains all elements of the set [s1] and all
+     elements of the set [s2].
+
+     The weight-balanced-tree implementation ({!Bistro.W}) offers
+     the following guarantee:
+     if the result is logically equal to [s1] or to [s2], then
+     the result is physically equal to [s1] or to [s2].
+     The height-balanced tree implementation ({!Bistro.H}) does
+     not offer this guarantee.
+
+     Time complexity: {i O(m.log (n/m))},
+     where {i m} is the size of the smaller set
+     and {i n} is the size of the larger set. *)
   val union : set -> set -> set
+
+  (**[inter s1 s2] returns the intersection of the sets [s1] and [s2],
+     that is, a set that contains the common elements of the sets [s1]
+     and [s2].
+
+     The weight-balanced-tree implementation ({!Bistro.W}) offers
+     the following guarantee:
+     if the result is logically equal to [s1] or to [s2], then
+     the result is physically equal to [s1] or to [s2].
+     The height-balanced tree implementation ({!Bistro.H}) does
+     not offer this guarantee.
+
+     Time complexity: {i O(m.log (n/m))},
+     where {i m} is the size of the smaller set
+     and {i n} is the size of the larger set. *)
   val inter : set -> set -> set
+
+  (**[diff s1 s2] returns the difference of the sets [s1] and [s2],
+     that is, a set that contains the elements of the set [s1]
+     that do not appear in the set [s2].
+
+     if the result is logically equal to [s1], then
+     the result is physically equal to [s1].
+
+     Time complexity: {i O(m.log (n/m))},
+     where {i m} is the size of the smaller set
+     and {i n} is the size of the larger set. *)
   val diff : set -> set -> set
+
+  (**[xor s1 s2] returns the symmetric difference of the sets [s1] and [s2],
+     that is, a set that contains the elements of the set [s1]
+     that do not appear in the set [s2]
+     and the elements of the set [s2]
+     that do not appear in the set [s1].
+
+     Time complexity: {i O(m.log (n/m))},
+     where {i m} is the size of the smaller set
+     and {i n} is the size of the larger set. *)
   val xor : set -> set -> set
+
+  (**[split x s] returns a triple [(l, present, r)], where
+     [l] is the set of the elements of [s] that are strictly less than [x],
+     [r] is the set of the elements of [s] that are strictly greater than [x],
+     and [present] is [true] if and only if [x] is a member of the set [s].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val split : elt -> set -> set * bool * set
 
   (** {1:query Querying sets} *)
