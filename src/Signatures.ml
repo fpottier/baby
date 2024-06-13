@@ -374,16 +374,61 @@ module type SET = sig
 
   (** {1:conversions Conversions to and from sets} *)
 
-  val elements : set -> elt list
+  (**[of_list xs] constructs a set whose elements are the elements
+     of the list [xs].
+
+     This function has adaptive time complexity.
+     In the worst case, its complexity is {i O(n.log n)},
+       where {i n} is the length of the list [xs].
+     However, if the list [xs] is sorted,
+     then its complexity is only {i O(n)}.
+     In between these extremes, its complexity degrades gracefully. *)
+  val of_list : elt list -> set
+
+  (**[to_list s] constructs a list whose elements are the elements
+     of the set [s], in increasing order.
+
+     Time complexity: {i O(n)},
+     where {i n} is the size of the set [s]. *)
   val to_list : set -> elt list
+
+  (**[elements] is a synonym for [to_list]. *)
+  val elements : set -> elt list
+
+  (**[of_array xs] constructs a set whose elements are the elements
+     of the array [xs].
+
+     This function has adaptive time complexity.
+     In the worst case, its complexity is {i O(n.log n)},
+       where {i n} is the length of the array [xs].
+     However, if the array [xs] is sorted,
+     then its complexity is only {i O(n)}.
+     In between these extremes, its complexity degrades gracefully. *)
+  val of_array : elt array -> set
+
+  (**[to_array s] constructs an array whose elements are the elements
+     of the set [s], in increasing order.
+
+     Time complexity: {i O(n)},
+     where {i n} is the size of the set [s]. *)
+  val to_array : set -> elt array
+
+  (**[of_seq xs] constructs a set whose elements are the elements of the
+     sequence [xs]. (The whole sequence is immediately consumed.)
+
+     This function has adaptive time complexity.
+     In the worst case, its complexity is {i O(n.log n)},
+       where {i n} is the length of the list [xs].
+     However, if the sequence [xs] is sorted,
+     then its complexity is only {i O(n)}.
+     In between these extremes, its complexity degrades gracefully. *)
   val of_seq : elt Seq.t -> set
+
   val add_seq : elt Seq.t -> set -> set
   val to_seq : set -> elt Seq.t
   val to_seq_from : elt -> set -> elt Seq.t
   val to_rev_seq : set -> elt Seq.t
-  val of_list : elt list -> set
-  val of_array : elt array -> set
-  val to_array : set -> elt array
+
 
   (** {1:iter Iterating, searching, transforming sets} *)
 
