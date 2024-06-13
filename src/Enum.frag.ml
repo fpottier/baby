@@ -39,17 +39,17 @@ module Enum = struct
   let[@inline] enum (t : tree) : enum =
     cat_tree_enum t empty
 
-  (* [from_enum_1 low t e] constructs an enumeration whose elements are: 1-
+  (* [filter_tree low t e] constructs an enumeration whose elements are: 1-
      the elements [x] of the tree [t] such that [low <= x] holds, followed
      with 2- all elements of the enumeration [e]. *)
 
-  (* In [from_enum_1 low t e], only the tree [t] is filtered by the constraint
+  (* In [filter_tree low t e], only the tree [t] is filtered by the constraint
      [low <= x]. The enumeration [e] is not filtered (typically because it is
      already known that all of its elements satisfy this constraint). This is
      in contrast with [from_more low t e] (below), where both [t] and [e] are
      filtered. *)
 
-  let rec from_enum_1 (low : key) (t : tree) (e : enum) : enum =
+  let rec filter_tree (low : key) (t : tree) (e : enum) : enum =
     match VIEW(t) with
     | LEAF ->
         e
@@ -58,12 +58,12 @@ module Enum = struct
         if c = 0 then
           More (v, r, e)
         else if c < 0 then
-          from_enum_1 low r e
+          filter_tree low r e
         else
-          from_enum_1 low l (More (v, r, e))
+          filter_tree low l (More (v, r, e))
 
   let[@inline] from_enum (low : key) (t : tree) : enum =
-    from_enum_1 low t empty
+    filter_tree low t empty
 
   (* [from_more low r e] extracts from an enumeration [More (v, r, e)],
      where the value [v] is known to lie below the threshold [low],
@@ -87,11 +87,11 @@ module Enum = struct
           (* [v'] is above the threshold. *)
           (* No part of [e] must be discarded. *)
           (* Keep part of [r], followed with [e]. *)
-          from_enum_1 low r e
+          filter_tree low r e
     | End ->
         (* [e] is empty. Keep part of [r]. *)
         from_enum low r
-          (* this is equivalent to [from_enum_1 low r e] *)
+          (* this is equivalent to [filter_tree low r e] *)
 
   (* [from low e] extracts from the enumeration [e]
      the elements that lie at or above the threshold [low] . *)
@@ -183,11 +183,11 @@ module Enum = struct
 
   exception NotDisjoint
 
-  (* [from_enum_disjoint_1 low t e] returns the same result as [from_enum_1
-     low t e], except that it raises [NotDisjoint] if the key [low] appears
-     in its result. *)
+  (* [filter_tree_disjoint low t e] returns the same result as
+     [filter_tree low t e], except that it raises [NotDisjoint] if
+     the key [low] appears in its result. *)
 
-  let rec from_enum_disjoint_1 (low : key) (t : tree) (e : enum) : enum =
+  let rec filter_tree_disjoint (low : key) (t : tree) (e : enum) : enum =
     match VIEW(t) with
     | LEAF ->
         e
@@ -196,9 +196,9 @@ module Enum = struct
         if c = 0 then
           raise NotDisjoint
         else if c < 0 then
-          from_enum_disjoint_1 low r e
+          filter_tree_disjoint low r e
         else
-          from_enum_disjoint_1 low l (More (v, r, e))
+          filter_tree_disjoint low l (More (v, r, e))
 
   (* [from_more_disjoint low r e] returns the same result as [from_more low r
      e], except that it raises [NotDisjoint] if the key [low] appears in its
@@ -213,9 +213,9 @@ module Enum = struct
         else if c = 0 then
           raise NotDisjoint
         else
-          from_enum_disjoint_1 low r e
+          filter_tree_disjoint low r e
     | End ->
-        from_enum_disjoint_1 low r e
+        filter_tree_disjoint low r e
 
   (* [disjoint_more_more v1 r1 e1 v2 r2 e2] requires [v1 < v2]. It determines
      whether the enumerations [More(v1, r1, e1)] and [More(v2, r2, e2)] are
