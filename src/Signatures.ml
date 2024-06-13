@@ -112,16 +112,35 @@ module type BST = sig
 
 end
 
+(**The signature [SET] describes an abstract type of sets. *)
 module type SET = sig
+
+  (**The type of elements. *)
   type elt
+
+  (**The abstract type of sets. **)
   type set
+
+  (**[t] is a synonym for [set]. *)
   type t = set
-  (**/**)
-  val check : set -> unit
-  (**/**)
+
+  (** {1:construct Constructing sets} *)
+
   val empty : set
-  val is_empty : set -> bool
   val singleton : elt -> t
+  val add : elt -> set -> set
+  val remove : elt -> set -> set
+  val remove_min_elt : set -> set
+  val remove_max_elt : set -> set
+  val union : set -> set -> set
+  val inter : set -> set -> set
+  val diff : set -> set -> set
+  val xor : set -> set -> set
+  val split : elt -> set -> set * bool * set
+
+  (** {1:query Querying sets} *)
+
+  val is_empty : set -> bool
   val min_elt : set -> elt
   val min_elt_opt : set -> elt option
   val max_elt : set -> elt
@@ -131,19 +150,14 @@ module type SET = sig
   val mem : elt -> set -> bool
   val find : elt -> set -> elt
   val find_opt : elt -> set -> elt option
-  val add : elt -> set -> set
-  val remove : elt -> set -> set
-  val remove_min_elt : set -> set
-  val remove_max_elt : set -> set
-  val union : set -> set -> set
-  val inter : set -> set -> set
   val disjoint : set -> set -> bool
-  val diff : set -> set -> set
   val subset : set -> set -> bool
-  val xor : set -> set -> set
   val equal : set -> set -> bool
   val compare : set -> set -> int
-  val split : elt -> set -> set * bool * set
+  val cardinal : set -> int
+
+  (** {1:conversions Conversions to and from sets} *)
+
   val elements : set -> elt list
   val to_list : set -> elt list
   val of_seq : elt Seq.t -> set
@@ -155,7 +169,13 @@ module type SET = sig
   val of_array : elt array -> set
   val of_sorted_unique_array : elt array -> set
   val to_array : set -> elt array
-  val cardinal : set -> int
+
+  (** {1:iter Iterating, searching, transforming sets} *)
+
+  val iter: (elt -> unit) -> set -> unit
+  val fold: (elt -> 'a -> 'a) -> set -> 'a -> 'a
+  val for_all: (elt -> bool) -> set -> bool
+  val exists: (elt -> bool) -> set -> bool
 
   val find_first : (elt -> bool) -> t -> elt
   val find_first_opt : (elt -> bool) -> t -> elt option
@@ -167,11 +187,7 @@ module type SET = sig
   val filter : (elt -> bool) -> set -> set
   val partition : (elt -> bool) -> set -> set * set
 
-  val iter: (elt -> unit) -> set -> unit
-  val fold: (elt -> 'a -> 'a) -> set -> 'a -> 'a
-  val for_all: (elt -> bool) -> set -> bool
-  val exists: (elt -> bool) -> set -> bool
-
+  (** {1:random Random access} *)
   (* The random access functions -- not implemented by height-balanced trees. *)
   val get : set -> int -> elt
   val index : elt -> set -> int
@@ -240,5 +256,12 @@ module type SET = sig
        complexity. Otherwise, {!length} has linear time complexity. *)
 
   end (* Enum *)
+
+  (**/**)
+  (* The function [check] is used while testing the library.
+     If the library is built in release mode, this function
+     has no effect. *)
+  val check : set -> unit
+  (**/**)
 
 end
