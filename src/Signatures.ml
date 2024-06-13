@@ -1,6 +1,16 @@
+(**The signature [OrderedType] describes a type equipped
+   with a total ordering function. *)
 module type OrderedType = sig
+
+  (**The type of the set elements. *)
   type t
+
+  (** A total ordering function over values of type [t].
+      [compare x1 x2] must be zero if [x1] and [x2] are equal.
+      It must be strictly negative if [x1] is smaller than [x2].
+      It must be strictly positive if [x1] is greater than [x2]. *)
   val compare : t -> t -> int
+
 end
 
 (**The signature [BST] describes the interface offered by the balancing code.
