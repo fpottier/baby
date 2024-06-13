@@ -418,10 +418,8 @@ let of_array u =
   let module P = struct let u = u end in
   let module R = OfArray(R)(struct include P let candidate = "reference" end) in
   let module W1 = OfArray(W)(struct include P let candidate = "weight/of_array" end) in
-  let module WS = OfArray(struct include W let of_array = of_sorted_unique_array end)
-                         (struct include P let candidate = "weight/of_sorted_unique_array" end) in
   [ R.benchmark1; W1.benchmark1;
-    R.benchmark2; W1.benchmark2; WS.benchmark2 ]
+    R.benchmark2; W1.benchmark2 ]
 
 (* -------------------------------------------------------------------------- *)
 

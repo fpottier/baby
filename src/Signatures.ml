@@ -383,7 +383,6 @@ module type SET = sig
   val to_rev_seq : set -> elt Seq.t
   val of_list : elt list -> set
   val of_array : elt array -> set
-  val of_sorted_unique_array : elt array -> set
   val to_array : set -> elt array
 
   (** {1:iter Iterating, searching, transforming sets} *)

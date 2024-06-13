@@ -105,8 +105,14 @@ let rec of_sorted_unique_array_slice a i j =
    contain no duplicate elements. It converts this array, in linear time,
    to a set. *)
 
+(* Because this function is unsafe (the user can provide an array that
+   is not sorted and/or that has duplicate elements), it is disabled.
+   [to_array] (below) is safe and is almost just as fast.
+
 let[@inline] of_sorted_unique_array a =
   of_sorted_unique_array_slice a 0 (Array.length a)
+
+ *)
 
 (* -------------------------------------------------------------------------- *)
 
