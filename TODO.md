@@ -5,12 +5,6 @@
 * Hide or clearly mark all unsafe operations.
     (`of_sorted_unique_array` should probably be hidden.)
 
-* Better document the difference between `enum_from_1` and `from_more`,
-  as they have the same type, but different specs.
-  Rename them?
-
-* Implement `to_rev_seq`.
-
 * Benchmark weight-balanced trees. (Vary α.)
 
 * Make sure everything is tested, including `Enum`.
