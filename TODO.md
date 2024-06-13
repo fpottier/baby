@@ -29,6 +29,10 @@
 
 # Not To Do
 
+* One might wish to expose `view`, `join`, and `join2` to the end user, so as
+  to allow her to define their own operations (with access to the tree
+  structure) if desired.
+
 * Blelloch et al. discuss multi-insert and multi-delete operations, which
   insert or remove an array of elements at once. These can be simulated by
   converting the array to a set (using `of_array`) and using a set union or
@@ -40,3 +44,7 @@
   `down_to`, which allow selecting a subset of elements, based on ordering
   constraints. These can be simulated using `split` (at the cost of
   constructing and throwing away useless subtrees).
+
+* The submodule `Enum` of increasing enumerations could be duplicated so as to
+  also offer a submodule `RevEnum` of decreasing enumerations. I will wait
+  until there is a need.
