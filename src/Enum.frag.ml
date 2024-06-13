@@ -96,8 +96,7 @@ module Enum = struct
           filter_tree low r e
     | End ->
         (* [e] is empty. Keep part of [r]. *)
-        from_enum low r
-          (* this is equivalent to [filter_tree low r e] *)
+        filter_tree low r e
 
   (* [from low e] extracts from the enumeration [e]
      the elements that lie at or above the threshold [low] . *)
