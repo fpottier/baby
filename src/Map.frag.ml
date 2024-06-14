@@ -2,6 +2,19 @@
 
 (* [map] is defined in the same way as in OCaml's Set library. *)
 
+(* [tree_below_key] and [key_below_tree] invoke [min_elt] or [max_elt],
+   whose cost is the height of the subtree. The cumulative cost of
+   these calls, during the execution of [map], is of the form
+   1 * n/2 + 2 * n/4 + 3 * n/8 + ..., that is, O(n). *)
+
+(* If the function [f] is monotone, then the tests in [lax_join]
+   always succeed, so [join] is invoked at every node, and every
+   such call runs in constant time, since no rebalancing is
+   required. Thus, in this case, [map] runs in linear time. *)
+
+(* Otherwise, I believe (but have not carefully checked) that the
+   complexity of [map] is O(n.log n). *)
+
 let[@inline] tree_below_key (t : tree) (x : key) : bool =
   match VIEW(t) with
   | LEAF ->
