@@ -459,14 +459,85 @@ module type SET = sig
 
   (** {1:iter Iterating, searching, transforming sets} *)
 
+  (**[iter yield s] produces an increasing sequence whose elements are
+     the elements of the set [s].
+
+     This is achieved by applying the function [yield] in turn to each
+     element of the sequence.
+
+     Time complexity: {i O(n)},
+     where {i n} is the size of the set [s]. *)
   val iter: (elt -> unit) -> set -> unit
+
+  (**[fold yield s accu] produces an increasing sequence whose elements
+     are the elements of the set [s].
+
+     This is achieved by applying the function [yield] in turn to each
+     element of the sequence. An accumulator, whose initial value is
+     [accu], is threaded through this sequence of function invocations.
+
+     Time complexity: {i O(n)},
+     where {i n} is the size of the set [s]. *)
   val fold: (elt -> 'a -> 'a) -> set -> 'a -> 'a
+
+  (**[for_all p s] tests whether all elements of the set [s]
+     satisfy the predicate [p].
+
+     Time complexity: {i O(n)},
+     where {i n} is the size of the set [s]. *)
   val for_all: (elt -> bool) -> set -> bool
+
+  (**[exists p s] tests whether at least one element of the set [s]
+     satisfies the predicate [p].
+
+     Time complexity: {i O(n)},
+     where {i n} is the size of the set [s]. *)
   val exists: (elt -> bool) -> set -> bool
 
+  (**[find_first f s] requires the function [f] to be a monotonically
+     increasing function of elements to Boolean values. It returns the
+     least element [x] of the set [s] such that [f x] is [true], if
+     there is such an element. If there is none, it raises [Not_found].
+
+     In other words, when the elements of the set are enumerated as an
+     increasing sequence, [find_first f s] returns the {i first} element
+     of the sequence that follows the threshold of the function [f].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val find_first : (elt -> bool) -> t -> elt
+
+  (**[find_first_opt f s] requires the function [f] to be a monotonically
+     increasing function of elements to Boolean values. It returns [Some x],
+     where [x] is the least element of the set [s] such that [f x] is
+     [true], if there is such an element. If there is none, it returns
+     [None].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val find_first_opt : (elt -> bool) -> t -> elt option
+
+  (**[find_last f s] requires the function [f] to be a monotonically
+     decreasing function of elements to Boolean values. It returns the
+     greatest element [x] of the set [s] such that [f x] is [true], if
+     there is such an element. If there is none, it raises [Not_found].
+
+     In other words, when the elements of the set are enumerated as an
+     increasing sequence, [find_last f s] returns the {i last} element
+     of the sequence that precedes the threshold of the function [f].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val find_last : (elt -> bool) -> t -> elt
+
+  (**[find_last_opt f s] requires the function [f] to be a monotonically
+     decreasing function of elements to Boolean values. It returns [Some x],
+     where [x] is the greatest element of the set [s] such that [f x] is
+     [true], if there is such an element. If there is none, it returns
+     [None].
+
+     Time complexity: {i O(log n)},
+     where {i n} is the size of the set [s]. *)
   val find_last_opt : (elt -> bool) -> t -> elt option
 
   val map : (elt -> elt) -> set -> set
