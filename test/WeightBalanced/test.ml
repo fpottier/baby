@@ -212,7 +212,7 @@ let () =
     declare "flip index" spec (flip R.index) (flip C.index);
 
     let spec = set ^>> fun s -> le (R.cardinal s) ^> set *** set in
-    declare "split_at_2" spec R.split_at_2 C.split_at_2;
+    declare "cut" spec R.cut C.cut;
 
     let spec = set ^>> fun s -> lt (R.cardinal s) ^> triple set value set in
     declare "split_at_3" spec R.split_at_3 C.split_at_3;

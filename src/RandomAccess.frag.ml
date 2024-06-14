@@ -79,7 +79,7 @@ let index x t =
 
 (* Splitting by index -- in two parts. *)
 
-let rec split_at_2 (t : tree) (i : int) : tree * tree =
+let rec cut (t : tree) (i : int) : tree * tree =
   if debug then assert (0 <= i && i <= cardinal t);
   if i = 0 then
     leaf, t
@@ -92,24 +92,24 @@ let rec split_at_2 (t : tree) (i : int) : tree * tree =
     | NODE(l, v, r) ->
         let cl = cardinal l in
         if i <= cl then
-          let ll, lr = split_at_2 l i in
+          let ll, lr = cut l i in
           if debug then assert (lr != l);
           ll, join lr v r
         else (* [cl < i] *)
-          let rl, rr = split_at_2 r (i - (cl + 1)) in
+          let rl, rr = cut r (i - (cl + 1)) in
           if debug then assert (rl != r);
           join l v rl, rr
 
-let split_at_2 (t : tree) (i : int) : tree * tree =
+let cut (t : tree) (i : int) : tree * tree =
   if constant_time_cardinal then
     if 0 <= i && i <= cardinal t then
-      split_at_2 t i
+      cut t i
     else
-      Printf.sprintf "split_at_2: index %d is out of expected range [0, %d]"
+      Printf.sprintf "cut: index %d is out of expected range [0, %d]"
         i (cardinal t)
       |> invalid_arg
   else
-    failwith "split_at_2: operation is not available"
+    failwith "cut: operation is not available"
 
 (* -------------------------------------------------------------------------- *)
 

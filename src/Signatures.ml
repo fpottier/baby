@@ -616,14 +616,14 @@ module type SET = sig
      where {m n} is the size of the set [s]. *)
   val index : elt -> set -> int
 
-  (**[split_at_2 s i] requires [0 <= i && i <= cardinal s]. It returns a
-     pair [(s1, s2)], where [s1] is the set of the elements of [s] whose
-     index is less than [i], and [s2] is the set of the elements of [s]
-     whose index is greater than or equal to [i].
+  (**[cut s i] requires [0 <= i && i <= cardinal s]. It returns a pair
+     [(s1, s2)], where [s1] is the set of the elements of [s] whose index
+     is less than [i], and [s2] is the set of the elements of [s] whose
+     index is greater than or equal to [i].
 
      Time complexity: {m O(\log n)},
      where {m n} is the size of the set [s]. *)
-  val split_at_2 : set -> int -> set * set
+  val cut : set -> int -> set * set
 
   (**[split_at_3 s i] requires [0 <= i && i < cardinal s]. It returns a
      triple [(s1, x, s2)], where [s1] is the set of the elements of [s]

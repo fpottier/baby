@@ -43,7 +43,7 @@ end) = struct
     | None ->
         raise Not_found
 
-  let split_at_2 s i =
+  let cut s i =
     let a = Array.of_list (elements s) in
     of_array (Array.sub a 0 i),
     of_array (Array.sub a i (Array.length a - i))
