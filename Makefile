@@ -142,7 +142,7 @@ HEADER   := header
 
 .PHONY: headache
 headache:
-	@ for f in {src,benchmark_old}/*.{ml,mli} benchmark_new/*.ml ; do \
+	@ for f in $(shell gfind . -type f -regex ".*\.mli?") ; do \
 	  $(HEADACHE) -h $(HEADER) $$f ; \
 	done
 
