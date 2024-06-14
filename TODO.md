@@ -1,11 +1,10 @@
 # To Do
 
+* Write a nice front page for the documentation.
+
 * Name the signature `S` instead of `SET`? Or both.
 
 * Make sure every file is clean and documented.
-
-* Hide or clearly mark all unsafe operations.
-    (`of_sorted_unique_array` should probably be hidden.)
 
 * Benchmark weight-balanced trees. (Vary α.)
 
