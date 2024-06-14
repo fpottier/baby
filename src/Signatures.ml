@@ -480,15 +480,15 @@ module type SET = sig
      where {i n} is the size of the set [s]. *)
   val fold: (elt -> 'a -> 'a) -> set -> 'a -> 'a
 
-  (**[for_all p s] tests whether all elements of the set [s]
-     satisfy the predicate [p].
+  (**[for_all p s] tests whether all elements [x] of the set [s]
+     satisfy [p x = true].
 
      Time complexity: {i O(n)},
      where {i n} is the size of the set [s]. *)
   val for_all: (elt -> bool) -> set -> bool
 
-  (**[exists p s] tests whether at least one element of the set [s]
-     satisfies the predicate [p].
+  (**[exists p s] tests whether at least one element [x] of the set [s]
+     satisfies [p x = true].
 
      Time complexity: {i O(n)},
      where {i n} is the size of the set [s]. *)
@@ -540,9 +540,46 @@ module type SET = sig
      where {i n} is the size of the set [s]. *)
   val find_last_opt : (elt -> bool) -> t -> elt option
 
+  (**[map f s] computes the image of the set [s] through the function [f],
+     that is, in mathematical notation,
+     the set {i \{ y | y = f x ∧ x ∈ s \}}.
+
+     If, for every element [x] of the set [s],
+     [f x] is [x],
+     then the result is physically equal to [s].
+
+     If the function [f] is monotonically increasing,
+     then the time complexity is
+     {i O(n)}, where {i n} is the size of the set [s];
+     otherwise, it is {i O(n.log n)}. *)
   val map : (elt -> elt) -> set -> set
-  val filter_map : (elt -> elt option) -> set -> set
+
+  (**[filter p s] returns the set of the elements [x] of the set [s]
+     such that [p x] is [true].
+
+     If, for every element [x] of the set [s],
+     [p x] is [true],
+     then the result of [filter p s] is physically equal to [s].
+
+     Time complexity: {i O(n)},
+     where {i n} is the size of the set [s]. *)
   val filter : (elt -> bool) -> set -> set
+
+  (**[filter_map f s] computes
+     the set {i \{ y | Some y = f x ∧ x ∈ s \}}.
+
+     If, for every element [x] of the set [s],
+     [f x] is [Some x],
+     then the result is physically equal to [s].
+
+     If the function [f]
+     (restricted to the elements that it retains)
+     is monotonically increasing,
+     then the time complexity is
+     {i O(n)}, where {i n} is the size of the set [s];
+     otherwise, it is {i O(n.log n)}. *)
+  val filter_map : (elt -> elt option) -> set -> set
+
   val partition : (elt -> bool) -> set -> set * set
 
   (** {1:random Random access} *)
