@@ -19,13 +19,14 @@
   efficient random access functions;
   fast negative paths (based on cardinal) for `subset` and `equal`.
   In `union`, `inter`, and possibly a few other functions,
+  fast positive paths (based on sharing) and
   better preservation of sharing.
   New function `xor`.
-  In `of_list`, `of_array`, `of_seq`, adaptive complexity.
   New functions `of_array` and `to_array`.
+  In `of_list`, `of_array`, `of_seq`, adaptive complexity.
   New functions `remove_min_elt` and `remove_max_elt`.
-  Enumerations.
-  Clear documentation of the time complexity of every operation.
+  New enumeration API.
+  Documentation of the time complexity of every operation.
 
 * Document the potential departures from OCaml's Set library.
   In `of_list`, `of_seq`, `add_seq`,
@@ -36,6 +37,8 @@
 
 * Implement a variant of `choose` that runs in time O(1),
   and does not promise to respect equality of sets.
+  Implement `extract_min` which both chooses an element
+  and removes it?
 
 * Add README, AUTHORS, LICENSE, CHANGES, etc. Add headers.
 
@@ -67,7 +70,9 @@
 * Blelloch et al. offers variations on `split`, such as `range`, `up_to`,
   `down_to`, which allow selecting a subset of elements, based on ordering
   constraints. These can be simulated using `split` (at the cost of
-  constructing and throwing away useless subtrees).
+  constructing and throwing away useless subtrees). Beside, the functions
+  `find_first` and `first_last` allow searching based on a monotone predicate;
+  one could also allow splitting based on a monotone predicate.
 
 * The submodule `Enum` of increasing enumerations could be duplicated so as to
   also offer a submodule `RevEnum` of decreasing enumerations. I will wait
