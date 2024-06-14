@@ -39,7 +39,7 @@
   Implement `extract_min` which both chooses an element
   and removes it?
 
-* Add README, AUTHORS, LICENSE, CHANGES, etc. Add headers.
+* Add a README.
 
 * In the documentation `Seq` shows up as `Stdlib.Seq`,
   and the hyperlink does not work.
