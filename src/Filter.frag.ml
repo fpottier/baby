@@ -28,9 +28,6 @@ let rec filter p (t : tree) : tree =
    optimization: as in [filter], we attempt to preserve sharing where
    possible. *)
 
-(* Regarding worst-case time complexity, the above comment about [filter]
-   also applies to [partition]. *)
-
 let rec partition p (t : tree) : tree * tree =
   match VIEW(t) with
   | LEAF ->
