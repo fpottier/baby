@@ -28,7 +28,14 @@ let rec find_opt (x : key) (t : tree) : key option =
 
 (* [find_first] and its variants are as in OCaml's Set library. *)
 
-(* A lot of boring code. *)
+(* A lot of repetitive code. *)
+
+(* It is worth noting that [find_first] is not a naive linear search.
+   Instead, it assumes that [f] is a monotonically increasing function
+   of elements to Booleans. This implies that there is at most one
+   position in the increasing sequence of the set elements where the
+   value of [f] changes, and it changes from [false] to [true]. This
+   position can be found in logarithmic time. *)
 
 let rec find_first_aux v0 f (t : tree) =
   match VIEW(t) with
