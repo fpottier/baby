@@ -625,15 +625,15 @@ module type SET = sig
      where {m n} is the size of the set [s]. *)
   val cut : set -> int -> set * set
 
-  (**[split_at_3 s i] requires [0 <= i && i < cardinal s]. It returns a
+  (**[cut_and_get s i] requires [0 <= i && i < cardinal s]. It returns a
      triple [(s1, x, s2)], where [s1] is the set of the elements of [s]
      whose index is less than [i], [x] is the element of [s] at index [i],
-     and [s2] is the set of the elements of [s] whose index is greater than
-     [i].
+     and [s2] is the set of the elements of [s] whose index is greater
+     than [i].
 
      Time complexity: {m O(\log n)},
      where {m n} is the size of the set [s]. *)
-  val split_at_3 : set -> int -> set * elt * set
+  val cut_and_get : set -> int -> set * elt * set
 
   (** {1:enum Enumerations} *)
 

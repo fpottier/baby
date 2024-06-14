@@ -48,7 +48,7 @@ end) = struct
     of_array (Array.sub a 0 i),
     of_array (Array.sub a i (Array.length a - i))
 
-  let split_at_3 s i =
+  let cut_and_get s i =
     let a = Array.of_list (elements s) in
     of_array (Array.sub a 0 i),
     a.(i),

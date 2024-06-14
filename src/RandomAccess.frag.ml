@@ -115,7 +115,7 @@ let cut (t : tree) (i : int) : tree * tree =
 
 (* Splitting by index -- in three parts. *)
 
-let rec split_at_3 (t : tree) (i : int) : tree * key * tree =
+let rec cut_and_get (t : tree) (i : int) : tree * key * tree =
   if debug then assert (0 <= i && i < cardinal t);
   match VIEW(t) with
   | LEAF ->
@@ -125,19 +125,19 @@ let rec split_at_3 (t : tree) (i : int) : tree * key * tree =
       if i = cl then
         l, v, r
       else if i < cl then
-        let ll, lv, lr = split_at_3 l i in
+        let ll, lv, lr = cut_and_get l i in
         ll, lv, join lr v r
       else
-        let rl, rv, rr = split_at_3 r (i - (cl + 1)) in
+        let rl, rv, rr = cut_and_get r (i - (cl + 1)) in
         join l v rl, rv, rr
 
-let split_at_3 (t : tree) (i : int) : tree * key * tree =
+let cut_and_get (t : tree) (i : int) : tree * key * tree =
   if constant_time_cardinal then
     if 0 <= i && i < cardinal t then
-      split_at_3 t i
+      cut_and_get t i
     else
-      Printf.sprintf "split_at_3: index %d is out of expected range [0, %d)"
+      Printf.sprintf "cut_and_get: index %d is out of expected range [0, %d)"
         i (cardinal t)
       |> invalid_arg
   else
-    failwith "split_at_3: operation is not available"
+    failwith "cut_and_get: operation is not available"

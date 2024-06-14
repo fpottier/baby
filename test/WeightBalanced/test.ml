@@ -215,7 +215,7 @@ let () =
     declare "cut" spec R.cut C.cut;
 
     let spec = set ^>> fun s -> lt (R.cardinal s) ^> triple set value set in
-    declare "split_at_3" spec R.split_at_3 C.split_at_3;
+    declare "cut_and_get" spec R.cut_and_get C.cut_and_get;
 
   end;
 
