@@ -424,11 +424,38 @@ module type SET = sig
      In between these extremes, its complexity degrades gracefully. *)
   val of_seq : elt Seq.t -> set
 
-  val add_seq : elt Seq.t -> set -> set
-  val to_seq : set -> elt Seq.t
-  val to_seq_from : elt -> set -> elt Seq.t
-  val to_rev_seq : set -> elt Seq.t
+  (**[add_seq xs s] constructs a set whose elements are the elements
+     of the sequence [xs] and the elements of the set [s].
 
+     It is equivalent to [union (of_seq xs) s].
+
+     Its time complexity is the combined time complexity of [of_seq] and
+     [union]. *)
+  val add_seq : elt Seq.t -> set -> set
+
+  (**[to_seq s] constructs an increasing sequence whose elements are the
+     elements of the set [s].
+
+     The time complexity of consuming the entire sequence is {i O(n)},
+     where {i n} is the size of the set [s]. The time complexity of
+     demanding one element is {i O(log n)}. *)
+  val to_seq : set -> elt Seq.t
+
+  (**[to_seq_from x s] constructs an increasing sequence whose elements are
+     the elements of the set [s] that are greater than or equal to [x].
+
+     The time complexity of consuming the entire sequence is {i O(n)},
+     where {i n} is the size of the set [s]. The time complexity of
+     demanding one element is {i O(log n)}. *)
+  val to_seq_from : elt -> set -> elt Seq.t
+
+  (**[to_rev_seq s] constructs a decreasing sequence whose elements are the
+     elements of the set [s].
+
+     The time complexity of consuming the entire sequence is {i O(n)},
+     where {i n} is the size of the set [s]. The time complexity of
+     demanding one element is {i O(log n)}. *)
+  val to_rev_seq : set -> elt Seq.t
 
   (** {1:iter Iterating, searching, transforming sets} *)
 
