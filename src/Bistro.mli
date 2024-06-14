@@ -1,3 +1,15 @@
+(**************************************************************************)
+(*                                                                        *)
+(*                                  Bistro                                *)
+(*                                                                        *)
+(*                      François Pottier, Inria Paris                     *)
+(*                                                                        *)
+(*      Copyright 2024--2024 Inria. All rights reserved. This file is     *)
+(*      distributed under the terms of the GNU Library General Public     *)
+(*      License, with an exception, as described in the file LICENSE.     *)
+(*                                                                        *)
+(**************************************************************************)
+
 (**This library offers two flavors of binary search trees as well as
    building blocks that allow advanced users to construct their own
    custom flavors.

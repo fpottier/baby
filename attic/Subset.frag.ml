@@ -1,3 +1,15 @@
+(**************************************************************************)
+(*                                                                        *)
+(*                                  Bistro                                *)
+(*                                                                        *)
+(*                      François Pottier, Inria Paris                     *)
+(*                                                                        *)
+(*      Copyright 2024--2024 Inria. All rights reserved. This file is     *)
+(*      distributed under the terms of the GNU Library General Public     *)
+(*      License, with an exception, as described in the file LICENSE.     *)
+(*                                                                        *)
+(**************************************************************************)
+
 (* This alternative version of [subset] does not allocate any memory.
    Unfortunately, I believe that its worst-case time complexity may
    be suboptimal, because of the calls to [mem]. In practice, I have
