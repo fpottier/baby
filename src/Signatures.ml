@@ -1,4 +1,4 @@
-(**The signature [OrderedType] describes a type equipped
+(**The signature {!OrderedType} describes a type equipped
    with a total ordering function. *)
 module type OrderedType = sig
 
@@ -13,7 +13,7 @@ module type OrderedType = sig
 
 end
 
-(**The signature [BST] describes the interface that must be offered by
+(**The signature  {!BST} describes the interface that must be offered by
    the balancing code to the rest of the balanced binary search tree
    library. Most operations on binary search tree are built on top of
    this interface, and are oblivious to the balancing criterion. *)
@@ -112,13 +112,14 @@ module type BST = sig
 
 end
 
-(**The signature [SET] describes an abstract type of sets. *)
+(**The signature {!SET} describes an abstract data type of sets,
+   equipped with a wide array of efficient operations. *)
 module type SET = sig
 
   (**The type of elements. *)
   type elt
 
-  (**The abstract type of sets. *)
+  (**The abstract type of sets. A set is an immutable data structure. *)
   type set
 
   (**A synonym for the type [set]. *)
@@ -433,24 +434,25 @@ module type SET = sig
      [union]. *)
   val add_seq : elt Seq.t -> set -> set
 
-  (**[to_seq s] constructs an increasing sequence whose elements are the
-     elements of the set [s].
+  (**[to_seq s] constructs a (persistent) increasing sequence whose elements
+     are the elements of the set [s].
 
-     The time complexity of consuming the entire sequence is {m O(n)},
-     where {m n} is the size of the set [s]. The time complexity of
+     The time complexity of consuming the entire sequence is {m O(n)}, where
+     {m n} is the size of the set [s]. The worst-case time complexity of
      demanding one element is {m O(\log n)}. *)
   val to_seq : set -> elt Seq.t
 
-  (**[to_seq_from x s] constructs an increasing sequence whose elements are
-     the elements of the set [s] that are greater than or equal to [x].
+  (**[to_seq_from x s] constructs a (persistent) increasing sequence whose
+     elements are the elements of the set [s] that are greater than or equal
+     to [x].
 
      The time complexity of consuming the entire sequence is {m O(n)},
      where {m n} is the size of the set [s]. The time complexity of
      demanding one element is {m O(\log n)}. *)
   val to_seq_from : elt -> set -> elt Seq.t
 
-  (**[to_rev_seq s] constructs a decreasing sequence whose elements are the
-     elements of the set [s].
+  (**[to_rev_seq s] constructs a (persistent) decreasing sequence whose
+     elements are the elements of the set [s].
 
      The time complexity of consuming the entire sequence is {m O(n)},
      where {m n} is the size of the set [s]. The time complexity of
@@ -637,64 +639,115 @@ module type SET = sig
 
   (** {1:enum Enumerations} *)
 
+  (**The submodule {!Enum} offers an abstract data type of {i enumerations},
+     which allow efficient iteration over a set. *)
   module Enum : sig
 
+    (**The type of enumerations. An enumeration an immutable data structure.
 
+       An enumeration represents an increasing sequence of elements. It can
+       also be thought of as a set.
+
+       Enumerations and sets represent the same abstract object (namely, a
+       mathematical set), but have different internal representations, and
+       support a different array of operations. In particular, enumerations
+       support {!head}, {!tail}, and {!from}, which allow efficient
+       iteration. *)
     type enum
-    (** The type of enumerations. An enumeration represents an increasing
-        sequence of elements of type [elt]. *)
 
+    (**The type [t] is a synonym for the type [enum]. *)
     type t = enum
-    (** A synonym for the type [enum]. *)
 
+    (**[empty] is the empty enumeration. *)
     val empty : enum
-    (** [empty] is the empty enumeration. It contains zero elements. *)
 
+    (**[is_empty e] determines whether the enumeration [e] is empty.
+
+       Time complexity: {m O(1)}. *)
     val is_empty : enum -> bool
-    (** [is_empty e] tests whether the enumeration [e] is empty. *)
 
+    (**[enum s] returns an enumeration of the set [s]. This enumeration
+       can be thought of as an increasing sequence whose elements are
+       the elements of the set [s].
+
+       Time complexity: {m O(\log n)},
+       where {m n} is the size of the set [s]. *)
     val enum : set -> enum
-    (** [enum s] returns an enumeration of the set [s]. This enumeration
-        contains all of the elements of the set [s], in increasing order. *)
 
+    (**[from_enum x s] returns an enumeration whose elements are the
+       elements of the set [s] that are greater than or equal to [x].
+       It is equivalent to [from x (enum s)].
+
+       Time complexity: {m O(\log n)},
+       where {m n} is the size of the set [s]. *)
     val from_enum : elt -> set -> enum
-    (** [from_enum x s] returns an enumeration of the subset of [s]
-        formed of just the elements that are no less than [x].
-        It is equivalent to [from x (enum s)]. *)
 
+    (**If the enumeration [e] is nonempty, then [head e] returns its first
+       element (that is, its least element). Otherwise, it raises [Not_found].
+
+       Time complexity: {m O(1)}. *)
     val head : enum -> elt
-    (** [head e] returns the first element of the enumeration [e].
-        The enumeration [e] must be nonempty. *)
 
+    (**If the enumeration [e] is nonempty, then [tail e] returns this
+       enumeration, deprived of its first element (that is, its least
+       element). Otherwise, it raises [Not_found].
+
+       The worst-case time complexity of this operation is {m O(\log n)},
+       where {m n} is the size of the enumeration [e].
+       However, its amortized time complexity is only {m O(1)}: that is,
+       the cost of enumerating all elements of a set of size {m n},
+       using [head] and [tail], is only {m O(n)}. *)
     val tail : enum -> enum
-    (** [tail e] returns the enumeration [e], deprived of its first element.
-        The enumeration [e] must be nonempty. *)
 
+    (**If the enumeration [e] is nonempty, then [head_opt e] returns its first
+       element (that is, its least element). Otherwise, it returns [None].
+
+       Time complexity: {m O(1)}. *)
     val head_opt : enum -> elt option
-    (** If the enumeration [e] is nonempty, then [head_opt e] returns its
-        first element. Otherwise, it returns [None]. *)
 
+    (**If the enumeration [e] is nonempty, then [tail_opt e] returns this
+       enumeration, deprived of its first element (that is, its least
+       element). Otherwise, it returns [None].
+
+       The worst-case time complexity of this operation is {m O(\log n)},
+       where {m n} is the size of the enumeration [e].
+       However, its amortized time complexity is only {m O(1)}: that is,
+       the cost of enumerating all elements of a set of size {m n},
+       using [head_opt] and [tail_opt], is only {m O(n)}. *)
     val tail_opt : enum -> enum option
-    (** If the enumeration [e] is nonempty, then [tail_opt e] returns the
-        enumeration [e], deprived of its first element. Otherwise, it
-        returns [None]. *)
 
+    (**[from x e] returns the enumeration obtained from the enumeration [e]
+       by skipping (removing) the elements that are less than [x].
+
+       Time complexity: {m O(\log k)},
+       where {m k} is the number of elements that are skipped. *)
     val from : elt -> enum -> enum
-    (** [from x e] returns the enumeration obtained from the enumeration [e]
-        by skipping the elements that lie below the threshold [x]. In other
-        words, only the elements of [e] that lie at or above the threshold
-        [x] are retained. *)
 
+    (**[to_seq e] constructs a (persistent) increasing sequence whose elements
+       are the elements of the enumeration [e].
+
+       The time complexity of consuming the entire sequence is {m O(n)}, where
+       {m n} is the size of the enumeration [e]. The worst-case time
+       complexity of demanding one element is {m O(\log n)}. *)
     val to_seq : enum -> elt Seq.t
-    (** [to_seq] converts an enumeration into a (persistent) sequence. *)
 
+    (**[elements e] returns a set whose elements are the elements of the
+       enumeration [e].
+
+       Time complexity: {m O(\log n)},
+       where {m n} is the size of the enumeration [e]. *)
     val elements : enum -> set
-    (** [elements] converts an enumeration into a set. *)
 
+    (**[length e] returns the length of the enumeration [e],
+       that is, the number of its elements.
+
+       Time complexity:
+       in the weight-balanced-tree implementation ({!Bistro.W}),
+         {m O(\log n)},
+         where {m n} is the size of the enumeration [e];
+       in the height-balanced-tree implementation ({!Bistro.H}),
+         {m O(n)}. *)
     val length : enum -> int
-    (**[length e] returns the length of the enumeration [e]. If {!cardinal}
-       has constant time complexity, then {!length} has logarithmic time
-       complexity. Otherwise, {!length} has linear time complexity. *)
 
   end (* Enum *)
 
