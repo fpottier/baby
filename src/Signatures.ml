@@ -639,8 +639,6 @@ module type SET = sig
 
   module Enum : sig
 
-    type set = t
-    (** The type [set] is a synonym for the type of sets. *)
 
     type enum
     (** The type of enumerations. An enumeration represents an increasing

@@ -6,8 +6,6 @@ module Enum = struct
 
   type tree = t
 
-  type set = tree
-
   type enum =
     | End
     | More of elt * t * enum
