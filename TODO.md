@@ -62,7 +62,7 @@
   converting the array to a set (using `of_array`) and using a set union or
   set difference (`union`, `diff`). Some time is wasted in the conversion of
   the array to a balanced binary tree, but (for now, at least) this seems
-  acceptable.
+  acceptable. `add_seq` is an example of a multi-insertion.
 
 * Blelloch et al. offers variations on `split`, such as `range`, `up_to`,
   `down_to`, which allow selecting a subset of elements, based on ordering
