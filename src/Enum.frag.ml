@@ -168,6 +168,10 @@ module Enum = struct
      It exploits the construction function [join].
      It performs no key comparisons. *)
 
+  (* I believe, but have not proved, that, thanks to the remarkable
+     properties of [join], the time complexity of [elements] is only
+     O(log n). *)
+
   let rec elements (v : key) (r : tree) (e : enum) : tree =
     match e with
     | End ->
