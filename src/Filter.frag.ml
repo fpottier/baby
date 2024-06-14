@@ -1,9 +1,10 @@
 (* [filter] is the same as in OCaml's Set library. *)
 
-(* The worst-case time complexity of this implementation may be worse than
-   linear, due to the use of [join] and [join2] -- I am not quite sure.
-   One could imagine a completely different implementation of [filter],
-   with linear worst-case time complexity, as follows: copy the data to an
+(* Because [join] and [join2] have logarithmic cost, this implementation
+   of [filter] has linear time complexity. *)
+
+(* One could imagine a completely different implementation of [filter],
+   also with linear time complexity, as follows: copy the data to an
    array, filter the array, reconstruct a tree. However, this approach
    would require linear auxiliary storage, may be slower in practice, and
    would be less effective at preserving sharing in scenarios where many
