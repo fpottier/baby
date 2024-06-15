@@ -143,6 +143,12 @@ let declare_elt_set_function result name r c =
   let spec = set ^>> fun s -> (inhabits s) ^> result in
   declare ("flip " ^ name) spec (flip r) (flip c)
 
+let declare_elt_set_function_may_fail_if_absent result name r c =
+  let spec = elt ^> set ^!> result in
+  declare name spec r c;
+  let spec = set ^>> fun s -> (inhabits s) ^> result in
+  declare ("flip " ^ name) spec (flip r) (flip c)
+
 (* -------------------------------------------------------------------------- *)
 
 (* Declare the operations. *)
@@ -202,9 +208,7 @@ let () =
 
   declare_elt_set_function bool "mem" R.mem C.mem;
 
-  (* [find] can raise an exception. *)
-  let spec = elt ^> set ^!> elt in
-  declare "find" spec R.find C.find;
+  declare_elt_set_function_may_fail_if_absent elt "find" R.find C.find;
 
   declare_elt_set_function (option elt) "find_opt" R.find_opt C.find_opt;
 
@@ -258,24 +262,66 @@ let () =
 
   (* Section 4: iterating, searching, transforming sets. *)
 
-  (* not tested: [find_first], [find_first_opt] *)
-  (* not tested: [find_last], [find_last_opt] *)
+  (* not tested: [iter] *)
+  (* not tested: [fold] *)
+  (* not tested: [for_all] *)
+  (* not tested: [exists] *)
 
+  (* [find_first] is applied specifically to the function [(<=) 0]. *)
+  let spec = set ^!> elt in
+  declare "find_first ((<=) 0)" spec
+    (R.find_first ((<=) 0))
+    (C.find_first ((<=) 0));
 
+  let spec = set ^> option elt in
+  declare "find_first_opt ((<=) 0)" spec
+    (R.find_first_opt ((<=) 0))
+    (C.find_first_opt ((<=) 0));
 
+  let spec = set ^!> elt in
+  declare "find_last ((>=) 0)" spec
+    (R.find_last ((>=) 0))
+    (C.find_last ((>=) 0));
 
+  let spec = set ^> option elt in
+  declare "find_last_opt ((>=) 0)" spec
+    (R.find_last_opt ((>=) 0))
+    (C.find_last_opt ((>=) 0));
+
+  (* [map] is tested in three different scenarios: applied to the identity;
+     applied to a monotonically increasing function; applied to an arbitrary
+     function. In the first scenario, we check that sharing is preserved. *)
+
+  let must_preserve_sharing f s =
+    let s' = f s in
+    assert (s == s');
+    s'
+  in
+
+  let spec = set ^> set in
+  let f = Fun.id in
+  declare "map Fun.id" spec (R.map f) (must_preserve_sharing (C.map f));
+
+  let spec = set ^> set in
+  let f = succ in
+  declare "map succ" spec (R.map f) (C.map f);
+
+  let spec = set ^> set in
+  let f = Int.neg in
+  declare "map Int.neg" spec (R.map f) (C.map f);
+
+  (* TODO [filter] *)
+  (* TODO [filter_map] *)
+  (* TODO [partition] *)
+
+  (* Section 5: random access. *)
 
   if C.has_random_access_functions then begin
 
     let spec = set ^>> fun s -> lt (R.cardinal s) ^> elt in
     declare "get" spec R.get C.get;
 
-    let spec = elt ^> set ^!> int in
-    declare "index" spec R.index C.index;
-
-    (* Specifically query a value that is in the set. *)
-    let spec = set ^>> fun s -> (inhabits s) ^> int in
-    declare "flip index" spec (flip R.index) (flip C.index);
+    declare_elt_set_function_may_fail_if_absent int "index" R.index C.index;
 
     let spec = set ^>> fun s -> le (R.cardinal s) ^> set *** set in
     declare "cut" spec R.cut C.cut;
@@ -285,16 +331,7 @@ let () =
 
   end;
 
-  (* not tested: [map] *)
-  (* TODO test [filter_map] with identity (test physical equality),
-       with monotone function, with non-monotone function *)
-  (* not tested: [filter] *)
-  (* TODO test [partition] *)
-
-  (* not tested: [iter] *)
-  (* not tested: [fold] *)
-  (* not tested: [for_all] *)
-  (* not tested: [exists] *)
+  (* Section 6: enumerations. *)
 
   let spec = enum in
   declare "Enum.empty" spec R.Enum.empty C.Enum.empty;
