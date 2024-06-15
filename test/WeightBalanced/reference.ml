@@ -34,6 +34,9 @@ end) = struct
   let of_array a =
     a |> Array.to_list |> of_list
 
+  let to_array s =
+    s |> elements |> Array.of_list
+
   let of_sorted_unique_array =
     of_array
 
