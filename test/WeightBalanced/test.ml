@@ -323,7 +323,23 @@ let () =
   declare "filter (fun x -> x mod 2 = 0)" spec
     (R.filter p) (C.filter p);
 
-  (* TODO [filter_map] *)
+  let spec = set ^> set in
+  let f x = Some x in
+  declare "filter_map (fun x -> Some x)"
+    spec (R.filter_map f) (must_preserve_sharing (C.filter_map f));
+
+  let spec = set ^> set in
+  let f x = if x mod 2 = 0 then Some (x + 1) else None in
+  declare
+    "filter_map (fun x -> if x mod 2 = 0 then Some (x + 1) else None) "
+    spec (R.filter_map f) (C.filter_map f);
+
+  let spec = set ^> set in
+  let f x = if x mod 2 = 0 then Some (-x) else None in
+  declare
+    "filter_map (fun x -> if x mod 2 = 0 then Some (-x) else None) "
+    spec (R.filter_map f) (C.filter_map f);
+
   (* TODO [partition] *)
 
   (* Section 5: random access. *)
