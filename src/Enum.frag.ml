@@ -287,7 +287,7 @@ module Enum = struct
     | End ->
         accu
     | More (_, r, e) ->
-        length_aux (accu + cardinal r) e
+        length_aux (accu + cardinal r + 1) e
 
   let[@inline] length (e : enum) : int =
     length_aux 0 e
