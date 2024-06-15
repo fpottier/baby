@@ -22,7 +22,7 @@ module C = Candidate
 
 (* -------------------------------------------------------------------------- *)
 
-(* We have one abstract type, namely [set]. *)
+(* The abstract type [set]. *)
 
 (* It is equipped with a well-formedness check,
    which ignores the model (the reference side). *)
@@ -34,12 +34,17 @@ let check _model =
 let set =
   declare_abstract_type ~check ()
 
+(* The abstract type [enum] *)
+
+let enum =
+  declare_abstract_type ()
+
 (* We draw random integer keys. *)
 
 let range =
   1 lsl 8
 
-let value =
+let elt =
   semi_open_interval (-range) (range-1)
 
 (* We can also draw an inhabitant out of a set. *)
@@ -70,7 +75,7 @@ let triple spec1 spec2 spec3 =
 
 (* Generating arrays. *)
 
-let array_value =
+let array_elt =
   easily_constructible
     Gen.(array (int range) (semi_open_interval (-range) (range-1)))
     Print.(array int)
@@ -80,15 +85,15 @@ let sorted_unique_array compare n element () =
   |> List.sort_uniq compare
   |> Array.of_list
 
-let sorted_unique_array_value =
+let sorted_unique_array_elt =
   easily_constructible
     Gen.(sorted_unique_array Int.compare (int 16) (semi_open_interval (-16) (15)))
     Print.(array int)
 
-(* Generating or consuming sequences of values. *)
+(* Generating or consuming sequences of elts. *)
 
-let seq_value =
-  declare_seq value
+let seq_elt =
+  declare_seq elt
 
 (* Exchanging two arguments. *)
 
@@ -104,44 +109,44 @@ let () =
   let spec = set in
   declare "empty" spec R.empty C.empty;
 
-  let spec = value ^> set in
+  let spec = elt ^> set in
   declare "singleton" spec R.singleton C.singleton;
 
   (* not tested: [is_empty] *)
 
-  let spec = set ^!> value in
+  let spec = set ^!> elt in
   declare "min_elt" spec R.min_elt C.min_elt;
 
-  let spec = set ^!> option value in
+  let spec = set ^!> option elt in
   declare "min_elt_opt" spec R.min_elt_opt C.min_elt_opt;
 
-  let spec = set ^!> value in
+  let spec = set ^!> elt in
   declare "max_elt" spec R.max_elt C.max_elt;
 
-  let spec = set ^!> option value in
+  let spec = set ^!> option elt in
   declare "max_elt_opt" spec R.max_elt_opt C.max_elt_opt;
 
   (* not tested: [choose], [choose_opt] *)
   (* not tested: [find_first], [find_first_opt] *)
   (* not tested: [find_last], [find_last_opt] *)
 
-  let spec = value ^> set ^> bool in
+  let spec = elt ^> set ^> bool in
   declare "mem" spec R.mem C.mem;
 
-  let spec = value ^> set ^!> value in
+  let spec = elt ^> set ^!> elt in
   declare "find" spec R.find C.find;
 
-  let spec = value ^> set ^> option value in
+  let spec = elt ^> set ^> option elt in
   declare "find_opt" spec R.find_opt C.find_opt;
 
-  let spec = value ^> set ^> set in
+  let spec = elt ^> set ^> set in
   declare "add" spec R.add C.add;
 
-  let spec = value ^> set ^> set in
+  let spec = elt ^> set ^> set in
   declare "remove" spec R.remove C.remove;
 
   (* TODO do the same for [mem], [find], [add], etc. *)
-  (* Specifically remove a value that is in the set. *)
+  (* Specifically remove a elt that is in the set. *)
   let spec = set ^>> fun s -> (inhabits s) ^> set in
   declare "flip remove" spec (flip R.remove) (flip C.remove);
 
@@ -174,36 +179,36 @@ let () =
 
   (* [split] is not tested. *)
 
-  let spec = set ^> list value in
+  let spec = set ^> list elt in
   declare "elements" spec R.elements C.elements;
 
-  let spec = seq_value ^> set in
+  let spec = seq_elt ^> set in
   declare "of_seq" spec R.of_seq C.of_seq;
 
-  let spec = set ^> seq_value in
+  let spec = set ^> seq_elt in
   declare "to_seq" spec R.to_seq C.to_seq;
 
-  let spec = value ^> set ^> seq_value in
+  let spec = elt ^> set ^> seq_elt in
   declare "to_seq_from" spec R.to_seq_from C.to_seq_from;
 
-  let spec = set ^> seq_value in
+  let spec = set ^> seq_elt in
   declare "to_rev_seq" spec R.to_rev_seq C.to_rev_seq;
 
-  let spec = seq_value ^> set ^> set in
+  let spec = seq_elt ^> set ^> set in
   declare "add_seq" spec R.add_seq C.add_seq;
 
   (* [of_list] is important in this test because it offers a cheap way
      of creating nontrivial sets. It consumes just one unit of fuel. *)
-  let spec = list value ^> set in
+  let spec = list elt ^> set in
   declare "of_list" spec R.of_list C.of_list;
 
-  let spec = array_value ^> set in
+  let spec = array_elt ^> set in
   declare "of_array" spec R.of_array C.of_array;
 
-  let spec = sorted_unique_array_value ^> set in
+  let spec = sorted_unique_array_elt ^> set in
   declare "of_sorted_unique_array" spec R.of_array C.of_array;
 
-  let spec = set ^> list value in
+  let spec = set ^> list elt in
   declare "(fun s -> Array.to_list (to_array s))" spec
     R.elements
     (fun s -> Array.to_list (C.to_array s));
@@ -213,10 +218,10 @@ let () =
 
   if C.has_random_access_functions then begin
 
-    let spec = set ^>> fun s -> lt (R.cardinal s) ^> value in
+    let spec = set ^>> fun s -> lt (R.cardinal s) ^> elt in
     declare "get" spec R.get C.get;
 
-    let spec = value ^> set ^!> int in
+    let spec = elt ^> set ^!> int in
     declare "index" spec R.index C.index;
 
     (* Specifically query a value that is in the set. *)
@@ -226,7 +231,7 @@ let () =
     let spec = set ^>> fun s -> le (R.cardinal s) ^> set *** set in
     declare "cut" spec R.cut C.cut;
 
-    let spec = set ^>> fun s -> lt (R.cardinal s) ^> triple set value set in
+    let spec = set ^>> fun s -> lt (R.cardinal s) ^> triple set elt set in
     declare "cut_and_get" spec R.cut_and_get C.cut_and_get;
 
   end;
@@ -241,6 +246,42 @@ let () =
   (* not tested: [fold] *)
   (* not tested: [for_all] *)
   (* not tested: [exists] *)
+
+  let spec = enum in
+  declare "Enum.empty" spec R.Enum.empty C.Enum.empty;
+
+  let spec = enum ^> bool in
+  declare "Enum.is_empty" spec R.Enum.is_empty C.Enum.is_empty;
+
+  let spec = set ^> enum in
+  declare "Enum.enum" spec R.Enum.enum C.Enum.enum;
+
+  let spec = elt ^> set ^> enum in
+  declare "Enum.from_enum" spec R.Enum.from_enum C.Enum.from_enum;
+
+  let spec = enum ^!> elt in
+  declare "Enum.head" spec R.Enum.head C.Enum.head;
+
+  let spec = enum ^!> enum in
+  declare "Enum.tail" spec R.Enum.tail C.Enum.tail;
+
+  let spec = enum ^> option elt in
+  declare "Enum.head_opt" spec R.Enum.head_opt C.Enum.head_opt;
+
+  let spec = enum ^> option enum in
+  declare "Enum.tail_opt" spec R.Enum.tail_opt C.Enum.tail_opt;
+
+  let spec = elt ^> enum ^> enum in
+  declare "Enum.from" spec R.Enum.from C.Enum.from;
+
+  let spec = enum ^> seq_elt in
+  declare "Enum.to_seq" spec R.Enum.to_seq C.Enum.to_seq;
+
+  let spec = enum ^> set in
+  declare "Enum.elements" spec R.Enum.elements C.Enum.elements;
+
+  let spec = enum ^> int in
+  declare "Enum.length" spec R.Enum.length C.Enum.length;
 
   ()
 

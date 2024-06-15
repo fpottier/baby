@@ -66,4 +66,70 @@ end) = struct
     a.(i),
     of_array (Array.sub a (i+1) (Array.length a - (i+1)))
 
+  module Enum = struct
+
+    type enum =
+      elt Seq.t
+
+    let empty =
+      Seq.empty
+
+    let is_empty =
+      Seq.is_empty
+
+    let enum =
+      to_seq
+
+    let rec from x (e : enum) =
+      match e() with
+      | Seq.Cons (x', e') ->
+          if E.compare x x' <= 0 then
+            e
+          else
+            from x e'
+      | Seq.Nil ->
+          e
+
+    let from_enum x s =
+      from x (enum s)
+
+    let head e =
+      match e() with
+      | Seq.Cons (x, _) ->
+          x
+      | Seq.Nil ->
+          raise Not_found
+
+    let tail e =
+      match e() with
+      | Seq.Cons (_, e) ->
+          e
+      | Seq.Nil ->
+          raise Not_found
+
+    let head_opt e =
+      match e() with
+      | Seq.Cons (x, _) ->
+          Some x
+      | Seq.Nil ->
+          None
+
+    let tail_opt e =
+      match e() with
+      | Seq.Cons (_, e) ->
+          Some e
+      | Seq.Nil ->
+          None
+
+    let to_seq e =
+      e
+
+    let elements =
+      of_seq
+
+    let length =
+      Seq.length
+
+  end
+
 end
