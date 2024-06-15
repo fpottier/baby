@@ -70,6 +70,15 @@ let triple spec1 spec2 spec3 =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Testing that sharing is preserved. *)
+
+let must_preserve_sharing f s =
+  let s' = f s in
+  assert (s == s');
+  s'
+
+(* -------------------------------------------------------------------------- *)
+
 (* The abstract type [set]. *)
 
 (* This type is equipped with a well-formedness check,
@@ -292,12 +301,6 @@ let () =
      applied to a monotonically increasing function; applied to an arbitrary
      function. In the first scenario, we check that sharing is preserved. *)
 
-  let must_preserve_sharing f s =
-    let s' = f s in
-    assert (s == s');
-    s'
-  in
-
   let spec = set ^> set in
   let f = Fun.id in
   declare "map Fun.id" spec (R.map f) (must_preserve_sharing (C.map f));
@@ -310,7 +313,16 @@ let () =
   let f = Int.neg in
   declare "map Int.neg" spec (R.map f) (C.map f);
 
-  (* TODO [filter] *)
+  let spec = set ^> set in
+  let p _ = true in
+  declare "filter (fun _ -> true)" spec
+    (R.filter p) (must_preserve_sharing (C.filter p));
+
+  let spec = set ^> set in
+  let p x = x mod 2 = 0 in
+  declare "filter (fun x -> x mod 2 = 0)" spec
+    (R.filter p) (C.filter p);
+
   (* TODO [filter_map] *)
   (* TODO [partition] *)
 
