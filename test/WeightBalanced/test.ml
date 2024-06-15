@@ -340,7 +340,10 @@ let () =
     "filter_map (fun x -> if x mod 2 = 0 then Some (-x) else None) "
     spec (R.filter_map f) (C.filter_map f);
 
-  (* TODO [partition] *)
+  let spec = set ^> set *** set in
+  let p x = x mod 2 = 0 in
+  declare "partition (fun x -> x mod 2 = 0)" spec
+    (R.partition p) (C.partition p);
 
   (* Section 5: random access. *)
 
