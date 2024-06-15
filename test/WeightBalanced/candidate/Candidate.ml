@@ -30,7 +30,7 @@ include Bistro.W.Set.Make(Int)
 
 (* -------------------------------------------------------------------------- *)
 
-(* We now wrap some of the candidate functions with extra runtime checks. *)
+(* Wrap some of the candidate functions with extra runtime checks. *)
 
 (* We could also place these runtime checks in [Bistro] itself, under
    [if debug], so they are erased in release mode. I prefer to place
@@ -56,27 +56,4 @@ let inter t1 t2 =
   let result = inter t1 t2 in
   if equal result t1 || equal result t2 then
     assert (result == t1 || result == t2);
-  result
-
-(* -------------------------------------------------------------------------- *)
-
-(* [diff] guarantees that if the result is logically equal to [t1]
-   then it is physically equal to [t1]. This holds regardless of
-   which balancing criterion is used. *)
-
-let[@inline] diff t1 t2 =
-  let result = diff t1 t2 in
-  if equal result t1 then assert (result == t1);
-  result
-
-(* [add] and [remove] offers similar guarantees. *)
-
-let[@inline] add x t =
-  let result = add x t in
-  if mem x t then assert (result == t);
-  result
-
-let[@inline] remove x t =
-  let result = remove x t in
-  if not (mem x t) then assert (result == t);
   result

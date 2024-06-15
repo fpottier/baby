@@ -18,7 +18,34 @@ module R = Reference.Make(Int)
 (* The candidate implementation is supplied by a separate library,
    which is either [Weight_candidate] or [Height_candidate]. Both
    of these libraries offer a module named [Candidate]. *)
-module C = Candidate
+module C = struct
+
+  include Candidate
+
+  (* Wrap some of the candidate functions with extra runtime checks. *)
+
+  (* [diff] guarantees that if the result is logically equal to [t1]
+     then it is physically equal to [t1]. This holds regardless of
+     which balancing criterion is used. *)
+
+  let[@inline] diff t1 t2 =
+    let result = diff t1 t2 in
+    if equal result t1 then assert (result == t1);
+    result
+
+  (* [add] and [remove] offers similar guarantees. *)
+
+  let[@inline] add x t =
+    let result = add x t in
+    if mem x t then assert (result == t);
+    result
+
+  let[@inline] remove x t =
+    let result = remove x t in
+    if not (mem x t) then assert (result == t);
+    result
+
+end
 
 (* -------------------------------------------------------------------------- *)
 
