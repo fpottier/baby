@@ -8,8 +8,6 @@
 
 * Benchmark weight-balanced trees. (Vary α.)
 
-* Make sure everything is tested, including `Enum`.
-
 * Make sure assertions are erased in release mode (ArrayExtra).
 
 * Document what this library offers over OCaml's Set library.
