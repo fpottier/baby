@@ -46,6 +46,12 @@ module Make
 (_ : BST with type key = E.t)
 : SET with type elt = E.t
 
+(**/**)
+
+(* The following modules must be exported, because they are (or may
+   be) used in the benchmarks. Because they are somewhat unlikely to
+   be useful to an end user, their existence is not advertised. *)
+
 module Height : sig
   (** @inline *)
    include module type of Height
