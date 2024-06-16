@@ -635,6 +635,7 @@ module Words (S : sig
   val add : elt -> t -> t
   val remove : elt -> t -> t
   val union : t -> t -> t
+  val of_list : elt list -> t
 end) (P : sig
   val filename : string
   val candidate : string
@@ -663,7 +664,18 @@ end) = struct
       ) empty words
     in
     ignore freq
-  let benchmark = B.benchmark ~name ~quota ~basis ~run
+  let benchmark1 = B.benchmark ~name ~quota ~basis ~run
+
+  let basis = 1
+  let name =
+    sprintf "of_list (%s, %d words) (%s)"
+      filename (List.length words) candidate
+  let run () =
+    let words = List.map (fun w -> (w, 0)) words in
+    fun () ->
+      ignore (of_list words)
+  let benchmark2 = B.benchmark ~name ~quota ~basis ~run
+
 end
 
 let words filename =
@@ -678,7 +690,8 @@ let words filename =
   let module R = Words(R)(struct include P let candidate = "reference" end) in
   let module H = Words(H)(struct include P let candidate = "height" end) in
   let module W = Words(W)(struct include P let candidate = "weight" end) in
-  [ R.benchmark; H.benchmark; W.benchmark ]
+  [ R.benchmark1; H.benchmark1; W.benchmark1;
+    R.benchmark2; H.benchmark2; W.benchmark2; ]
 
 (* -------------------------------------------------------------------------- *)
 
