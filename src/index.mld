@@ -1,0 +1,57 @@
+{0 Bistro: Fast Sets Based on Balanced Binary Search Trees}
+
+[bistro] is an OCaml library that offers several implementations of
+balanced binary search trees.
+
+Height-balanced and weight-balanced binary search trees are offered
+out of the box. Furthermore, to advanced users, the library offers
+a lightweight way of implementing other balancing strategies.
+
+The algorithms in [bistro] are based on
+those found in OCaml's [Set] library
+and in the paper
+{{: https://dl.acm.org/doi/full/10.1145/3512769 }Joinable Parallel Balanced Binary Trees}
+by Blelloch, Ferizovic, and Sun (2022).
+
+All implementations of balanced binary search trees implement the same
+abstract data type, namely, sets.
+
+{1 Installation and Usage}
+
+Type [opam install bistro].
+
+In your [dune] file, add [(libraries bistro)] to the description of
+your [library] or [executable].
+
+{1 Ready-Made Weight-Balanced Trees}
+
+{b We recommend using [bistro]'s ready-made weight-balanced binary search
+trees}, because they are generally faster then height-balanced trees,
+offer a constant-time [cardinal] function, and offer several
+logarithmic-time random access functions.
+
+To use them,
+just use the functor {!Bistro.W.Set.Make}
+instead of the usual [Set.Make].
+
+{1 Ready-Made Height-Balanced Trees}
+
+If you prefer to use [bistro]'s ready-made height-balanced binary
+search trees, use {!Bistro.H.Set.Make}.
+
+Please be aware that, in this implementation, the [cardinal] function
+is slow: its time complexity is linear. Furthermore, the random access
+functions are unavailable: an attempt to invoke one of them will
+result in a [Failure] exception.
+
+{1 Rolling Your Own Balanced Trees}
+
+If you wish to design your own balancing scheme, while re-using most of
+[bistro]'s functionality, use the functor {!Bistro.Make}. This requires
+you to implement a module that satisfies the signature {!Bistro.BST}.
+
+As part of this signature, the central operation that you must provide
+is [join]. You must also implement [join_neighbors] and
+[join_weight_balanced], two variants of [join]
+that make stronger assumptions about their inputs.
+If you are lazy, you can implement both of them as just [join].
