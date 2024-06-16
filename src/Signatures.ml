@@ -80,12 +80,12 @@ module type BST = sig
      trees [l] and [r] differ by at most one. *)
   val join_weight_balanced : tree -> key -> tree -> tree
 
-  (**If the weight of a tree can be determined in constant time, then [weight
-     t] returns the weight of the tree [t]. If the weight of a tree cannot be
-     efficiently determined, then it is acceptable for [weight] to always
-     return zero. The function [weight] is used to implement fast paths in
-     subset and equality tests: it must be the case that [subset t1 t2]
-     implies [weight t1 <= weight t2]. *)
+  (**If the weight of a tree can be determined in constant time, then
+     [weight t] returns the weight of the tree [t]. If the weight of a
+     tree cannot be efficiently determined, then it is acceptable for
+     [weight] to always return zero. The function [weight] is used to
+     implement fast paths in subset and equality tests: it must be the
+     case that [subset t1 t2] implies [weight t1 <= weight t2]. *)
   val weight : tree -> int
 
   (**[cardinal t] returns the number of elements in the tree. Depending on the
