@@ -24,9 +24,9 @@
   (action (run %{bin:cppo} Weight.cppo.ml -o %{targets})))
 
 (rule
-  (targets BinarySearchTree.ml)
-  (deps BinarySearchTree.cppo.ml (glob_files *.frag.ml))
-  (action (run %{bin:cppo} BinarySearchTree.cppo.ml -o %{targets})))
+  (targets Bistro.ml)
+  (deps Bistro.cppo.ml (glob_files *.frag.ml))
+  (action (run %{bin:cppo} Bistro.cppo.ml -o %{targets})))
 
 (rule
   (targets HeightBalanced.ml)
