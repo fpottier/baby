@@ -114,10 +114,6 @@ module type BST = sig
      postcondition is [true]. *)
   val seems_smaller : tree -> tree -> bool
 
-  (**[siblings t1 t2] determines whether the trees [t1] and [t2] can be
-     siblings in a valid tree. It is used in debugging assertions only. *)
-  val siblings : tree -> tree -> bool
-
   (**[check t] checks that the tree [t] is well-formed: that is, [t] is a
      balanced binary search tree. This function is used while testing only. *)
   val check : tree -> unit
