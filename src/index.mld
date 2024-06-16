@@ -13,8 +13,9 @@ and in the paper
 {{: https://dl.acm.org/doi/full/10.1145/3512769 }Joinable Parallel Balanced Binary Trees}
 by Blelloch, Ferizovic, and Sun (2022).
 
-All implementations of balanced binary search trees implement the same
-abstract data type, namely, sets.
+For a discussion of the strengths of [bistro]
+over OCaml's standard library,
+see {!section-comparison}.
 
 {1 Installation and Usage}
 
@@ -55,3 +56,5 @@ is [join]. You must also implement [join_neighbors] and
 [join_weight_balanced], two variants of [join]
 that make stronger assumptions about their inputs.
 If you are lazy, you can implement both of them as just [join].
+
+{1:comparison Comparison With OCaml's Set Library}
