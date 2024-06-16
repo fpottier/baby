@@ -693,7 +693,7 @@ end) = struct
           let k = i + n/2 in
           union (of_array_slice a i k) (of_array_slice a k j)
     in
-    let rec of_array a = of_array_slice a 0 (Array.length a) in
+    let of_array a = of_array_slice a 0 (Array.length a) in
     fun () ->
       ignore (of_array words)
   let benchmark3 = B.benchmark ~name ~quota ~basis ~run
