@@ -631,6 +631,7 @@ module Words (S : sig
   type elt = string * int
   type t
   val empty : t
+  val singleton : elt -> t
   val find : elt -> t -> elt
   val add : elt -> t -> t
   val remove : elt -> t -> t
@@ -676,6 +677,27 @@ end) = struct
       ignore (of_list words)
   let benchmark2 = B.benchmark ~name ~quota ~basis ~run
 
+  let basis = 1
+  let name =
+    sprintf "union (%s, %d words) (%s)"
+      filename (List.length words) candidate
+  let run () =
+    let words = List.map (fun w -> (w, 0)) words in
+    let words = Array.of_list words in
+    let rec of_array_slice a i j =
+      let n = j - i in
+      match n with
+      | 0 -> empty
+      | 1 -> singleton a.(i)
+      | _ ->
+          let k = i + n/2 in
+          union (of_array_slice a i k) (of_array_slice a k j)
+    in
+    let rec of_array a = of_array_slice a 0 (Array.length a) in
+    fun () ->
+      ignore (of_array words)
+  let benchmark3 = B.benchmark ~name ~quota ~basis ~run
+
 end
 
 let words filename =
@@ -691,7 +713,32 @@ let words filename =
   let module H = Words(H)(struct include P let candidate = "height" end) in
   let module W = Words(W)(struct include P let candidate = "weight" end) in
   [ R.benchmark1; H.benchmark1; W.benchmark1;
-    R.benchmark2; H.benchmark2; W.benchmark2; ]
+    R.benchmark2; H.benchmark2; W.benchmark2;
+    R.benchmark3; H.benchmark3; W.benchmark3; ]
+
+let words_with_comparison_counts filename =
+  let module P = struct let filename = filename end in
+  let module V = struct
+    type t = string * int
+    let c = ref 0
+    let reset() = c := 0
+    let count() = !c
+    let compare (s1, _) (s2, _) = incr c; String.compare s1 s2
+  end in
+  let module R = Stdlib.Set.Make(V) in
+  let module H = Bistro.H.Set.Make(V) in
+  let module W = Bistro.W.Set.Make(V) in
+  let module R = Words(R)(struct include P let candidate = "reference" end) in
+  let module H = Words(H)(struct include P let candidate = "height" end) in
+  let module W = Words(W)(struct include P let candidate = "weight" end) in
+  [ R.benchmark1; H.benchmark1; W.benchmark1;
+    R.benchmark2; H.benchmark2; W.benchmark2;
+    R.benchmark3; H.benchmark3; W.benchmark3; ]
+  |> List.iter @@ fun benchmark ->
+     V.reset();
+     B.run_once benchmark;
+     let c = V.count() in
+     eprintf "%d comparisons\n%!" c
 
 (* -------------------------------------------------------------------------- *)
 
@@ -820,7 +867,9 @@ let () =
   if true then begin
     eprintf "*** words\n";
     eprintf "\n";
-    run (words "pg135.txt")
+    run (words "pg135.txt");
+    eprintf "\n";
+    words_with_comparison_counts "pg135.txt"
   end;
 
   ()
