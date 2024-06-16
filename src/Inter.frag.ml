@@ -40,6 +40,12 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
    + the code guarantees that if the result is equal to [t2]
      then [t2] itself is returned. *)
 
+(* Adding specialized code for the case where [t1] is a singleton can lead
+   to small gains or losses in speed; the effect seems unclear. *)
+
+(* Adding specialized code for the cases where one of [l2] or [r2] is empty
+   saves a few percent in time, and is not worth the extra complexity. *)
+
 let rec inter (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _
@@ -51,10 +57,6 @@ let rec inter (t1 : tree) (t2 : tree) : tree =
         (* The tree [t2] is [singleton k2]. *)
         if mem k2 t1 then t2 else leaf
       else
-        (* At least one of the subtrees [l2] and [r2] is nonempty. We
-           could specialize the following code for the cases where one
-           of them is empty, but the performance gain (a few percent)
-           is not worth the extra complexity. *)
         let l1, b, r1 = split k2 t1 in
         let l = inter l1 l2
         and r = inter r1 r2 in
