@@ -73,8 +73,8 @@ assembly:
 	| grep -vw "\.short" \
 	| grep -vw "\.asciz" \
 	| gsed "s/L[[:digit:]]\+/L/g" \
-	> WeightBalanced.s
-	@ open -a /Applications/Emacs.app/ WeightBalanced.s
+	> simplified.s
+	@ open -a /Applications/Emacs.app/ simplified.s
 
 # ------------------------------------------------------------------------------
 
