@@ -5,9 +5,10 @@
 )
 
 ;; Warnings are enabled in development builds and disabled in release builds.
+;; Assertions are disabled in release builds.
 (env
   (dev     (flags :standard -w @A-4-44) (ocamlopt_flags :standard -S))
-  (release (flags :standard           ) (ocamlopt_flags :standard -S))
+  (release (flags :standard -noassert ) (ocamlopt_flags :standard -S))
 )
 
 ;; Some files require preprocessing by cppo.
