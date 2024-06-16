@@ -48,6 +48,7 @@ let rec union (t1 : tree) (t2 : tree) : tree =
       t1
   | NODE(l1, k1, r1), NODE(l2, k2, r2) ->
       if BOTH_EMPTY(l1, r1) then add k1 t2 else
+      if BOTH_EMPTY(l2, r2) then add k2 t1 else
       let l1, r1 = split13 k2 t1 in
       let l = union l1 l2
       and r = union r1 r2 in
