@@ -1,16 +1,14 @@
 # To Do
 
-* Write a nice front page for the documentation.
+* Remove `pg135.txt` from the repository.
 
-* Name the signature `S` instead of `SET`? Or both.
+* Rename the signature `BST` to something better.
 
 * Make sure every file is clean and documented.
 
-* Benchmark weight-balanced trees. (Vary α.)
-
-* Make sure assertions are erased in release mode (ArrayExtra).
-
 * Document what this library offers over OCaml's Set library.
+  Generally better performance (many operations are faster and/or
+  allocate less memory).
   In the weight-balanced implementation,
   a constant time `cardinal` function;
   efficient random access functions;
@@ -32,11 +30,6 @@
   (A difference with `Set` can be observed only if the equivalence relation
    on elements is coarser than equality.)
 
-* Implement a variant of `choose` that runs in time O(1),
-  and does not promise to respect equality of sets.
-  Implement `extract_min` which both chooses an element
-  and removes it?
-
 * Add a README.
 
 * In the documentation `Seq` shows up as `Stdlib.Seq`,
@@ -51,7 +44,14 @@
 * Explore parallel computation.
   Add `reduce` and `map_reduce`.
 
-# Not To Do
+# Maybe Later
+
+* Implement a variant of `choose` that runs in time *O(1)*,
+  and does not promise to respect equality of sets.
+
+* Implement `extract_min` as a thin wrapper on top of
+  `min_elt` and `remove_min_elt`. (Also `extract_max`.)
+  (Also `extract_min_opt` and `extract_max_opt`.)
 
 * One might wish to expose `view`, `join`, and `join2` to the end user, so as
   to allow her to define their own operations (with access to the tree
