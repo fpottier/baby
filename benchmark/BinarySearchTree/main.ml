@@ -621,6 +621,67 @@ let silly_fixed_point u =
 
 (* -------------------------------------------------------------------------- *)
 
+(* A benchmark for (emulated) string maps. *)
+
+let whitespace = function
+  | '\n' | '\r' | '\t' -> ' '
+  | c -> c
+
+module Words (S : sig
+  type elt = string * int
+  type t
+  val empty : t
+  val find : elt -> t -> elt
+  val add : elt -> t -> t
+  val remove : elt -> t -> t
+  val union : t -> t -> t
+end) (P : sig
+  val filename : string
+  val candidate : string
+end) = struct
+  open S
+  open P
+  let words : string list =
+    IO.read_whole_file filename
+    |> String.map whitespace
+    |> String.split_on_char ' '
+
+  let basis = 1
+  let name =
+    sprintf "find+remove+add (%s, %d words) (%s)"
+      filename (List.length words) candidate
+  let run () () =
+    let freq =
+      List.fold_left (fun freq w ->
+        match find (w, 0) freq with
+        | exception Not_found ->
+            add (w, 1) freq
+        | (_, k) as key ->
+            let freq = remove key freq in
+            let freq = add (w, k+1) freq in
+            freq
+      ) empty words
+    in
+    ignore freq
+  let benchmark = B.benchmark ~name ~quota ~basis ~run
+end
+
+let words filename =
+  let module P = struct let filename = filename end in
+  let module V = struct
+    type t = string * int
+    let compare (s1, _) (s2, _) = String.compare s1 s2
+  end in
+  let module R = Stdlib.Set.Make(V) in
+  let module H = Bistro.H.Set.Make(V) in
+  let module W = Bistro.W.Set.Make(V) in
+  let module R = Words(R)(struct include P let candidate = "reference" end) in
+  let module H = Words(H)(struct include P let candidate = "height" end) in
+  let module W = Words(W)(struct include P let candidate = "weight" end) in
+  [ R.benchmark; H.benchmark; W.benchmark ]
+
+(* -------------------------------------------------------------------------- *)
+
 (* Main. *)
 
 let () =
@@ -707,7 +768,7 @@ let () =
     run (of_list 100000);
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** map\n";
     eprintf "\n";
     run (map 100);
@@ -741,6 +802,12 @@ let () =
     run (silly_fixed_point 10000);
     eprintf "\n";
     run (silly_fixed_point 100000)
+  end;
+
+  if true then begin
+    eprintf "*** words\n";
+    eprintf "\n";
+    run (words "pg135.txt")
   end;
 
   ()
