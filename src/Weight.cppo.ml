@@ -187,6 +187,8 @@ module[@inline] Make (E : OrderedType) = struct
 
   let[@inline] seems_smaller t1 t2 =
     match t1, t2 with
+    | TLeaf, TLeaf ->
+        false
     | TLeaf, _ ->
         true
     | _, TLeaf ->
