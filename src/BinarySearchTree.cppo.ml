@@ -13,7 +13,6 @@
 (* BFS = Blelloch, Ferizovic and Sun (2022). *)
 
 open Signatures
-open Profile
 
 module[@inline] Make
 (E : OrderedType)

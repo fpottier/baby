@@ -11,7 +11,6 @@
 (**************************************************************************)
 
 open Signatures
-open Profile
 
 (* This code implements weight-balancing, following Blelloch, Ferizovic and
    Sun (2022), thereafter abbreviated as BFS. The balancing invariant and
@@ -78,7 +77,7 @@ module[@inline] Make (E : OrderedType) = struct
     DESTRUCT(t, tl, tv, tr); \
     let wtl = weight tl in \
     let wtr = w - wtl in \
-    if debug then assert (wtr = weight tr)
+    assert (wtr = weight tr)
 
   (* Weight-balanced trees with parameter α maintain the following invariant:
      for every tree [t] whose children are [l] and [r],
@@ -149,8 +148,8 @@ module[@inline] Make (E : OrderedType) = struct
      the weights [wl] and [wr] of the trees [l] and [r]. *)
 
   let[@inline] create'' w l v r =
-    if debug then assert (w = weight l + weight r);
-    if debug then assert (siblings l r);
+    assert (w = weight l + weight r);
+    assert (siblings l r);
     TNode { l; v; r; w }
 
   let[@inline] create l v r =
@@ -158,14 +157,14 @@ module[@inline] Make (E : OrderedType) = struct
     create'' w l v r
 
   let[@inline] create' wl l v wr r =
-    if debug then assert (wl = weight l && wr = weight r);
+    assert (wl = weight l && wr = weight r);
     let w = wl + wr in
     create'' w l v r
 
   (* [create] is published under the name [join_weight_balanced]. *)
 
   let join_weight_balanced l v r =
-    if debug then assert (siblings l r);
+    assert (siblings l r);
     create l v r
 
   (* Trees of one, two, three elements. *)
@@ -175,12 +174,12 @@ module[@inline] Make (E : OrderedType) = struct
     TNode { l = TLeaf; v = x; r = TLeaf; w = 2 }
 
   let[@inline] doubleton x y =
-    if debug then assert (E.compare x y < 0);
+    assert (E.compare x y < 0);
     TNode { l = TLeaf; v = x; r = singleton y; w = 3 }
 
   let[@inline] tripleton x y z =
-    if debug then assert (E.compare x y < 0);
-    if debug then assert (E.compare y z < 0);
+    assert (E.compare x y < 0);
+    assert (E.compare y z < 0);
     TNode { l = singleton x; v = y; r = singleton z; w = 4 }
 
   (* [seems_smaller t1 t2] is equivalent to [weight t1 < weight t2]. *)
@@ -241,8 +240,8 @@ module[@inline] Make (E : OrderedType) = struct
      to me. Presumably the subtree [r] must not be excessively heavy. *)
 
   let balance_right_heavy wl l v wr r =
-    if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (right_heavy wl wr);
+    assert (wl = weight l && wr = weight r);
+    assert (right_heavy wl wr);
     DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
     if like_weights wl wrl && like_weights (wl + wrl) wrr then
       (* [rotate_left l v r] *)
@@ -258,8 +257,8 @@ module[@inline] Make (E : OrderedType) = struct
      either balanced or right heavy. *)
 
   let[@inline] balance_maybe_right_heavy wl l v wr r =
-    if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (not_left_heavy wl wr);
+    assert (wl = weight l && wr = weight r);
+    assert (not_left_heavy wl wr);
     if not_right_heavy wl wr then
       create' wl l v wr r
     else
@@ -268,8 +267,8 @@ module[@inline] Make (E : OrderedType) = struct
   (* The following two functions are symmetric with the previous two. *)
 
   let balance_left_heavy wl l v wr r =
-    if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (left_heavy wl wr);
+    assert (wl = weight l && wr = weight r);
+    assert (left_heavy wl wr);
     DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
     if like_weights wlr wr && like_weights wll (wlr + wr) then
       (* [rotate_right l v r] *)
@@ -282,8 +281,8 @@ module[@inline] Make (E : OrderedType) = struct
       create'' w (create' wll ll lv wlrl lrl) lrv (create' wlrr lrr v wr r)
 
   let[@inline] balance_maybe_left_heavy wl l v wr r =
-    if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (not_right_heavy wl wr);
+    assert (wl = weight l && wr = weight r);
+    assert (not_right_heavy wl wr);
     if not_left_heavy wl wr then
       create' wl l v wr r
     else
@@ -302,9 +301,9 @@ module[@inline] Make (E : OrderedType) = struct
      [balance_maybe_right_heavy]. *)
 
   let rec join_maybe_left_heavy l v wr r =
-    if debug then assert (wr = weight r);
+    assert (wr = weight r);
     let wl = weight l in
-    if debug then assert (not_right_heavy wl wr);
+    assert (not_right_heavy wl wr);
     if not_left_heavy wl wr then
       create' wl l v wr r
     else
@@ -313,8 +312,8 @@ module[@inline] Make (E : OrderedType) = struct
   (* [join_left_heavy] assumes that [NODE(l, v, r)] is left heavy. *)
 
   and join_left_heavy wl l v wr r =
-    if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (left_heavy wl wr);
+    assert (wl = weight l && wr = weight r);
+    assert (left_heavy wl wr);
     DESTRUCTW(wl, l, wll, ll, lv, wlr, lr);
     balance_maybe_right_heavy
       wll ll
@@ -324,17 +323,17 @@ module[@inline] Make (E : OrderedType) = struct
   (* The following two functions are symmetric with the previous two. *)
 
   let rec join_maybe_right_heavy wl l v r =
-    if debug then assert (wl = weight l);
+    assert (wl = weight l);
     let wr = weight r in
-    if debug then assert (not_left_heavy wl wr);
+    assert (not_left_heavy wl wr);
     if not_right_heavy wl wr then
       create' wl l v wr r
     else
       join_right_heavy wl l v wr r
 
   and join_right_heavy wl l v wr r =
-    if debug then assert (wl = weight l && wr = weight r);
-    if debug then assert (right_heavy wl wr);
+    assert (wl = weight l && wr = weight r);
+    assert (right_heavy wl wr);
     DESTRUCTW(wr, r, wrl, rl, rv, wrr, rr);
     balance_maybe_left_heavy
       (wl + wrl) (join_maybe_right_heavy wl l v rl)

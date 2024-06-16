@@ -63,7 +63,7 @@ let remove_max_elt (t : tree) : tree =
    this seems to make essentially no difference in practice. *)
 
 let join2_siblings (l : tree) (r : tree) : tree =
-  if debug then assert (siblings l r);
+  assert (siblings l r);
   match VIEW(l), VIEW(r) with
   | _, LEAF ->
       l

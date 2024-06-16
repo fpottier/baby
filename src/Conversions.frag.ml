@@ -54,7 +54,7 @@ let to_rev_seq (t : tree) : key Seq.t =
    It returns the end index of this slice. *)
 
 let rec to_array_slice (t : tree) a i : int =
-  if debug then assert (0 <= i && i + cardinal t <= Array.length a);
+  assert (0 <= i && i + cardinal t <= Array.length a);
   match VIEW(t) with
   | LEAF ->
       i
@@ -76,7 +76,7 @@ let to_array (t : tree) : key array =
       let n = cardinal t in
       let a = Array.make n dummy in
       let j = to_array_slice t a 0 in
-      if debug then assert (n = j);
+      assert (n = j);
       a
 
 (* -------------------------------------------------------------------------- *)
@@ -87,7 +87,7 @@ let to_array (t : tree) : key array =
    set. *)
 
 let rec of_sorted_unique_array_slice a i j =
-  if debug then assert (0 <= i && i <= j && j <= Array.length a);
+  assert (0 <= i && i <= j && j <= Array.length a);
   let n = j - i in
   match n with
   | 0 ->

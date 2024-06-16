@@ -25,7 +25,7 @@
    followed with [Array.get]. *)
 
 let rec get (t : tree) (i : int) : key =
-  if debug then assert (0 <= i && i < cardinal t);
+  assert (0 <= i && i < cardinal t);
   match VIEW(t) with
   | LEAF ->
       assert false
@@ -92,7 +92,7 @@ let index x t =
 (* Splitting by index -- in two parts. *)
 
 let rec cut (t : tree) (i : int) : tree * tree =
-  if debug then assert (0 <= i && i <= cardinal t);
+  assert (0 <= i && i <= cardinal t);
   if i = 0 then
     leaf, t
   else if i = cardinal t then
@@ -105,11 +105,11 @@ let rec cut (t : tree) (i : int) : tree * tree =
         let cl = cardinal l in
         if i <= cl then
           let ll, lr = cut l i in
-          if debug then assert (lr != l);
+          assert (lr != l);
           ll, join lr v r
         else (* [cl < i] *)
           let rl, rr = cut r (i - (cl + 1)) in
-          if debug then assert (rl != r);
+          assert (rl != r);
           join l v rl, rr
 
 let cut (t : tree) (i : int) : tree * tree =
@@ -128,7 +128,7 @@ let cut (t : tree) (i : int) : tree * tree =
 (* Splitting by index -- in three parts. *)
 
 let rec cut_and_get (t : tree) (i : int) : tree * key * tree =
-  if debug then assert (0 <= i && i < cardinal t);
+  assert (0 <= i && i < cardinal t);
   match VIEW(t) with
   | LEAF ->
       assert false

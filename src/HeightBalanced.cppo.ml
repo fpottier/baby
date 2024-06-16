@@ -11,7 +11,6 @@
 (**************************************************************************)
 
 open Signatures
-open Profile
 
 (* Unfortunately, the OCaml compiler is pretty bad at optimization. In my
    experience, although it does usually inline functions when requested, it

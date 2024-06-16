@@ -11,7 +11,6 @@
 (**************************************************************************)
 
 open Signatures
-open Profile
 
 (* The following code taken from OCaml's Set library, and slightly adapted. *)
 
@@ -90,7 +89,7 @@ module[@inline] Make (E : OrderedType) = struct
      balanced, and the difference in their heights must be at most 2. *)
 
   let[@inline] create l v r =
-    if debug then assert (siblings l r);
+    assert (siblings l r);
     let h = max (height l) (height r) + 1 in
     TNode { l; v; r; h }
 
@@ -102,12 +101,12 @@ module[@inline] Make (E : OrderedType) = struct
     TNode { l = TLeaf; v = x; r = TLeaf; h = 1 }
 
   let[@inline] doubleton x y =
-    if debug then assert (E.compare x y < 0);
+    assert (E.compare x y < 0);
     TNode { l = TLeaf; v = x; r = singleton y; h = 2 }
 
   let[@inline] tripleton x y z =
-    if debug then assert (E.compare x y < 0);
-    if debug then assert (E.compare y z < 0);
+    assert (E.compare x y < 0);
+    assert (E.compare y z < 0);
     TNode { l = singleton x; v = y; r = singleton z; h = 2 }
 
   (* [seems_smaller t1 t2] is equivalent to [height t1 < height t2]. *)
@@ -134,7 +133,7 @@ module[@inline] Make (E : OrderedType) = struct
      difference in the run time. *)
 
   let bal l v r =
-    if debug then assert (neighbors l r);
+    assert (neighbors l r);
     let hl = height l
     and hr = height r in
     if hl > hr + 2 then begin

@@ -243,7 +243,7 @@ module Enum = struct
   (* This is Veldhuizen's leapfrog join algorithm. *)
 
   let rec disjoint_more_more v1 r1 e1 v2 r2 e2 =
-    if debug then assert (E.compare v1 v2 < 0);
+    assert (E.compare v1 v2 < 0);
     (* Skip past [v2] in the enumeration [e1]. *)
     (* If [v2] appears in [e1], fail. *)
     let e1 = filter_tree_enum_disjoint v2 r1 e1 in
@@ -254,7 +254,7 @@ module Enum = struct
     | More (v1, r1, e1) ->
         (* If [e1] is nonempty, then its front value [v1] must be greater than
            [v2]. Exchange the roles of the two enumerations and continue. *)
-        if debug then assert (E.compare v2 v1 < 0);
+        assert (E.compare v2 v1 < 0);
         disjoint_more_more v2 r2 e2 v1 r1 e1
 
   (* [disjoint e1 e2] determines whether the enumerations [e1] and [e2] are
