@@ -10,7 +10,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-(**The signature {!OrderedType} describes a type equipped
+(**The signature [Bistro.OrderedType] describes a type equipped
    with a total ordering function. *)
 module type OrderedType = sig
 
@@ -23,12 +23,12 @@ module type OrderedType = sig
       It must be strictly positive if [x1] is greater than [x2]. *)
   val compare : t -> t -> int
 
-end
+end (* OrderedType *)
 
-(**The signature  {!BST} describes the interface that must be offered by
-   the balancing code to the rest of the balanced binary search tree
-   library. Most operations on binary search tree are built on top of
-   this interface, and are oblivious to the balancing criterion. *)
+(**The signature [Bistro.BST] describes the interface that must be offered by
+   the balancing code to the rest of the balanced binary search tree library.
+   Most operations on binary search tree are built on top of this interface,
+   and are oblivious to the balancing criterion. *)
 module type BST = sig
 
   (**Keys, or elements. *)
@@ -118,9 +118,9 @@ module type BST = sig
      balanced binary search tree. This function is used while testing only. *)
   val check : tree -> unit
 
-end
+end (* BST *)
 
-(**The signature {!SET} describes an abstract data type of sets,
+(**The signature [Bistro.SET] describes an abstract data type of sets,
    equipped with a wide array of efficient operations. *)
 module type SET = sig
 
@@ -766,4 +766,4 @@ module type SET = sig
   val check : set -> unit
   (**/**)
 
-end
+end (* SET *)

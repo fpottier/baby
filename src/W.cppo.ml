@@ -14,6 +14,10 @@ open Signatures
 
 module Set = struct
 
+  module type OrderedType = OrderedType
+
+  module type S = SET
+
   module[@inline] Make (E : OrderedType) = struct
 
     include Weight.Make(E)

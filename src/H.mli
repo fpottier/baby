@@ -14,6 +14,10 @@ open Signatures
 
 module Set : sig
 
+  module type OrderedType = OrderedType
+
+  module type S = SET
+
   module Make (E : OrderedType) : SET with type elt = E.t
 
 end

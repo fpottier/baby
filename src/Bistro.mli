@@ -38,6 +38,8 @@ module Make
 module H : sig
 
   module Set : sig
+    module type OrderedType = OrderedType
+    module type S = SET
     module Make (E : OrderedType) : SET with type elt = E.t
   end
 
@@ -48,6 +50,8 @@ end
 module W : sig
 
   module Set : sig
+    module type OrderedType = OrderedType
+    module type S = SET
     module Make (E : OrderedType) : SET with type elt = E.t
   end
 
