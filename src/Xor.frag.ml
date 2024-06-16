@@ -30,6 +30,10 @@ let rec xor (t1 : tree) (t2 : tree) : tree =
 
  *)
 
+(* Except in the case where [t1] or [t2] is empty, [xor t1 t2] cannot be
+   equal to [t1] or [t2]. So there is no need to attempt to preserve
+   sharing when constructing new nodes. *)
+
 let rec xor (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
@@ -51,5 +55,4 @@ let rec xor (t1 : tree) (t2 : tree) : tree =
         if b then
           join2 l r
         else
-          if l == l2 && r == r2 then t2 else (* preserve sharing *)
           join l k2 r
