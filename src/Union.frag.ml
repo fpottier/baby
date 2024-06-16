@@ -40,6 +40,11 @@ let rec union (t1 : tree) (t2 : tree) : tree =
 (* The recursive function [union] ensures that if the result is
    equal to [t2] then the result is physically equal to [t2]. *)
 
+(* In the case where [t2] is a singleton, we have already checked that
+   [t1] is neither empty nor a singleton, so the result of the union
+   cannot possibly be equal to [t2]. Thus, the obligation to preserve
+   sharing disappears in this case: using [add k2 t1] is safe. *)
+
 let rec union (t1 : tree) (t2 : tree) : tree =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
