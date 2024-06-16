@@ -36,22 +36,24 @@ end
 (* The module [Bistro.H] provides ready-made height-balanced binary
    search trees. *)
 
-module H = struct
+(* Unfortunately, the OCaml compiler is pretty bad at optimization. In my
+   experience, although it does usually inline functions when requested, it
+   does not subsequently perform the simplifications that one might naturally
+   expect. In particular, it does not simplify match-of-match, and cannot even
+   simplify match-of-constructor. *)
 
-  module Set = HeightBalanced
+(* For this reason, instead of applying the functor [Make] (above), we inline
+   it, using a preprocessor hack. Thus, we avoid the overhead of going through
+   a [view] function; instead, we have a [VIEW] macro. *)
 
-end
+module H = H
 
 (* -------------------------------------------------------------------------- *)
 
 (* The module [Bistro.W] provides ready-made weight-balanced binary
    search trees. *)
 
-module W = struct
-
-  module Set = WeightBalanced
-
-end
+module W = W
 
 (* -------------------------------------------------------------------------- *)
 

@@ -29,14 +29,14 @@
   (action (run %{bin:cppo} Bistro.cppo.ml -o %{targets})))
 
 (rule
-  (targets HeightBalanced.ml)
-  (deps HeightBalanced.cppo.ml (glob_files *.frag.ml))
-  (action (run %{bin:cppo} HeightBalanced.cppo.ml -o %{targets})))
+  (targets H.ml)
+  (deps H.cppo.ml (glob_files *.frag.ml))
+  (action (run %{bin:cppo} H.cppo.ml -o %{targets})))
 
 (rule
-  (targets WeightBalanced.ml)
-  (deps WeightBalanced.cppo.ml (glob_files *.frag.ml))
-  (action (run %{bin:cppo} WeightBalanced.cppo.ml -o %{targets})))
+  (targets W.ml)
+  (deps W.cppo.ml (glob_files *.frag.ml))
+  (action (run %{bin:cppo} W.cppo.ml -o %{targets})))
 
 ;; Request documentation.
 (documentation)
