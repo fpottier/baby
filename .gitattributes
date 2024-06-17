@@ -1,0 +1,9 @@
+# The following files and directories are excluded from the release archive.
+*.md            export-ignore
+Makefile        export-ignore
+attic           export-ignore
+benchmark       export-ignore
+headache.config export-ignore
+header.txt      export-ignore
+LICENSE         export-ignore
+play.ml         export-ignore
