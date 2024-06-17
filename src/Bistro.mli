@@ -30,7 +30,7 @@ include module type of Signatures
    the user is expected to provide is [join]. *)
 module Make
 (E : OrderedType)
-(_ : BST with type key = E.t)
+(_ : CORE with type key = E.t)
 : SET with type elt = E.t
 
 (**The module [Bistro.H] provides ready-made height-balanced binary

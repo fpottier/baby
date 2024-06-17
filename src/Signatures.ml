@@ -25,11 +25,11 @@ module type OrderedType = sig
 
 end (* OrderedType *)
 
-(**The signature [Bistro.BST] describes the interface that must be offered by
+(**The signature [Bistro.CORE] describes the interface that must be offered by
    the balancing code to the rest of the balanced binary search tree library.
    Most operations on binary search tree are built on top of this interface,
    and are oblivious to the balancing criterion. *)
-module type BST = sig
+module type CORE = sig
 
   (**Keys, or elements. *)
   type key
@@ -118,7 +118,7 @@ module type BST = sig
      balanced binary search tree. This function is used while testing only. *)
   val check : tree -> unit
 
-end (* BST *)
+end (* CORE *)
 
 (**The signature [Bistro.SET] describes an abstract data type of sets,
    equipped with a wide array of efficient operations. *)

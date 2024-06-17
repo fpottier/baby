@@ -49,7 +49,7 @@ result in a [Failure] exception.
 
 If you wish to design your own balancing scheme, while re-using most of
 [bistro]'s functionality, use the functor {!Bistro.Make}. This requires
-you to implement a module that satisfies the signature {!Bistro.BST}.
+you to implement a module that satisfies the signature {!Bistro.CORE}.
 
 As part of this signature, the central operation that you must provide
 is [join]. You must also implement [join_neighbors] and

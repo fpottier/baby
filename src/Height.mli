@@ -27,7 +27,7 @@ module Make (E : OrderedType)
     | TNode of { l : tree; v : key; r : tree; h : int }
 
   (**The minimal abstract interface. *)
-  include BST with type key := E.t
-               and type tree := tree
+  include CORE with type key := E.t
+                and type tree := tree
 
 end

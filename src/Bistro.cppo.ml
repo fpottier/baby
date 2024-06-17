@@ -19,7 +19,7 @@ include Signatures
 
 module[@inline] Make
 (E : OrderedType)
-(T : BST with type key = E.t)
+(T : CORE with type key = E.t)
 = struct
 include T
 
