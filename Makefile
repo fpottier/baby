@@ -85,6 +85,10 @@ assembly:
 
 # Documentation.
 
+# Unfortunately, odoc seems unable to produce proper (hyperlinked)
+# references to standard library types, such as [Seq.t]. So, we search
+# for unresolved references in the HTML output and suppress them.
+
 DOCDIR = _build/default/_doc/_html
 DOC    = $(DOCDIR)/index.html
 
@@ -93,6 +97,8 @@ doc:
 	@ rm -rf _build/default/_doc
 	@ dune clean
 	@ dune build @doc
+	@ gfind $(DOCDIR) -name "*.html" \
+	  | xargs sed -i.bak 's|<span class="xref-unresolved">Stdlib</span>.||g'
 	@ echo "You can view the documentation by typing 'make view'".
 
 .PHONY: view
