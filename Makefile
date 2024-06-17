@@ -97,7 +97,7 @@ doc:
 	@ rm -rf _build/default/_doc
 	@ dune clean
 	@ dune build @doc
-	@ gfind $(DOCDIR) -name "*.html" \
+	@ find $(DOCDIR) -name "*.html" \
 	  | xargs sed -i.bak 's|<span class="xref-unresolved">Stdlib</span>.||g'
 	@ echo "You can view the documentation by typing 'make view'".
 
