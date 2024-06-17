@@ -6,30 +6,6 @@
 
 * Make sure every file is clean and documented.
 
-* Document what this library offers over OCaml's Set library.
-  Generally better performance (many operations are faster and/or
-  allocate less memory).
-  In the weight-balanced implementation,
-  a constant time `cardinal` function;
-  efficient random access functions;
-  fast negative paths (based on cardinal) for `subset` and `equal`.
-  In `union`, `inter`, and possibly a few other functions,
-  fast positive paths (based on sharing) and
-  better preservation of sharing.
-  New function `xor`.
-  New functions `of_array` and `to_array`.
-  In `of_list`, `of_array`, `of_seq`, adaptive complexity.
-  New functions `remove_min_elt` and `remove_max_elt`.
-  New enumeration API.
-  Documentation of the time complexity of every operation.
-
-* Document the potential departures from OCaml's Set library.
-  In `of_list`, `of_seq`, `add_seq`,
-  if the list or sequence contains duplicate elements,
-  then which element is retained is unspecified.
-  (A difference with `Set` can be observed only if the equivalence relation
-   on elements is coarser than equality.)
-
 * Add a README.
 
 * In the documentation `Seq` shows up as `Stdlib.Seq`,
