@@ -1,9 +1,11 @@
 # The following files and directories are excluded from the release archive.
+.git*           export-ignore
 *.md            export-ignore
 Makefile        export-ignore
 attic           export-ignore
 benchmark       export-ignore
 headache.config export-ignore
 header.txt      export-ignore
-LICENSE         export-ignore
 play.ml         export-ignore
+test            export-ignore
+LICENSE         export-ignore
