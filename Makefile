@@ -35,9 +35,14 @@ test:
 	@ make -C test/HeightBalanced random_nodep & \
           make -C test/WeightBalanced random_nodep
 
+# [make bench] runs the benchmark.
+
+# You may need to edit the file benchmark/main.ml to decide exactly
+# which part of the benchmark is run. There are many small parts.
+
 .PHONY: bench
 bench:
-	@ make -C benchmark/BinarySearchTree test
+	@ make -C benchmark test
 
 .PHONY: install
 install: all
