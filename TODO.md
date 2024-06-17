@@ -1,23 +1,13 @@
 # To Do
 
-* Remove `pg135.txt` from the repository.
-
-* Rename the signature `BST` to something better.
-
-* Make sure every file is clean and documented.
-
-* Add a README.
-
-* In the documentation `Seq` shows up as `Stdlib.Seq`,
-  and the hyperlink does not work.
-
 # Later
 
 * Implement maps on top of sets,
   without an indirection,
   and without code duplication.
 
-* Explore parallel computation.
+* Explore parallel computation on top of `domainslib`.
+  Make `of_array` parallel.
   Add `reduce` and `map_reduce`.
 
 # Maybe Later
