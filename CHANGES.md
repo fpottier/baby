@@ -1,6 +1,6 @@
 # Changes
 
-# 2024/07/XX
+# 2024/06/17
 
 Initial implementation and release. The library offers both height-balanced
-and weight-balanced binary search trees. Only the `SET` API is supported.
+and weight-balanced binary search trees. Only the `Set` API is supported.
