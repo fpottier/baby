@@ -26,9 +26,9 @@ your [library] or [executable].
 
 {1 Ready-Made Weight-Balanced Trees}
 
-{b We recommend using [bistro]'s ready-made weight-balanced binary search
-trees}, because they are generally faster then height-balanced trees,
-offer a constant-time [cardinal] function, and offer several
+{b We recommend using [bistro]'s ready-made weight-balanced binary
+search trees}, because they are generally faster than height-balanced
+trees, offer a constant-time [cardinal] function, and offer several
 logarithmic-time random access functions.
 
 To use them,
@@ -58,3 +58,60 @@ that make stronger assumptions about their inputs.
 If you are lazy, you can implement both of them as just [join].
 
 {1:comparison Comparison With OCaml's Set Library}
+
+{2 Better Performance}
+
+At the time of writing (2024), [bistro] offers generally better
+performance than OCaml's [Set] library. Its operations are generally
+faster (sometimes much faster; sometimes slightly faster; sometimes
+slightly slower) than those of the [Set] library, and its memory
+allocation rate is slightly lower.
+
+{2 Constant-Time Cardinal}
+
+In contrast with the [Set] library, [bistro]'s weight-balanced trees
+offer a [cardinal] function whose time complexity is {m O(1)}. They
+also offer a family of random access functions ([get], [index], etc.)
+whose time complexity is {m O(\log n)}. Furthermore, by exploiting
+cardinality information, the functions [subset] and [equal] are
+sometimes able to return [false] in constant time.
+
+{2 Better Sharing}
+
+[bistro]'s binary operations ([union], [inter], [diff]) take advantage
+of (and preserve) physical equality in a more aggressive way. This
+allows them to (sometimes) be faster and allocate less memory.
+
+{2 Adaptive Conversions To Sets}
+
+[bistro]'s conversion functions [of_list], [of_array], and [of_seq]
+have adaptive complexity. If the input data is sorted, their
+complexity is {m O(n)}; otherwise, their complexity gracefully
+degrades down to {m O(n.\log n)}.
+
+{2 More Operations}
+
+[bistro] offers a few operations that do not exist in OCaml's [Set]
+library:
+
++ The symmetric difference, [xor];
++ The conversion functions [of_array] and [to_array];
++ The extremum-removal functions [remove_min_elt] and [remove_max_elt];
++ The enumeration API in the submodule [Enum].
+  Enumerations should be slightly faster than standard sequences,
+  and are able to efficiently seek ahead, via the function [from].
+
+{2 Documented Complexity}
+
+In [bistro], the time complexity of every operation is documented.
+
+{2 Compatibility}
+
+[bistro] is perfectly compatible with OCaml's Set library.
+In other words, using [Bistro.W.Set] instead of [Set] is safe.
+
+As a word of warning, though, if the equivalence relation on elements
+is coarser than equality (that is, if [compare x y = 0] does not imply
+[x = y]), then [Bistro.W.Set] and [Set] might behave differently when
+a choice must be made between two equivalent elements. This can occur
+in [union], [of_list], [of_array], [of_seq], [add_seq], [map].
