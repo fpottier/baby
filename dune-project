@@ -10,7 +10,7 @@
   )
   (homepage https://github.com/fpottier/bistro/)
   (bug_reports francois.pottier@inria.fr)
-  (synopsis "Several kinds of balanced binary search trees")
+  (synopsis "Fast sets based on balanced binary search trees")
   (depends
     (ocaml (>= 4.14))
     cppo
