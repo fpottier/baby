@@ -138,7 +138,7 @@ handiwork:
 # [make headache] updates the headers.
 
 HEADACHE := headache
-HEADER   := header
+HEADER   := header.txt
 
 .PHONY: headache
 headache:
