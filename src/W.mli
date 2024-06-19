@@ -20,4 +20,6 @@ module Set : sig
 
   module Make (E : OrderedType) : SET with type elt = E.t
 
+  module Int : SET with type elt = int
+
 end

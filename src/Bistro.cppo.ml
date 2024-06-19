@@ -27,6 +27,7 @@ include T
   #define LEAF          Leaf
   #define NODE(x, y, z) Node (x, y, z)
 
+  #include "Macros.frag.ml"
   #include "Common.frag.ml"
 
 end

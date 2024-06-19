@@ -30,6 +30,7 @@ end
 
 module F = Bistro.H.Set.Make(Int)
 module W = Bistro.W.Set.Make(Int)
+module I = Bistro.W.Set.Int
 module C = Bistro.Make(Int)(Bistro.Height.Make(Int))
 
 module type PARAMS = sig
@@ -582,8 +583,9 @@ let eratosthenes u =
   let module R = Eratosthenes(R)(struct include P let candidate = "reference" end) in
   let module F = Eratosthenes(F)(struct include P let candidate = "height/flat" end) in
   let module W = Eratosthenes(W)(struct include P let candidate = "weight/flat" end) in
-  [ R.benchmark1; F.benchmark1; W.benchmark1;
-    R.benchmark2; F.benchmark2; W.benchmark2; ]
+  let module I = Eratosthenes(I)(struct include P let candidate = "int" end) in
+  [ R.benchmark1; F.benchmark1; W.benchmark1; I.benchmark1;
+    R.benchmark2; F.benchmark2; W.benchmark2; I.benchmark2; ]
 
 module SillyFixedPoint (S : sig
   type t
@@ -840,7 +842,7 @@ let () =
     run (map 100000);
   end;
 
-  if false then begin
+  if true then begin
     eprintf "*** eratosthenes\n";
     eprintf "\n";
     run (eratosthenes 100);
@@ -864,7 +866,7 @@ let () =
     run (silly_fixed_point 100000)
   end;
 
-  if true then begin
+  if false then begin
     eprintf "*** words\n";
     eprintf "\n";
     run (words "pg135.txt");

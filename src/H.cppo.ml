@@ -26,6 +26,16 @@ module Set = struct
     #define LEAF          TLeaf
     #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
 
+    #include "Macros.frag.ml"
+    #include "Common.frag.ml"
+
+  end
+
+  (* This module is equivalent to [Make(Stdlib.Int)]. *)
+  module Int = struct
+
+    module E = Stdlib.Int
+    include Weight.Make(E)
     #include "Common.frag.ml"
 
   end
