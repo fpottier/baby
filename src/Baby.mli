@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*                                                                            *)
-(*                                   Bistro                                   *)
+(*                                    Baby                                    *)
 (*                                                                            *)
 (*                       François Pottier, Inria Paris                        *)
 (*                                                                            *)
@@ -15,17 +15,17 @@
    custom flavors.
 
    For {b height-balanced binary search trees}, ready for use,
-   please see {!Bistro.H.Set.Make}.
+   please see {!Baby.H.Set.Make}.
 
    For {b weight-balanced binary search trees}, ready for use,
-   please see {!Bistro.W.Set.Make}.
+   please see {!Baby.W.Set.Make}.
 
  *)
 
 (** @inline *)
 include module type of Signatures
 
-(**The functor [Bistro.Make] constructs balanced binary search trees
+(**The functor [Baby.Make] constructs balanced binary search trees
    based on a user-supplied balancing scheme. The main operation that
    the user is expected to provide is [join]. *)
 module Make
@@ -33,7 +33,7 @@ module Make
 (_ : CORE with type key = E.t)
 : SET with type elt = E.t
 
-(**The module [Bistro.H] provides ready-made height-balanced binary
+(**The module [Baby.H] provides ready-made height-balanced binary
    search trees. *)
 module H : sig
 
@@ -46,7 +46,7 @@ module H : sig
 
 end
 
-(**The module [Bistro.W] provides ready-made weight-balanced binary
+(**The module [Baby.W] provides ready-made weight-balanced binary
    search trees. *)
 module W : sig
 

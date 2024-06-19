@@ -1,5 +1,5 @@
 (library
   (name height_candidate)
-  (libraries bistro)
+  (libraries baby)
   (enabled_if (= %{profile} dev))
 )

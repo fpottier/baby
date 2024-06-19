@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*                                                                            *)
-(*                                   Bistro                                   *)
+(*                                    Baby                                    *)
 (*                                                                            *)
 (*                       François Pottier, Inria Paris                        *)
 (*                                                                            *)
@@ -28,10 +28,10 @@ module R = struct
 
 end
 
-module F = Bistro.H.Set.Make(Int)
-module W = Bistro.W.Set.Make(Int)
-module I = Bistro.W.Set.Int
-module C = Bistro.Make(Int)(Bistro.Height.Make(Int))
+module F = Baby.H.Set.Make(Int)
+module W = Baby.W.Set.Make(Int)
+module I = Baby.W.Set.Int
+module C = Baby.Make(Int)(Baby.Height.Make(Int))
 
 module type PARAMS = sig
   val seed : int
@@ -709,8 +709,8 @@ let words filename =
     let compare (s1, _) (s2, _) = String.compare s1 s2
   end in
   let module R = Stdlib.Set.Make(V) in
-  let module H = Bistro.H.Set.Make(V) in
-  let module W = Bistro.W.Set.Make(V) in
+  let module H = Baby.H.Set.Make(V) in
+  let module W = Baby.W.Set.Make(V) in
   let module R = Words(R)(struct include P let candidate = "reference" end) in
   let module H = Words(H)(struct include P let candidate = "height" end) in
   let module W = Words(W)(struct include P let candidate = "weight" end) in
@@ -728,8 +728,8 @@ let words_with_comparison_counts filename =
     let compare (s1, _) (s2, _) = incr c; String.compare s1 s2
   end in
   let module R = Stdlib.Set.Make(V) in
-  let module H = Bistro.H.Set.Make(V) in
-  let module W = Bistro.W.Set.Make(V) in
+  let module H = Baby.H.Set.Make(V) in
+  let module W = Baby.W.Set.Make(V) in
   let module R = Words(R)(struct include P let candidate = "reference" end) in
   let module H = Words(H)(struct include P let candidate = "height" end) in
   let module W = Words(W)(struct include P let candidate = "weight" end) in

@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*                                                                            *)
-(*                                   Bistro                                   *)
+(*                                    Baby                                    *)
 (*                                                                            *)
 (*                       François Pottier, Inria Paris                        *)
 (*                                                                            *)
@@ -26,13 +26,13 @@ let has_random_access_functions =
 
 (* The candidate. *)
 
-include Bistro.W.Set.Make(Int)
+include Baby.W.Set.Make(Int)
 
 (* -------------------------------------------------------------------------- *)
 
 (* Wrap some of the candidate functions with extra runtime checks. *)
 
-(* We could also place these runtime checks in [Bistro] itself, under
+(* We could also place these runtime checks in [Baby] itself, under
    [if debug], so they are erased in release mode. I prefer to place
    them here. *)
 

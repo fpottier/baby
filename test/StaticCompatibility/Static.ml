@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*                                                                            *)
-(*                                   Bistro                                   *)
+(*                                    Baby                                    *)
 (*                                                                            *)
 (*                       François Pottier, Inria Paris                        *)
 (*                                                                            *)
@@ -17,5 +17,5 @@ module type FACTORY =
 (* We check that our functors have the same type. This guarantees that (as far
    as the type-checker is concerned) they can be used as drop-in replacements
    for OCaml's [Set.Make]. *)
-module TestH = (Bistro.H.Set.Make : FACTORY)
-module TestW = (Bistro.W.Set.Make : FACTORY)
+module TestH = (Baby.H.Set.Make : FACTORY)
+module TestW = (Baby.W.Set.Make : FACTORY)

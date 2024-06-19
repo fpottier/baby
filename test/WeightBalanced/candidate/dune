@@ -1,5 +1,5 @@
 (library
   (name weight_candidate)
-  (libraries bistro)
+  (libraries baby)
   (enabled_if (= %{profile} dev))
 )

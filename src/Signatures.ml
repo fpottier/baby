@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*                                                                            *)
-(*                                   Bistro                                   *)
+(*                                    Baby                                    *)
 (*                                                                            *)
 (*                       François Pottier, Inria Paris                        *)
 (*                                                                            *)
@@ -10,7 +10,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-(**The signature [Bistro.OrderedType] describes a type equipped
+(**The signature [Baby.OrderedType] describes a type equipped
    with a total ordering function. *)
 module type OrderedType = sig
 
@@ -25,7 +25,7 @@ module type OrderedType = sig
 
 end (* OrderedType *)
 
-(**The signature [Bistro.CORE] describes the interface that must be offered by
+(**The signature [Baby.CORE] describes the interface that must be offered by
    the balancing code to the rest of the balanced binary search tree library.
    Most operations on binary search tree are built on top of this interface,
    and are oblivious to the balancing criterion. *)
@@ -120,7 +120,7 @@ module type CORE = sig
 
 end (* CORE *)
 
-(**The signature [Bistro.SET] describes an abstract data type of sets,
+(**The signature [Baby.SET] describes an abstract data type of sets,
    equipped with a wide array of efficient operations. *)
 module type SET = sig
 
@@ -187,11 +187,11 @@ module type SET = sig
      is, a set that contains all elements of the set [s1] and all
      elements of the set [s2].
 
-     The weight-balanced-tree implementation ({!Bistro.W}) offers
+     The weight-balanced-tree implementation ({!Baby.W}) offers
      the following guarantee:
      if the result is logically equal to [s1] or to [s2], then
      the result is physically equal to [s1] or to [s2].
-     The height-balanced tree implementation ({!Bistro.H}) does
+     The height-balanced tree implementation ({!Baby.H}) does
      not offer this guarantee.
 
      Time complexity: {m O(m.\log (\frac{n}{m}))},
@@ -203,11 +203,11 @@ module type SET = sig
      that is, a set that contains the common elements of the sets [s1]
      and [s2].
 
-     The weight-balanced-tree implementation ({!Bistro.W}) offers
+     The weight-balanced-tree implementation ({!Baby.W}) offers
      the following guarantee:
      if the result is logically equal to [s1] or to [s2], then
      the result is physically equal to [s1] or to [s2].
-     The height-balanced tree implementation ({!Bistro.H}) does
+     The height-balanced tree implementation ({!Baby.H}) does
      not offer this guarantee.
 
      Time complexity: {m O(m.\log (\frac{n}{m}))},
@@ -374,9 +374,9 @@ module type SET = sig
      the number of its elements.
 
      Time complexity:
-     in the weight-balanced-tree implementation ({!Bistro.W}),
+     in the weight-balanced-tree implementation ({!Baby.W}),
        {m O(1)};
-     in the height-balanced-tree implementation ({!Bistro.H}),
+     in the height-balanced-tree implementation ({!Baby.H}),
        {m O(n)},
      where {m n} is the size of the set [s]. *)
   val cardinal : set -> int
@@ -602,8 +602,8 @@ module type SET = sig
   (** {1:random Random access} *)
 
   (**{b Caution:} the following functions exist only in the
-      weight-balanced-tree implementation ({!Bistro.W}).
-     In the height-balanced tree implementation ({!Bistro.H}),
+      weight-balanced-tree implementation ({!Baby.W}).
+     In the height-balanced tree implementation ({!Baby.H}),
      they raise an exception of the form [Failure _]. *)
 
   (**In the following descriptions, a set is viewed as an increasing
@@ -750,10 +750,10 @@ module type SET = sig
        that is, the number of its elements.
 
        Time complexity:
-       in the weight-balanced-tree implementation ({!Bistro.W}),
+       in the weight-balanced-tree implementation ({!Baby.W}),
          {m O(\log n)},
          where {m n} is the size of the enumeration [e];
-       in the height-balanced-tree implementation ({!Bistro.H}),
+       in the height-balanced-tree implementation ({!Baby.H}),
          {m O(n)}. *)
     val length : enum -> int
 

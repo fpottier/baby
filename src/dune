@@ -1,7 +1,7 @@
 ;; This is a library.
 (library
-  (name bistro)
-  (public_name bistro)
+  (name baby)
+  (public_name baby)
 )
 
 ;; Warnings are enabled in development builds and disabled in release builds.
@@ -24,9 +24,9 @@
   (action (run %{bin:cppo} Weight.cppo.ml -o %{targets})))
 
 (rule
-  (targets Bistro.ml)
-  (deps Bistro.cppo.ml (glob_files *.frag.ml))
-  (action (run %{bin:cppo} Bistro.cppo.ml -o %{targets})))
+  (targets Baby.ml)
+  (deps Baby.cppo.ml (glob_files *.frag.ml))
+  (action (run %{bin:cppo} Baby.cppo.ml -o %{targets})))
 
 (rule
   (targets H.ml)

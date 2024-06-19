@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*                                                                            *)
-(*                                   Bistro                                   *)
+(*                                    Baby                                    *)
 (*                                                                            *)
 (*                       François Pottier, Inria Paris                        *)
 (*                                                                            *)
@@ -26,4 +26,4 @@ let has_random_access_functions =
 
 (* The candidate. *)
 
-include Bistro.H.Set.Make(Int)
+include Baby.H.Set.Make(Int)

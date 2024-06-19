@@ -9,7 +9,7 @@ DATE     := $(shell /bin/date +%Y%m%d)
 DATE_WITH_SLASHES := $(shell /bin/date +%Y/%m/%d)
 
 # The project's name.
-THIS     := bistro
+THIS     := baby
 
 # The archive's URL (https).
 ARCHIVE  := https://github.com/fpottier/$(THIS)/archive/$(DATE).tar.gz
@@ -62,7 +62,7 @@ reinstall: uninstall
 
 .PHONY: show
 show: reinstall
-	@ echo "#require \"bistro\";;\n#show Bistro;;" | ocaml
+	@ echo "#require \"baby\";;\n#show Baby;;" | ocaml
 
 .PHONY: pin
 pin:
@@ -72,7 +72,7 @@ pin:
 unpin:
 	@ opam pin remove $(THIS) --yes
 
-ASSEMBLY=$(shell find . -name "bistro__WeightBalanced.s")
+ASSEMBLY=$(shell find . -name "baby__WeightBalanced.s")
 .PHONY: assembly
 assembly:
 	@ dune clean && dune build --profile=release

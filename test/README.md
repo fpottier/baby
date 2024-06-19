@@ -18,6 +18,6 @@ It is also possible to run both tests at once (in parallel) by moving
 to the repository's root directory and by typing `make test`.
 
 The subdirectory `StaticCompatibility` is a static test: its purpose is to
-ensure that the public interface offered by `bistro` subsumes the public
+ensure that the public interface offered by `baby` subsumes the public
 interface of OCaml's standard `Set` library. Running this test is not
 necessary; compiling it is sufficient.

@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*                                                                            *)
-(*                                   Bistro                                   *)
+(*                                    Baby                                    *)
 (*                                                                            *)
 (*                       François Pottier, Inria Paris                        *)
 (*                                                                            *)
@@ -16,7 +16,7 @@
 (* @03: Failure in an instruction. *)
           #require "monolith";;
           module Sup = Monolith.Support;;
-          open Bistro.WeightBalanced.Make(Int);;
+          open Baby.WeightBalanced.Make(Int);;
 (* @01 *) let x0 =
             of_sorted_unique_array
             [| (-15); (-13); (-12); (-8); (-7); (-4); (-2); (-1); 1; 2; 13 |];;

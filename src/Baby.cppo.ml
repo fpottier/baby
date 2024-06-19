@@ -1,6 +1,6 @@
 (******************************************************************************)
 (*                                                                            *)
-(*                                   Bistro                                   *)
+(*                                    Baby                                    *)
 (*                                                                            *)
 (*                       François Pottier, Inria Paris                        *)
 (*                                                                            *)
@@ -14,7 +14,7 @@ include Signatures
 
 (* -------------------------------------------------------------------------- *)
 
-(* The functor [Bistro.Make] constructs balanced binary search trees
+(* The functor [Baby.Make] constructs balanced binary search trees
    based on a user-supplied balancing scheme. *)
 
 module[@inline] Make
@@ -34,7 +34,7 @@ end
 
 (* -------------------------------------------------------------------------- *)
 
-(* The module [Bistro.H] provides ready-made height-balanced binary
+(* The module [Baby.H] provides ready-made height-balanced binary
    search trees. *)
 
 (* Unfortunately, the OCaml compiler is pretty bad at optimization. In my
@@ -51,7 +51,7 @@ module H = H
 
 (* -------------------------------------------------------------------------- *)
 
-(* The module [Bistro.W] provides ready-made weight-balanced binary
+(* The module [Baby.W] provides ready-made weight-balanced binary
    search trees. *)
 
 module W = W
