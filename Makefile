@@ -4,6 +4,10 @@
 # unless DATE is defined on the command line.
 DATE     := $(shell /bin/date +%Y%m%d)
 
+# This is used in [make release] to search CHANGES.md.
+# Ideally, it should be derived from $(DATE).
+DATE_WITH_SLASHES := $(shell /bin/date +%Y/%m/%d)
+
 # The project's name.
 THIS     := bistro
 
@@ -169,6 +173,11 @@ release:
 	@ make install
 # Check the current package description.
 	@ opam lint
+# Make sure a CHANGES entry with the current date seems to exist.
+	@ if ! grep $(DATE_WITH_SLASHES) CHANGES.md ; then \
+	    echo "Error: CHANGES.md has no entry with date $(DATE_WITH_SLASHES)." ; \
+	    exit 1 ; \
+	  fi
 # Check if everything has been committed.
 	@ if [ -n "$$(git status --porcelain)" ] ; then \
 	    echo "Error: there remain uncommitted changes." ; \
