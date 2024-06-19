@@ -5,7 +5,6 @@ Makefile        export-ignore
 attic           export-ignore
 benchmark       export-ignore
 headache.config export-ignore
-header.txt      export-ignore
+*.txt           export-ignore
 play.ml         export-ignore
 test            export-ignore
-LICENSE         export-ignore
