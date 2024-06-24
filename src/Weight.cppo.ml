@@ -89,10 +89,18 @@ module[@inline] Make (E : OrderedType) = struct
      equivalent.
 
      The trees [l] and [r] have like weights (can be siblings) if these
-     inequalities hold. According to BFS, if 2/11 < α < 1-1/sqrt(2) holds,
-     then [join] can be implemented using just single and double rotations.
-     This translates to 0.(18.) < α < 0.2928932... BFS use the value 0.29 in
-     their experiments. *)
+     inequalities hold. According to BFS, if α < 1-1/sqrt(2) holds, then
+     [join] can be implemented, using just single and double rotations.
+     This translates to α < 0.2928932... BFS use the value 0.29 in their
+     experiments.
+
+     The literature also mentions the constraint 2/11 < α, that is,
+     0.(18.) < α. According to BFS, this constraint is *NOT* required for
+     the correctness or complexity of [join]. It *IS* however required to
+     guarantee the correctness of [join_neighbors], that is, to guarantee
+     that if the weight of a subtree is off by one, then one (single or
+     double) rotation at the root suffices. These two claims are confirmed
+     by our tests. *)
 
   let alpha =
     29 (* in percent *)
