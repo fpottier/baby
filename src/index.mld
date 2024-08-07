@@ -112,6 +112,7 @@ In other words, using [Baby.W.Set] instead of [Set] is safe.
 
 As a word of warning, though, if the equivalence relation on elements
 is coarser than equality (that is, if [compare x y = 0] does not imply
-[x = y]), then [Baby.W.Set] and [Set] might behave differently when
-a choice must be made between two equivalent elements. This can occur
-in [union], [of_list], [of_array], [of_seq], [add_seq], [map].
+that [x] and [y] are indistinguishable), then [Baby.W.Set] and [Set]
+might behave differently when a choice must be made between two
+equivalent elements. This can occur in [union], [of_list], [of_array],
+[of_seq], [add_seq], [map].
