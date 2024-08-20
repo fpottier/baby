@@ -32,12 +32,7 @@ clean:
 
 .PHONY: test
 test:
-	@ make clean
-	@ dune build @all
-	@ make -C test/HeightBalanced prepare
-	@ make -C test/WeightBalanced prepare
-	@ make -C test/HeightBalanced random_nodep & \
-          make -C test/WeightBalanced random_nodep
+	@ make -C test test
 
 # [make bench] runs the benchmark.
 
