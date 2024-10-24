@@ -1,5 +1,10 @@
 # Changes
 
+## 2024/MM/DD
+
+* Documentation: in the signature `OrderedType`, clarify the specification
+  of the function `compare`; this function decides a total preorder `≤`.
+
 ## 2024/06/19
 
 * Initial implementation and release. The library offers both height-balanced
