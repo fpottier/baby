@@ -56,7 +56,9 @@ let add k v m =
     Set.add (k, v) (remove k m)
 
 (* TODO need a variant of [Set.union] where the new element is computed
-   as a function of the previous two elements *)
+   as a function of the previous two elements? but the function must
+   promise to return an element that is equivalent to the two elements
+   that it receives (dynamic check). *)
 
 let cardinal =
   Set.cardinal
@@ -69,3 +71,6 @@ let is_empty =
 
 (* TODO need a variant of [Set.compare] that is parameterized with an
    ordering function on values *)
+
+(* TODO to implement enumerations on maps, need a variant of [Set.Enum.from]
+   that takes [compare x] as an argument. This may be related to [find_first]. *)
