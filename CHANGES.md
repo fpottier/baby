@@ -5,6 +5,14 @@
 * Documentation: in the signature `OrderedType`, clarify the specification
   of the function `compare`; this function decides a total preorder `≤`.
 
+* Documentation: in the preamble, clarify that, most of the time, we assume
+  that `≤` is total order; if an operation must be understood in the more
+  general case where `≤` is a total preorder, then this is explicitly
+  indicated.
+
+* Documentation: update the documentation of `find` and `find_opt`
+  in accordance with the previous point.
+
 ## 2024/06/19
 
 * Initial implementation and release. The library offers both height-balanced
