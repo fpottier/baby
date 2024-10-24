@@ -159,6 +159,34 @@ module type SET = sig
   (**A synonym for the type [set]. *)
   type t = set
 
+  (**In the following,
+     we usually document the behavior of each operation
+     {b only in the common case where the relation {m \leq} is a total order}.
+     (To find out what this means, see {!OrderedType.compare}.)
+
+     In this common case, a value of type {!set}
+     can be thought of as a set in the usual sense.
+
+     Outside of this common case,
+     the relation {m \leq} is a total preorder,
+     but not a total order:
+     that is,
+     equivalence does not imply equality.
+     In this general case,
+     a value {m s} of type {!set}
+     can be thought of as a set,
+     with the added property that
+     {i within {m s}, equivalence implies equality}:
+     that is, if {m x} and {m y} are members of {m s},
+     then {m x \equiv y} implies {m x = y}.
+     In other words,
+     {i a set {m s} contains at most one element of each equivalence class}.
+
+     {b Some operations are useful only in the general case}
+     where the relation {m \leq} is not a total order.
+     This is explicitly indicated in the documentation
+     of each such operation. *)
+
   (** {1:construct Constructing sets} *)
 
   (**[empty] is the empty set. *)
@@ -338,24 +366,25 @@ module type SET = sig
      where {m n} is the size of the set [s]. *)
   val mem : elt -> set -> bool
 
-  (**If [x] is a member of the set [s], then [find x s] returns the unique
-     element [x'] of the set [s] such that [x] and [x'] are equivalent. (We
-     say that [x] and [x'] are equivalent if [compare x x' = 0] holds.)
+  (**This operation is typically useful when the relation {m \leq} is
+     not a total order.
+
+     If the set [s] contains an element [x']
+     such that [x'] {m \equiv} [x] holds,
+     then [find x s] returns [x'].
      Otherwise, it raises [Not_found].
 
      Time complexity: {m O(\log n)},
      where {m n} is the size of the set [s]. *)
   val find : elt -> set -> elt
-    (* The specification of [find] feels weird, because we have assumed and
-       indicated everywhere that [compare] must be an order, as opposed to a
-       preorder. Yet, [find] is useful only if [compare] is a preorder, so
-       that the equivalence relation [compare x x' = 0] is coarser than
-       equality. *)
 
-  (**If [x] is a member of the set [s], then [find_opt x s] returns [Some x'],
-     where [x'] is the unique element of the set [s] such that [x] and [x']
-     are equivalent. (We say that [x] and [x'] are equivalent if
-     [compare x x' = 0] holds.) Otherwise, it returns [None].
+  (**This operation is typically useful when the relation {m \leq} is
+     not a total order.
+
+     If the set [s] contains an element [x']
+     such that [x'] {m \equiv} [x] holds,
+     then [find_opt x s] returns [Some x'].
+     Otherwise, it returns [None].
 
      Time complexity: {m O(\log n)},
      where {m n} is the size of the set [s]. *)
