@@ -17,10 +17,36 @@ module type OrderedType = sig
   (**The type of the set elements. *)
   type t
 
-  (** A total ordering function over values of type [t].
-      [compare x1 x2] must be zero if [x1] and [x2] are equal.
-      It must be strictly negative if [x1] is smaller than [x2].
-      It must be strictly positive if [x1] is greater than [x2]. *)
+  (**The function [compare] decides a relation {m \leq}
+     over elements of type [t].
+
+     The relation {m \leq} must be {b a total preorder}: that is,
+     + for all elements {m x, y},
+       it must be the case that
+       {m x \leq y} or {m y \leq x} holds.
+     + for all elements {m x, y, z},
+       it must be the case that
+       {m x \leq y} and {m y \leq z} imply {m x \leq z};
+
+     Let us write {m x \equiv y} when
+     {m x \leq y} and {m y \leq x} hold.
+     In that case, we say that {m x} and {m y} are {b equivalent}.
+
+     Let us write {m x < y} when
+     {m x \leq y} and {m \neg (y \leq x)} hold.
+
+     [compare] must behave as follows:
+     + if {m x \equiv y} holds
+       then [compare x y] must be zero;
+     + if {m x < y} holds
+       then [compare x y] must be negative;
+     + if {m y < x} holds
+       then [compare x y] must be positive.
+
+     If equivalence implies equality
+     (that is, if for all elements {m x, y},
+       {m x \equiv y} implies {m x = y})
+     then we say that the relation {m \leq} is {b a total order}. *)
   val compare : t -> t -> int
 
 end (* OrderedType *)
