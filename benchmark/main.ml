@@ -31,7 +31,7 @@ end
 module F = Baby.H.Set.Make(Int)
 module W = Baby.W.Set.Make(Int)
 module I = Baby.W.Set.Int
-module C = Baby.Make(Int)(Baby.Height.Make(Int))
+module C = Baby.Make(Int)(Baby.Height)
 
 module type PARAMS = sig
   val seed : int

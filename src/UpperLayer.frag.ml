@@ -14,9 +14,12 @@
 
 (* Types. *)
 
+type key = E.t
 type elt = key
-type set = tree
+
+type set = elt tree
 type t = set
+type tree = set
 
 (* -------------------------------------------------------------------------- *)
 

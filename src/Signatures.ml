@@ -57,35 +57,32 @@ end (* OrderedType *)
    and are oblivious to the balancing criterion. *)
 module type CORE = sig
 
-  (**Keys, or elements. *)
-  type key
-
   (**Balanced binary search trees. *)
-  type tree
+  type 'key tree
 
   (**A view on a balanced binary search tree indicates whether this tree
      is a leaf or a node, and, if it is a node, gives access to its left
      child, its key, and its right child. A view does not give access to
      balancing information, such as the tree's height or weight. *)
-  type view =
+  type 'key view =
     | Leaf
-    | Node of tree * key * tree
+    | Node of 'key tree * 'key * 'key tree
 
   (**[view] turns a tree into a view. *)
-  val view : tree -> view
+  val view : 'key tree -> 'key view
 
   (* In the reverse direction, one could imagine a conversion function
      [make : view -> tree]. In order to avoid a memory allocation, we
      replace this function with a constant [leaf] and a function [join]. *)
 
   (**[leaf] is the empty tree; a leaf. *)
-  val leaf : tree
+  val leaf : 'key tree
 
   (**[join l v r] expects a subtree [l], a key [v], and a subtree [r] such
      that [l < v < r] holds. It returns a new tree whose elements are the
      elements of [l], [v], and [r]. If needed, it performs rebalancing, so the
      key [v] is not necessarily found at the root of the new tree. *)
-  val join : tree -> key -> tree -> tree
+  val join : 'key tree -> 'key -> 'key tree -> 'key tree
   (* Regarding computational complexity, BFS write: the cost of [join] must be
      proportional to the difference in ranks of two trees, and the rank of the
      result of a join must be at most one more than the maximum rank of the
@@ -99,12 +96,12 @@ module type CORE = sig
      requires [l < v < r]. Furthermore, it assumes that the trees [l] and [r]
      have been obtained by taking two siblings in a well-formed tree and by
      adding or removing one element in one of them. *)
-  val join_neighbors : tree -> key -> tree -> tree
+  val join_neighbors : 'key tree -> 'key -> 'key tree -> 'key tree
 
   (**[join_weight_balanced l v r] is analogous to [join l v r]. Like [join],
      it requires [l < v < r]. Furthermore, it assumes that the weights of the
      trees [l] and [r] differ by at most one. *)
-  val join_weight_balanced : tree -> key -> tree -> tree
+  val join_weight_balanced : 'key tree -> 'key -> 'key tree -> 'key tree
 
   (**If the weight of a tree can be determined in constant time, then
      [weight t] returns the weight of the tree [t]. If the weight of a
@@ -112,37 +109,37 @@ module type CORE = sig
      [weight] to always return zero. The function [weight] is used to
      implement fast paths in subset and equality tests: it must be the
      case that [subset t1 t2] implies [weight t1 <= weight t2]. *)
-  val weight : tree -> int
+  val weight : 'key tree -> int
 
   (**[cardinal t] returns the number of elements in the tree. Depending on the
      internal representation of trees, the function [cardinal] may have time
      complexity O(1) or O(n). This is indicated by [constant_time_cardinal]. *)
-  val cardinal : tree -> int
+  val cardinal : 'key tree -> int
 
   (**[constant_time_cardinal] indicates whether [cardinal] constant time
      complexity. *)
   val constant_time_cardinal : bool
 
   (**[singleton x] constructs a tree whose sole element is [x]. *)
-  val singleton : key -> tree
+  val singleton : 'key -> 'key tree
 
   (**[doubleton x y] requires [x < y]. It constructs a tree whose elements are
      [x] and [y]. *)
-  val doubleton : key -> key -> tree
+  val doubleton : 'key -> 'key -> 'key tree
 
   (**[tripleton x y z] requires [x < y < z]. It constructs a tree whose
      elements are [x], [y], and [z]. *)
-  val tripleton : key -> key -> key -> tree
+  val tripleton : 'key -> 'key -> 'key -> 'key tree
 
   (**[seems_smaller t1 t2] indicates which of the trees [t1] and [t2] seems
      smaller, based on height or weight. This function is used as part of a
      heuristic choice, so no correctness obligation bears on it; its
      postcondition is [true]. *)
-  val seems_smaller : tree -> tree -> bool
+  val seems_smaller : 'key tree -> 'key tree -> bool
 
   (**[check t] checks that the tree [t] is well-formed: that is, [t] is a
      balanced binary search tree. This function is used while testing only. *)
-  val check : tree -> unit
+  val check : 'key tree -> unit
 
 end (* CORE *)
 
