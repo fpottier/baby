@@ -23,3 +23,8 @@ instead of the usual `Set.Make`.
 For more information,
 please see the [documentation of the latest released
 version](http://cambium.inria.fr/~fpottier/baby/doc/baby/).
+
+## Information for developers
+
+An overview of the architecture of the library
+is given in [HACKING.md](HACKING.md).
