@@ -12,6 +12,8 @@
 
 open Signatures
 
+#include "ConcreteView.macros"
+
 module Set = struct
 
   module type OrderedType = OrderedType
@@ -21,10 +23,6 @@ module Set = struct
   module[@inline] Make (E : OrderedType) = struct
 
     include Height.Make(E)
-
-    #include "ConcreteView.macros"
-
-    #include "Macros.frag.ml"
     #include "Common.frag.ml"
 
   end

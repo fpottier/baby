@@ -3,3 +3,5 @@
 #define VIEW(t)       (view t)
 #define LEAF          Leaf
 #define NODE(x, y, z) Node (x, y, z)
+
+#include "Derived.macros"
