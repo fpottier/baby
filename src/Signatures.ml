@@ -53,7 +53,7 @@ end (* OrderedType *)
 
 (**The signature [Baby.CORE] describes the interface that must be offered by
    the balancing code to the rest of the balanced binary search tree library.
-   Most operations on binary search tree are built on top of this interface,
+   Most operations on binary search trees are built on top of this interface,
    and are oblivious to the balancing criterion. *)
 module type CORE = sig
 
