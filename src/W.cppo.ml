@@ -23,7 +23,7 @@ module Set = struct
   module[@inline] Make (E : OrderedType) = struct
 
     include Weight.Make(E)
-    #include "Common.frag.ml"
+    #include "UpperLayer.frag.ml"
 
   end
 
@@ -32,7 +32,7 @@ module Set = struct
 
     module E = Stdlib.Int
     include Weight.Make(E)
-    #include "Common.frag.ml"
+    #include "UpperLayer.frag.ml"
 
   end
 

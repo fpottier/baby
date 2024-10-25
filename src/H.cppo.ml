@@ -23,7 +23,7 @@ module Set = struct
   module[@inline] Make (E : OrderedType) = struct
 
     include Height.Make(E)
-    #include "Common.frag.ml"
+    #include "UpperLayer.frag.ml"
 
   end
 
@@ -32,7 +32,7 @@ module Set = struct
 
     module E = Stdlib.Int
     include Height.Make(E)
-    #include "Common.frag.ml"
+    #include "UpperLayer.frag.ml"
 
   end
 
