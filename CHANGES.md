@@ -2,6 +2,10 @@
 
 ## 2024/MM/DD
 
+* Incompatible changes:
+  + The signature `CORE` has changed.
+  + The signature of the functor `Baby.Make` has changed.
+
 * Documentation: in the signature `OrderedType`, clarify the specification
   of the function `compare`; this function decides a total preorder `≤`.
 
@@ -15,7 +19,9 @@
 
 * Bug: due to a copy-paste mistake, the submodule `Baby.H.Set.Int`
   mistakenly offered weight-balanced trees
-  instead of height-balanced trees. Fixed.
+  instead of height-balanced trees.
+  Of course, this was not observable, except perhaps in terms of performance.
+  Fixed.
 
 ## 2024/06/19
 
