@@ -25,17 +25,17 @@
 
 (rule
   (targets Baby.ml)
-  (deps Baby.cppo.ml (glob_files *.frag.ml))
+  (deps Baby.cppo.ml (glob_files *.frag.ml) (glob_files *.macros))
   (action (run %{bin:cppo} Baby.cppo.ml -o %{targets})))
 
 (rule
   (targets H.ml)
-  (deps H.cppo.ml (glob_files *.frag.ml))
+  (deps H.cppo.ml (glob_files *.frag.ml) (glob_files *.macros))
   (action (run %{bin:cppo} H.cppo.ml -o %{targets})))
 
 (rule
   (targets W.ml)
-  (deps W.cppo.ml (glob_files *.frag.ml))
+  (deps W.cppo.ml (glob_files *.frag.ml) (glob_files *.macros))
   (action (run %{bin:cppo} W.cppo.ml -o %{targets})))
 
 ;; Request documentation.

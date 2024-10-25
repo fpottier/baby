@@ -22,9 +22,7 @@ module Set = struct
 
     include Weight.Make(E)
 
-    #define VIEW(t)       (t)
-    #define LEAF          TLeaf
-    #define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
+    #include "ConcreteView.macros"
 
     #include "Macros.frag.ml"
     #include "Common.frag.ml"

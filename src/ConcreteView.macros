@@ -1,0 +1,6 @@
+(* In the concrete view, to deconstruct a tree [t], one matches the tree [t]
+   directly against the patterns [TLeaf] and [TNode _]. This requires the
+   concrete definition of the type [tree] to be visible. *)
+#define VIEW(t)       (t)
+#define LEAF          TLeaf
+#define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }

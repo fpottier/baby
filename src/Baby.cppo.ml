@@ -23,10 +23,7 @@ module[@inline] Make
 = struct
 include T
 
-  #define VIEW(t)       (view t)
-  #define LEAF          Leaf
-  #define NODE(x, y, z) Node (x, y, z)
-
+  #include "AbstractView.macros"
   #include "Macros.frag.ml"
   #include "Common.frag.ml"
 
