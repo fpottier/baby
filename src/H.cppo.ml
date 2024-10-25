@@ -35,7 +35,7 @@ module Set = struct
   module Int = struct
 
     module E = Stdlib.Int
-    include Weight.Make(E)
+    include Height.Make(E)
     #include "Common.frag.ml"
 
   end
