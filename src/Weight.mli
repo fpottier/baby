@@ -14,7 +14,7 @@ open Signatures
 
 (**This module defines a memory layout and a balancing scheme for
    height-balanced binary search trees. *)
-module Make (E : OrderedType)
+module Make (E : sig type t end)
 : sig
 
   type key = E.t

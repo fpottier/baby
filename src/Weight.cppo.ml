@@ -10,8 +10,6 @@
 (*                                                                            *)
 (******************************************************************************)
 
-open Signatures
-
 (* This code implements weight-balancing, following Blelloch, Ferizovic and
    Sun (2022), thereafter abbreviated as BFS. The balancing invariant and
    algorithm are the same as in the paper, but this code is more aggressively
@@ -22,9 +20,14 @@ open Signatures
 let impossible () =
   assert false
 
-(* Although this functor requires an ordered type, the ordering function
-   [E.compare] is used in assertions only. *)
-module[@inline] Make (E : OrderedType) = struct
+(* In the following, some functions have nontrivial preconditions:
+   [join] and its variants require [l < v < r];
+   [doubleton] and [tripleton] require [x < y] and [x < y < z].
+   Here, we do not have access to the ordering function [E.compare],
+   so we do not write assertions to check that these preconditions
+   are met. *)
+
+module[@inline] Make (E : sig type t end) = struct
 
   type key = E.t
 
@@ -177,17 +180,17 @@ module[@inline] Make (E : OrderedType) = struct
 
   (* Trees of one, two, three elements. *)
 
+  (* [doubleton x y] requires [x < y].
+     [tripleton x y z] requires [x < y < z]. *)
+
   let[@inline] singleton x =
     (* This is equivalent to [create TLeaf x TLeaf]. *)
     TNode { l = TLeaf; v = x; r = TLeaf; w = 2 }
 
   let[@inline] doubleton x y =
-    assert (E.compare x y < 0);
     TNode { l = TLeaf; v = x; r = singleton y; w = 3 }
 
   let[@inline] tripleton x y z =
-    assert (E.compare x y < 0);
-    assert (E.compare y z < 0);
     TNode { l = singleton x; v = y; r = singleton z; w = 4 }
 
   (* [seems_smaller t1 t2] is equivalent to [weight t1 < weight t2]. *)

@@ -10,8 +10,6 @@
 (*                                                                            *)
 (******************************************************************************)
 
-open Signatures
-
 (* The following code taken from OCaml's Set library, and slightly adapted. *)
 
 let[@inline] max (x : int) (y : int) =
@@ -22,9 +20,14 @@ let[@inline] max (x : int) (y : int) =
 let impossible () =
   assert false
 
-(* Although this functor requires an ordered type, the ordering function
-   [E.compare] is used in assertions only. *)
-module[@inline] Make (E : OrderedType) = struct
+(* In the following, some functions have nontrivial preconditions:
+   [join] and its variants require [l < v < r];
+   [doubleton] and [tripleton] require [x < y] and [x < y < z].
+   Here, we do not have access to the ordering function [E.compare],
+   so we do not write assertions to check that these preconditions
+   are met. *)
+
+module[@inline] Make (E : sig type t end) = struct
 
   type key = E.t
 
@@ -108,20 +111,24 @@ module[@inline] Make (E : OrderedType) = struct
     let h = max (height l) (height r) + 1 in
     TNode { l; v; r; h }
 
+  (* [create] is published under the name [join_weight_balanced]. *)
+
   let join_weight_balanced =
     create
+
+  (* Trees of one, two, three elements. *)
+
+  (* [doubleton x y] requires [x < y].
+     [tripleton x y z] requires [x < y < z]. *)
 
   let[@inline] singleton x =
     (* This is equivalent to [create TLeaf x TLeaf]. *)
     TNode { l = TLeaf; v = x; r = TLeaf; h = 1 }
 
   let[@inline] doubleton x y =
-    assert (E.compare x y < 0);
     TNode { l = TLeaf; v = x; r = singleton y; h = 2 }
 
   let[@inline] tripleton x y z =
-    assert (E.compare x y < 0);
-    assert (E.compare y z < 0);
     TNode { l = singleton x; v = y; r = singleton z; h = 2 }
 
   (* [seems_smaller t1 t2] is equivalent to [height t1 < height t2]. *)
