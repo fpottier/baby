@@ -55,7 +55,7 @@ on sets
 and is unaware of the balancing logic.
 
 There is one implementation of the upper layer,
-in the file `Common.frag.ml`.
+in the file `UpperLayer.frag.ml`.
 
 The code of the upper layer assumes that the base-layer module has been opened,
 so all base-layer types and functions are available in the current namespace.
