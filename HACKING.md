@@ -73,6 +73,9 @@ The macros `EMPTY` and `BOTH_EMPTY` can be defined in terms of the macros
 `VIEW` and `LEAF`. `EMPTY` tests whether a tree is empty (that is, a leaf);
 `BOTH_EMPTY` tests whether two trees are empty.
 
+The code of the upper layer assumes that the module `E : OrderedType`
+gives the (preordered) type of the set elements (also known as keys).
+
 ## Base layer (weight balancing implementation)
 
 The module `Weight` offers one implementation of the base layer,
