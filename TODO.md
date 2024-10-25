@@ -12,6 +12,9 @@
 
 # Maybe Later
 
+* In `Weight.cppo.ml`, clarify the precondition of `balance_right_heavy`.
+  Wassel Bousmaha's work contains the answer.
+
 * Implement a variant of `choose` that runs in time *O(1)*,
   and does not promise to respect equality of sets.
 
