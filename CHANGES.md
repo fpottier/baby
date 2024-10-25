@@ -13,6 +13,10 @@
 * Documentation: update the documentation of `find` and `find_opt`
   in accordance with the previous point.
 
+* Bug: due to a copy-paste mistake, the submodule `Baby.H.Set.Int`
+  mistakenly offered weight-balanced trees
+  instead of height-balanced trees. Fixed.
+
 ## 2024/06/19
 
 * Initial implementation and release. The library offers both height-balanced
