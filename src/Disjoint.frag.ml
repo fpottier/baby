@@ -16,7 +16,7 @@
 
 (* This simple version of [disjoint] has the same structure as [inter]. *)
 
-(* (Disabled.)
+(* (Disabled.) (Set variant only.)
 
 let rec disjoint (t1 : tree) (t2 : tree) : bool =
   match VIEW(t1), VIEW(t2) with
@@ -43,7 +43,9 @@ let disjoint t1 t2 =
   | _, LEAF ->
       true (* fast path *)
   | _, _ ->
+#ifndef MAP_VARIANT
       t1 != t2 && (* fast path *)
+#endif
       Enum.(disjoint (enum t1) (enum t2))
 
 (* I have also played with a version of [disjoint] that does not use [split],

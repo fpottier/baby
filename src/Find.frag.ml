@@ -10,27 +10,27 @@
 (*                                                                            *)
 (******************************************************************************)
 
-let rec find (x : key) (t : tree) : key =
+let rec find (x : key) (t : TREE) : DATA =
   match VIEW(t) with
   | LEAF ->
       raise Not_found
-  | NODE(l, v, r) ->
-      let c = E.compare x v in
+  | NODE(l, v, r)
+      let c = E.compare x (GET_KEY(v)) in
       if c = 0 then
-        v
+        GET_DATA(v)
       else if c < 0 then
         find x l
       else
         find x r
 
-let rec find_opt (x : key) (t : tree) : key option =
+let rec find_opt (x : key) (t : TREE) : DATA option =
   match VIEW(t) with
   | LEAF ->
       None
-  | NODE(l, v, r) ->
-      let c = E.compare x v in
+  | NODE(l, v, r)
+      let c = E.compare x (GET_KEY(v)) in
       if c = 0 then
-        Some v
+        Some (GET_DATA(v))
       else if c < 0 then
         find_opt x l
       else
@@ -49,82 +49,82 @@ let rec find_opt (x : key) (t : tree) : key option =
    value of [f] changes, and it changes from [false] to [true]. This
    position can be found in logarithmic time. *)
 
-let rec find_first_aux v0 f (t : tree) =
+let rec find_first_aux (v0 : ELT) (f : key -> bool) (t : TREE) : ELT =
   match VIEW(t) with
   | LEAF ->
       v0
-  | NODE(l, v, r) ->
-      if f v then
+  | NODE(l, v, r)
+      if f (GET_KEY(v)) then
         find_first_aux v f l
       else
         find_first_aux v0 f r
 
-let rec find_first f (t : tree) =
+let rec find_first (f : key -> bool) (t : TREE) : ELT =
   match VIEW(t) with
   | LEAF ->
       raise Not_found
-  | NODE(l, v, r) ->
-      if f v then
+  | NODE(l, v, r)
+      if f (GET_KEY(v)) then
         find_first_aux v f l
       else
         find_first f r
 
-let rec find_first_opt_aux v0 f (t : tree) =
+let rec find_first_opt_aux (v0 : ELT) (f : key -> bool) (t : TREE) : ELT option =
   match VIEW(t) with
   | LEAF ->
       Some v0
-  | NODE(l, v, r) ->
-      if f v then
+  | NODE(l, v, r)
+      if f (GET_KEY(v)) then
         find_first_opt_aux v f l
       else
         find_first_opt_aux v0 f r
 
-let rec find_first_opt f (t : tree) =
+let rec find_first_opt (f : key -> bool) (t : TREE) : ELT option =
   match VIEW(t) with
   | LEAF ->
       None
-  | NODE(l, v, r) ->
-      if f v then
+  | NODE(l, v, r)
+      if f (GET_KEY(v)) then
         find_first_opt_aux v f l
       else
         find_first_opt f r
 
-let rec find_last_aux v0 f (t : tree) =
+let rec find_last_aux (v0 : ELT) (f : key -> bool) (t : TREE) : ELT =
   match VIEW(t) with
   | LEAF ->
       v0
-  | NODE(l, v, r) ->
-      if f v then
+  | NODE(l, v, r)
+      if f (GET_KEY(v)) then
         find_last_aux v f r
       else
         find_last_aux v0 f l
 
-let rec find_last f (t : tree) =
+let rec find_last (f : key -> bool) (t : TREE) : ELT =
   match VIEW(t) with
   | LEAF ->
       raise Not_found
-  | NODE(l, v, r) ->
-      if f v then
+  | NODE(l, v, r)
+      if f (GET_KEY(v)) then
         find_last_aux v f r
       else
         find_last f l
 
-let rec find_last_opt_aux v0 f (t : tree) =
+let rec find_last_opt_aux (v0 : ELT) (f : key -> bool) (t : TREE) : ELT option =
   match VIEW(t) with
   | LEAF ->
       Some v0
-  | NODE(l, v, r) ->
-      if f v then
+  | NODE(l, v, r)
+      if f (GET_KEY(v)) then
         find_last_opt_aux v f r
       else
         find_last_opt_aux v0 f l
 
-let rec find_last_opt f (t : tree) =
+let rec find_last_opt (f : key -> bool) (t : TREE) : ELT option =
   match VIEW(t) with
   | LEAF ->
       None
-  | NODE(l, v, r) ->
-      if f v then
+  | NODE(l, v, r)
+      if f (GET_KEY(v)) then
         find_last_opt_aux v f r
       else
         find_last_opt f l

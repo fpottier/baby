@@ -1,0 +1,5 @@
+(library
+  (name helpers)
+  (libraries monolith)
+  (enabled_if (= %{profile} dev))
+)

@@ -1,16 +1,69 @@
 # To Do
 
-# Later
+# Before the next release
 
-* Implement maps on top of sets,
-  without an indirection,
-  and without code duplication.
+* The new version of `cppo` (with `#scope`) is needed.
+  Place a suitable version constraint in `dune-project`.
+
+# Benchmark and minor optimizations
+
+* Create a cleaner benchmark,
+  which tests many sizes,
+  and produces visual output,
+  as in `hachis`.
+
+* Benchmark (some operations on) maps.
+  Compare with OCaml's standard library.
+
+* In `xor`, the singleton case can be optimized.
+
+* In `union` (map variant), perhaps the special case where `t2` is a singleton
+  is not useful, as it is unlikely to be exercised (and it does not exist in
+  the set variant).
+
+* Test `iter` and `fold` and `map` and `mapi`.
+  Test that the keys are yielded in increasing order
+  (when this is guaranteed by the spec).
+
+* Check where `[@tail_mod_cons]` might be used. Benchmark it.
+
+* Extend `of_sorted_unique_array_slice` to go beyond size 3 (`tripleton`).
+  Benchmark and find out whether this makes a difference in performance.
+
+* In the set variant,
+  when `union` calls `add` (in the singleton case),
+  we already have a singleton tree at hand,
+  so we could pass it to `add`
+  in the hope of saving one allocation.
+
+* Every time we call `join_siblings`, we recompute balancing information that
+  we already have. (The one exception is `of_sorted_unique_array_slice`.)
+  Could we avoid this by passing a witness (the balancing information)?
+  This would require exposing the balancing information in the type `view`
+  and in variants of the view macro (`NODE`, etc.).
+
+# New Operations
+
+* In `union` on maps,
+  do we want a specialized monomorphic variant
+  that preserves sharing (as does `union` on sets)?
+
+* In `union` on maps,
+  do we want a more efficient variant (say `fusion`)
+  where `f` has type `'a -> 'a -> 'a`?
+
+* In `inter` (map variant),
+  if `f` returns its second argument, we get `restrict m1 m2`,
+  which restricts `m2` to the domain of `m1`.
+  Should we document this fact?
+  Should we define `restrict` as a specialized version of `inter`
+  and publish it?
+
+# Maybe Later
 
 * Explore parallel computation on top of `domainslib`.
   Make `of_array` parallel.
   Add `reduce` and `map_reduce`.
-
-# Maybe Later
 
 * In `Weight.cppo.ml`, clarify the precondition of `balance_right_heavy`.
   Wassel Bousmaha's work contains the answer.
@@ -21,10 +74,6 @@
 * Implement `extract_min` as a thin wrapper on top of
   `min_elt` and `remove_min_elt`. (Also `extract_max`.)
   (Also `extract_min_opt` and `extract_max_opt`.)
-
-* One might wish to expose `view`, `join`, and `join2` to the end user, so as
-  to allow her to define their own operations (with access to the tree
-  structure) if desired.
 
 * Blelloch et al. discuss multi-insert and multi-delete operations, which
   insert or remove an array of elements at once. These can be simulated by

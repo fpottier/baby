@@ -24,12 +24,12 @@
    preferable to just use [to_array], which has linear time complexity,
    followed with [Array.get]. *)
 
-let rec get (t : tree) (i : int) : key =
+let rec get (t : TREE) (i : int) : ELT =
   assert (0 <= i && i < cardinal t);
   match VIEW(t) with
   | LEAF ->
       assert false
-  | NODE(l, v, r) ->
+  | NODE(l, v, r)
       let cl = cardinal l in
       if i = cl then
         v
@@ -38,7 +38,7 @@ let rec get (t : tree) (i : int) : key =
       else
         get r (i - (cl + 1))
 
-let get (t : tree) (i : int) : key =
+let get (t : TREE) (i : int) : ELT =
   if constant_time_cardinal then
     if 0 <= i && i < cardinal t then
       get t i
@@ -63,12 +63,12 @@ let get (t : tree) (i : int) : key =
    this seems pointless. The user can implement this function using an
    enumeration, if she so wishes. *)
 
-let rec index (i : int) (x : key) (t : tree) : int =
+let rec index (i : int) (x : key) (t : TREE) : int =
   match VIEW(t) with
   | LEAF ->
       raise Not_found
-  | NODE(l, v, r) ->
-      let c = E.compare x v in
+  | NODE(l, v, r)
+      let c = E.compare x (GET_KEY(v)) in
       if c < 0 then
         index i x l
       else
@@ -91,7 +91,7 @@ let index x t =
 
 (* Splitting by index -- in two parts. *)
 
-let rec cut (t : tree) (i : int) : tree * tree =
+let rec cut (t : TREE) (i : int) : TREE * TREE =
   assert (0 <= i && i <= cardinal t);
   if i = 0 then
     leaf, t
@@ -101,7 +101,7 @@ let rec cut (t : tree) (i : int) : tree * tree =
     match VIEW(t) with
     | LEAF ->
         assert false
-    | NODE(l, v, r) ->
+    | NODE(l, v, r)
         let cl = cardinal l in
         if i <= cl then
           let ll, lr = cut l i in
@@ -112,7 +112,7 @@ let rec cut (t : tree) (i : int) : tree * tree =
           assert (rl != r);
           join l v rl, rr
 
-let cut (t : tree) (i : int) : tree * tree =
+let cut (t : TREE) (i : int) : TREE * TREE =
   if constant_time_cardinal then
     if 0 <= i && i <= cardinal t then
       cut t i
@@ -127,12 +127,12 @@ let cut (t : tree) (i : int) : tree * tree =
 
 (* Splitting by index -- in three parts. *)
 
-let rec cut_and_get (t : tree) (i : int) : tree * key * tree =
+let rec cut_and_get (t : TREE) (i : int) : TREE * ELT * TREE =
   assert (0 <= i && i < cardinal t);
   match VIEW(t) with
   | LEAF ->
       assert false
-  | NODE(l, v, r) ->
+  | NODE(l, v, r)
       let cl = cardinal l in
       if i = cl then
         l, v, r
@@ -143,7 +143,7 @@ let rec cut_and_get (t : tree) (i : int) : tree * key * tree =
         let rl, rv, rr = cut_and_get r (i - (cl + 1)) in
         join l v rl, rv, rr
 
-let cut_and_get (t : tree) (i : int) : tree * key * tree =
+let cut_and_get (t : TREE) (i : int) : TREE * ELT * TREE =
   if constant_time_cardinal then
     if 0 <= i && i < cardinal t then
       cut_and_get t i

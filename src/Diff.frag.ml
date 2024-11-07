@@ -15,15 +15,15 @@
 (* Difference. *)
 
 (* This is a simple, elegant version of [diff]. This version splits the
-   tree [t1].
+   tree [t1]. (Set variant only.)
 
-let rec diff (t1 : tree) (t2 : tree) : tree =
+let rec diff (t1 : TREE) (t2 : TREE) : TREE =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
       leaf
   | _, LEAF ->
       t1
-  | NODE(_, _, _), NODE(l2, k2, r2) ->
+  | NODENODE(_, _, _, l2, k2, r2)
       let l1, r1 = split13 k2 t1 in
       let l = diff l1 l2
       and r = diff r1 r2 in
@@ -32,28 +32,32 @@ let rec diff (t1 : tree) (t2 : tree) : tree =
  *)
 
 (* This version of [diff] guarantees that if the result is equal to [t1]
-   then [t1] itself is returned. *)
+   then [t1] itself is returned. It splits the tree [t2]. *)
 
-let rec diff (t1 : tree) (t2 : tree) : tree =
+let rec diff (t1 : TREE) (t2 : TREE) : TREE =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
       leaf
   | _, LEAF ->
       t1
-  | NODE(l1, k1, r1), NODE(l2, k2, r2) ->
+  | NODENODE(l1, v1, r1, l2, v2, r2)
+      let k1 = GET_KEY(v1) in
+#ifndef MAP_VARIANT
       if t1 == t2 then leaf else (* fast path *)
+#endif
       if BOTH_EMPTY(l1, r1) then
-        (* [t1] is [singleton k1]. *)
+        (* [t1] is [singleton v1]. *)
         if mem k1 t2 then leaf else t1
       else if BOTH_EMPTY(l2, r2) then
-        (* [t2] is [singleton k2]. *)
+        (* [t2] is [singleton v2]. *)
+        let k2 = GET_KEY(v2) in
         remove k2 t1
       else
         let l2, b, r2 = split k1 t2 in
         let l = diff l1 l2
         and r = diff r1 r2 in
-        if b then
+        IF(b)
           join2 l r
-        else
+        ELSE
           if l == l1 && r == r1 then t1 else (* preserve sharing *)
-          join l k1 r
+          join l v1 r

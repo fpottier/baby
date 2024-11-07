@@ -2,9 +2,32 @@
 
 ## 2024/MM/DD
 
+* The library now offers both sets and maps.
+  The modules `Baby.H.Set` and `Baby.W.Set` continue to exist,
+    and are compatible with OCaml's `Set` library.
+  The modules `Baby.H.Map` and `Baby.W.Map` appear,
+    and are compatible with OCaml's `Set` library.
+  Furthermore,
+  the functors `Baby.H.Make` and `Baby.W.Make` appear.
+  These functors produce a module that contains sets, maps,
+  and two conversion functions between sets and maps,
+  namely `domain` and `lift`.
+
 * Incompatible changes:
-  + The signature `CORE` has changed.
-  + The signature of the functor `Baby.Make` has changed.
+  + The modules `Baby.H.Set.Int` and `Baby.W.Set.Int` have been removed.
+    This makes the library simpler and smaller.
+    Use `Baby.H.Set.Make(Int)` and `Baby.W.Set.Make(Int)` instead.
+    With the `flambda` OCaml compiler, there is no difference in performance.
+  + The functor `Baby.Make` has been renamed `Baby.Custom`,
+    and its signature has changed. It now requires two
+    arguments whose signatures are `BASE_SET` and `BASE_MAP`.
+  + The signature `CORE` has been renamed to `BASE_SET`.
+    Furthermore, this signature has changed:
+    - the type `key` has been removed;
+    - the types `tree` and `view` are now parameterized;
+    - `join_weight_balanced` has been renamed to `join_siblings;
+    - `join_neighbors` has been renamed to `join_quasi_siblings`.
+  + The undocumented modules `Baby.Height` and `Baby.Weight` have been removed.
 
 * Documentation: in the signature `OrderedType`, clarify the specification
   of the function `compare`; this function decides a total preorder `≤`.
@@ -16,12 +39,6 @@
 
 * Documentation: update the documentation of `find` and `find_opt`
   in accordance with the previous point.
-
-* Bug: due to a copy-paste mistake, the submodule `Baby.H.Set.Int`
-  mistakenly offered weight-balanced trees
-  instead of height-balanced trees.
-  Of course, this was not observable, except perhaps in terms of performance.
-  Fixed.
 
 ## 2024/06/19
 

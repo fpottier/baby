@@ -11,6 +11,18 @@
 (******************************************************************************)
 
 open Monolith
+open Helpers
+
+(* TODO
+(* In order to detect an unintentional use of [Stdlib.compare], we use
+   a nonstandard ordering on keys: the reverse of the usual ordering. *)
+module Key = struct
+  type t = int
+  let compare x y = - (Int.compare x y)
+end
+
+let increasing, decreasing = decreasing, increasing
+*)
 
 (* This is the reference implementation. *)
 module R = Reference.Make(Int)
@@ -20,89 +32,176 @@ module R = Reference.Make(Int)
    of these libraries offer a module named [Candidate]. *)
 module C = struct
 
-  include Candidate
+  module Set = struct
 
-  (* Wrap some of the candidate functions with extra runtime checks. *)
+    include Candidate.Set
 
-  (* [diff] guarantees that if the result is logically equal to [t1]
-     then it is physically equal to [t1]. This holds regardless of
-     which balancing criterion is used. *)
+    (* Wrap some of the candidate functions with extra runtime checks. *)
 
-  let[@inline] diff t1 t2 =
-    let result = diff t1 t2 in
-    if equal result t1 then assert (result == t1);
-    result
+    (* [diff] guarantees that if the result is logically equal to [t1]
+       then it is physically equal to [t1]. This holds regardless of
+       which balancing criterion is used. *)
 
-  (* [add] and [remove] offers similar guarantees. *)
+    let diff t1 t2 =
+      let result = diff t1 t2 in
+      if equal result t1 then assert (result == t1);
+      result
 
-  let[@inline] add x t =
-    let result = add x t in
-    if mem x t then assert (result == t);
-    result
+    (* [add] and [remove] offers similar guarantees. *)
 
-  let[@inline] remove x t =
-    let result = remove x t in
-    if not (mem x t) then assert (result == t);
-    result
+    let add x t =
+      let result = add x t in
+      if mem x t then assert (result == t);
+      result
+
+    let remove x t =
+      let result = remove x t in
+      if not (mem x t) then assert (result == t);
+      result
+
+    (* [union] and [inter] guarantee that if the result is logically equal to
+       one of the arguments then it is physically equal to one of the
+       arguments. *)
+
+    (* This guarantee holds for weight-balanced trees, but not for
+       height-balanced trees; indeed, a reliable way of comparing the
+       cardinals of the two sets is needed. *)
+
+    let union t1 t2 =
+      let result = union t1 t2 in
+      if Candidate.weight_balanced && (equal result t1 || equal result t2) then
+        assert (result == t1 || result == t2);
+      result
+
+    let inter t1 t2 =
+      let result = inter t1 t2 in
+      if Candidate.weight_balanced && (equal result t1 || equal result t2) then
+        assert (result == t1 || result == t2);
+      result
+
+  end
+
+  module Map = struct
+
+    include Candidate.Map
+
+    let oeqeq (od : 'a option) (v' : 'a) =
+      match od with
+      | None ->
+          false
+      | Some v ->
+          v == v'
+
+    (* Wrap some of the candidate functions with extra runtime checks. *)
+
+    (* [add] guarantees that if the new value is physically equal to the
+       previous value then the new map is physically equal to the old map. *)
+
+    let add k v m =
+      let od = find_opt k m in
+      let result = add k v m in
+      if oeqeq od v then assert (result == m);
+      result
+
+    (* [remove x m] guarantees that if the result is equal to [m]
+       then it is physically equal to [m]. *)
+
+    let remove x m =
+      let result = remove x m in
+      if equal (=) result m then assert (result == m);
+      result
+
+    (* [diff] guarantees that if the result is logically equal to [t1]
+       then it is physically equal to [t1]. *)
+
+    let diff t1 t2 =
+      let result = diff t1 t2 in
+      if equal (=) result t1 then assert (result == t1);
+      result
+
+    (* [union] claims to be a special case of [merge]. *)
+
+    let union_via_merge f m1 m2 =
+      let f' key ov1 ov2 =
+        match ov1, ov2 with
+        | None, None ->
+            None
+        | Some v, None
+        | None, Some v ->
+            Some v
+        | Some v1, Some v2 ->
+            f key v1 v2
+      in
+      merge f' m1 m2
+
+    let union f m1 m2 =
+      let obtained = union f m1 m2 in
+      let expected = union_via_merge f m1 m2 in
+      assert (equal (=) obtained expected);
+      obtained
+
+    (* [inter] claims to be a special case of [merge]. *)
+
+    let inter_via_merge f m1 m2 =
+      let f' key ov1 ov2 =
+        match ov1, ov2 with
+        | Some v1, Some v2 ->
+            f key v1 v2
+        | _, _ ->
+            None
+      in
+      merge f' m1 m2
+
+    let inter f m1 m2 =
+      let obtained = inter f m1 m2 in
+      let expected = inter_via_merge f m1 m2 in
+      assert (equal (=) obtained expected);
+      obtained
+
+    (* [diff] claims to be a special case of [merge]. *)
+
+    let diff_via_merge m1 m2 =
+      let f _key ov1 ov2 =
+        match ov2 with
+        | None ->
+            ov1
+        | Some _ ->
+            None
+      in
+      merge f m1 m2
+
+    let diff m1 m2 =
+      let obtained = diff m1 m2 in
+      let expected = diff_via_merge m1 m2 in
+      assert (equal (=) obtained expected);
+      obtained
+
+    (* [xor] claims to be a special case of [merge]. *)
+
+    let xor_via_merge m1 m2 =
+      let f _key ov1 ov2 =
+        match ov1, ov2 with
+        | Some v, None
+        | None, Some v ->
+            Some v
+        | Some _, Some _
+        | None, None ->
+            None
+      in
+      merge f m1 m2
+
+    let xor m1 m2 =
+      let obtained = xor m1 m2 in
+      let expected = xor_via_merge m1 m2 in
+      assert (equal (=) obtained expected);
+      obtained
+
+  end
+
+  let domain = Candidate.domain
+  let lift = Candidate.lift
 
 end
-
-(* -------------------------------------------------------------------------- *)
-
-(* A Monolith combinator for arrays. *)
-
-let constructible_array spec =
-  map_outof
-    Array.of_list
-    (Array.of_list, constant "Array.of_list")
-    (list spec)
-
-let deconstructible_array spec =
-  map_into
-    Array.to_list
-    (Array.to_list, constant "Array.to_list")
-    (list spec)
-
-let array spec =
-  ifpol
-    (constructible_array spec)
-    (deconstructible_array spec)
-
-(* -------------------------------------------------------------------------- *)
-
-(* A Monolith combinator for triples. *)
-
-let unnest (x, (y, z)) =
-  (x, y, z)
-
-let nest (x, y, z) =
-  (x, (y, z))
-
-let constructible_triple spec1 spec2 spec3 =
-  map_outof
-    unnest
-    (unnest, constant "unnest")
-    (spec1 *** (spec2 *** spec3))
-
-let deconstructible_triple spec1 spec2 spec3 =
-  map_into
-    nest
-    (nest, constant "nest")
-    (spec1 *** (spec2 *** spec3))
-
-let triple spec1 spec2 spec3 =
-  ifpol
-    (constructible_triple spec1 spec2 spec3)
-    (deconstructible_triple spec1 spec2 spec3)
-
-(* -------------------------------------------------------------------------- *)
-
-(* Testing that sharing is preserved. *)
-
-let must_preserve_sharing f s =
-  let s' = f s in
-  assert (s == s');
-  s'
 
 (* -------------------------------------------------------------------------- *)
 
@@ -111,19 +210,20 @@ let must_preserve_sharing f s =
 (* This type is equipped with a well-formedness check,
    which ignores the model (the reference side). *)
 
-let check _model =
-  C.check,
-  constant "check"
-
 let set =
+  let check _model = C.Set.check, constant "Set.check" in
   declare_abstract_type ~check ()
 
 (* -------------------------------------------------------------------------- *)
 
-(* The abstract type [enum] *)
+(* The abstract type [map]. *)
 
-let enum =
-  declare_abstract_type ()
+(* This type is equipped with a well-formedness check,
+   which ignores the model (the reference side). *)
+
+let map =
+  let check _model = C.Map.check, constant "Map.check" in
+  declare_abstract_type ~check ()
 
 (* -------------------------------------------------------------------------- *)
 
@@ -137,13 +237,43 @@ let range =
 let elt =
   semi_open_interval (-range) (range-1)
 
+let key =
+  elt
+
 (* -------------------------------------------------------------------------- *)
 
-(* An element can also be drawn out of a set. *)
+(* The concrete type [value]. *)
 
-let inhabits s =
+(* Our values are integer values, drawn from a fixed interval. *)
+
+let range =
+  1 lsl 8
+
+let value =
+  semi_open_interval (-range) (range-1)
+
+(* -------------------------------------------------------------------------- *)
+
+(* The concrete type [binding] is defined as a key-value pair. *)
+
+(* It is both constructible and deconstructible. *)
+
+let binding =
+  key *** value
+
+(* -------------------------------------------------------------------------- *)
+
+(* An element can be drawn out of a set. *)
+
+(* This code is a hack. It is based on the reference implementation, which
+   does not support random access. We pick a random key [k] between the
+   minimum and maximum keys. If [k] exists in the tree, we return [k].
+   Otherwise, we return the next key; this is done by splitting the tree
+   based on [k] and returning the minimum key of the right-hand subtree. *)
+
+let inhabits_set s =
   int_within @@ fun () ->
-    let open R in
+    let open R.Set in
     let open Gen in
     if is_empty s then reject() else
     let x = min_elt s
@@ -154,278 +284,567 @@ let inhabits s =
     assert (mem z s);
     z
 
+let inhabits_map m =
+  int_within @@ fun () ->
+    let open R.Map in
+    let open Gen in
+    if is_empty m then reject() else
+    let x, _ = min_binding m
+    and y, _ = max_binding m in
+    let k = x + Random.int (y - x + 1) in
+    if mem k m then k else
+    let _, ov, r = split k m in
+    assert (ov = None);
+    let z = fst (min_binding r) in
+    assert (mem z m);
+    z
+
 (* -------------------------------------------------------------------------- *)
 
-(* The abstract type of sequences of elements. *)
-
-let seq_elt =
-  declare_seq elt
-
-(* -------------------------------------------------------------------------- *)
-
-(* An operation of type [elt -> set -> _], such as [add], [remove], [mem],
-   [find], etc., is tested both with arbitrary elements and specifically
-   with elements that are members of the set. *)
+(* An operation of type [elt -> set -> result], such as [add], [remove],
+   [mem], [find], etc., is tested both with arbitrary elements and
+   specifically with elements of the set. *)
 
 (* [result] is the result type; [name], [r], [c] are the name of the function,
    the reference implementation, and the candidate implementation. *)
 
-let flip f x y =
-  f y x
+(* [flag] indicates whether this operation:
+   - may fail when the key is not a member of the set, or
+   - cannot fail. *)
 
-let declare_elt_set_function result name r c =
-  let spec = elt ^> set ^> result in
-  declare name spec r c;
-  let spec = set ^>> fun s -> (inhabits s) ^> result in
-  declare ("flip " ^ name) spec (flip r) (flip c)
+let declare_elt_set_function flag result name r c =
 
-let declare_elt_set_function_may_fail_if_absent result name r c =
-  let spec = elt ^> set ^!> result in
+  (* First, test with arbitrary keys. *)
+  let spec =
+    match flag with
+    | `MayFailWhenAbsentKey ->
+        elt ^> set ^!> result
+    | `CannotFail ->
+        elt ^> set ^> result
+          (* One might wish to use [^!>] here as well,
+             as it is an over-approximation of the true spec.
+             However a limitation in Monolith (20230604) prevents
+             the use of [^!>] with complex result types. *)
+  in
   declare name spec r c;
-  let spec = set ^>> fun s -> (inhabits s) ^> result in
-  declare ("flip " ^ name) spec (flip r) (flip c)
+
+  (* Second, test with keys that are drawn from the set. Exceptions are not
+     allowed in this case. *)
+  let spec = flip (set ^>> fun s -> (inhabits_set s) ^> result) in
+  declare name spec r c
+
+(* Like above, for operations of type [key -> map -> result]. *)
+
+let declare_key_map_function flag result name r c =
+  let spec =
+    match flag with
+    | `MayFailWhenAbsentKey ->
+        key ^> map ^!> result
+    | `CannotFail ->
+        key ^> map ^> result
+  in
+  declare name spec r c;
+  let spec = flip (map ^>> fun m -> (inhabits_map m) ^> result) in
+  declare name spec r c
+
+(* Like above, for operations of type [key -> foo -> map -> result]. *)
+
+let declare_key_foo_map_function flag foo result name r c =
+  let spec =
+    match flag with
+    | `MayFailWhenAbsentKey ->
+        key ^> foo ^> map ^!> result
+    | `CannotFail ->
+        key ^> foo ^> map ^> result
+  in
+  declare name spec r c;
+  let spec = rot3 (map ^>> fun m -> (inhabits_map m) ^> foo ^> result) in
+  declare name spec r c
 
 (* -------------------------------------------------------------------------- *)
 
-(* Declare the operations. *)
+(* Declare the operations on sets. *)
 
 let () =
 
   (* Section 1: constructing sets. *)
 
   let spec = set in
-  declare "empty" spec R.empty C.empty;
+  declare "Set.empty" spec R.Set.empty C.Set.empty;
 
   let spec = elt ^> set in
-  declare "singleton" spec R.singleton C.singleton;
+  declare "Set.singleton" spec R.Set.singleton C.Set.singleton;
 
-  declare_elt_set_function set "add" R.add C.add;
+  declare_elt_set_function `CannotFail set
+    "Set.add" R.Set.add C.Set.add;
 
-  declare_elt_set_function set "remove" R.remove C.remove;
+  declare_elt_set_function `CannotFail set
+    "Set.remove" R.Set.remove C.Set.remove;
 
   let spec = set ^!> set in
-  declare "remove_min_elt" spec R.remove_min_elt C.remove_min_elt;
+  declare "Set.remove_min_elt" spec R.Set.remove_min_elt C.Set.remove_min_elt;
 
   let spec = set ^!> set in
-  declare "remove_max_elt" spec R.remove_max_elt C.remove_max_elt;
+  declare "Set.remove_max_elt" spec R.Set.remove_max_elt C.Set.remove_max_elt;
 
   let spec = set ^> set ^> set in
-  declare "union" spec R.union C.union;
+  declare "Set.union" spec R.Set.union C.Set.union;
 
   let spec = set ^> set ^> set in
-  declare "inter" spec R.inter C.inter;
+  declare "Set.inter" spec R.Set.inter C.Set.inter;
 
   let spec = set ^> set ^> set in
-  declare "diff" spec R.diff C.diff;
+  declare "Set.diff" spec R.Set.diff C.Set.diff;
 
   let spec = set ^> set ^> set in
-  declare "xor" spec R.xor C.xor;
+  declare "Set.xor" spec R.Set.xor C.Set.xor;
 
-  declare_elt_set_function (triple set bool set) "split" R.split C.split;
+  declare_elt_set_function `CannotFail (triple set bool set)
+    "Set.split" R.Set.split C.Set.split;
 
   (* Section 2: querying sets. *)
 
   let spec = set ^> bool in
-  declare "is_empty" spec R.is_empty C.is_empty;
+  declare "Set.is_empty" spec R.Set.is_empty C.Set.is_empty;
 
   let spec = set ^!> elt in
-  declare "min_elt" spec R.min_elt C.min_elt;
+  declare "Set.min_elt" spec R.Set.min_elt C.Set.min_elt;
 
   let spec = set ^!> option elt in
-  declare "min_elt_opt" spec R.min_elt_opt C.min_elt_opt;
+  declare "Set.min_elt_opt" spec R.Set.min_elt_opt C.Set.min_elt_opt;
 
   let spec = set ^!> elt in
-  declare "max_elt" spec R.max_elt C.max_elt;
+  declare "Set.max_elt" spec R.Set.max_elt C.Set.max_elt;
 
   let spec = set ^!> option elt in
-  declare "max_elt_opt" spec R.max_elt_opt C.max_elt_opt;
+  declare "Set.max_elt_opt" spec R.Set.max_elt_opt C.Set.max_elt_opt;
 
   (* not tested: [choose], [choose_opt] *)
 
-  declare_elt_set_function bool "mem" R.mem C.mem;
+  declare_elt_set_function `CannotFail bool
+    "Set.mem" R.Set.mem C.Set.mem;
 
-  declare_elt_set_function_may_fail_if_absent elt "find" R.find C.find;
+  declare_elt_set_function `MayFailWhenAbsentKey elt
+    "Set.find" R.Set.find C.Set.find;
 
-  declare_elt_set_function (option elt) "find_opt" R.find_opt C.find_opt;
-
-  let spec = set ^> set ^> bool in
-  declare "disjoint" spec R.disjoint C.disjoint;
-
-  let spec = set ^> set ^> bool in
-  declare "subset" spec R.subset C.subset;
+  declare_elt_set_function `CannotFail (option elt)
+    "Set.find_opt" R.Set.find_opt C.Set.find_opt;
 
   let spec = set ^> set ^> bool in
-  declare "equal" spec R.equal C.equal;
+  declare "Set.disjoint" spec R.Set.disjoint C.Set.disjoint;
+
+  let spec = set ^> set ^> bool in
+  declare "Set.subset" spec R.Set.subset C.Set.subset;
+
+  let spec = set ^> set ^> bool in
+  declare "Set.equal" spec R.Set.equal C.Set.equal;
 
   let spec = set ^> set ^> int in
-  declare "compare" spec R.compare C.compare;
+  declare "Set.compare" spec R.Set.compare C.Set.compare;
 
   let spec = set ^> int in
-  declare "cardinal" spec R.cardinal C.cardinal;
+  declare "Set.cardinal" spec R.Set.cardinal C.Set.cardinal;
 
   (* Section 3: conversions to and from sets. *)
+
+  let seq_elt = declare_seq elt in
 
   (* [of_list] is important in this test because it offers a cheap way
      of creating nontrivial sets. It consumes just one unit of fuel. *)
   let spec = list elt ^> set in
-  declare "of_list" spec R.of_list C.of_list;
-
-  let spec = set ^> list elt in
-  declare "elements" spec R.elements C.elements;
+  declare "Set.of_list" spec R.Set.of_list C.Set.of_list;
 
   (* [to_list] is a synonym for [elements]. *)
 
+  let spec = set ^> list elt in
+  declare "Set.elements" spec R.Set.elements C.Set.elements;
+
   let spec = array elt ^> set in
-  declare "of_array" spec R.of_array C.of_array;
+  declare "Set.of_array" spec R.Set.of_array C.Set.of_array;
 
   let spec = set ^> array elt in
-  declare "to_array" spec R.to_array C.to_array;
+  declare "Set.to_array" spec R.Set.to_array C.Set.to_array;
 
   let spec = seq_elt ^> set in
-  declare "of_seq" spec R.of_seq C.of_seq;
+  declare "Set.of_seq" spec R.Set.of_seq C.Set.of_seq;
 
   let spec = seq_elt ^> set ^> set in
-  declare "add_seq" spec R.add_seq C.add_seq;
+  declare "Set.add_seq" spec R.Set.add_seq C.Set.add_seq;
 
   let spec = set ^> seq_elt in
-  declare "to_seq" spec R.to_seq C.to_seq;
+  declare "Set.to_seq" spec R.Set.to_seq C.Set.to_seq;
 
   let spec = elt ^> set ^> seq_elt in
-  declare "to_seq_from" spec R.to_seq_from C.to_seq_from;
+  declare "Set.to_seq_from" spec R.Set.to_seq_from C.Set.to_seq_from;
 
   let spec = set ^> seq_elt in
-  declare "to_rev_seq" spec R.to_rev_seq C.to_rev_seq;
+  declare "Set.to_rev_seq" spec R.Set.to_rev_seq C.Set.to_rev_seq;
 
   (* Section 4: iterating, searching, transforming sets. *)
 
   (* not tested: [iter] *)
   (* not tested: [fold] *)
-  (* not tested: [for_all] *)
-  (* not tested: [exists] *)
 
-  (* [find_first] is applied specifically to the function [(<=) 0]. *)
-  let spec = set ^!> elt in
-  declare "find_first ((<=) 0)" spec
-    (R.find_first ((<=) 0))
-    (C.find_first ((<=) 0));
+  let spec = predicate ^> set ^> bool in
+  declare "Set.for_all" spec R.Set.for_all C.Set.for_all;
 
-  let spec = set ^> option elt in
-  declare "find_first_opt ((<=) 0)" spec
-    (R.find_first_opt ((<=) 0))
-    (C.find_first_opt ((<=) 0));
+  let spec = predicate ^> set ^> bool in
+  declare "Set.exists" spec R.Set.exists C.Set.exists;
 
-  let spec = set ^!> elt in
-  declare "find_last ((>=) 0)" spec
-    (R.find_last ((>=) 0))
-    (C.find_last ((>=) 0));
+  let spec = increasing ^> set ^!> elt in
+  declare "Set.find_first" spec R.Set.find_first C.Set.find_first;
 
-  let spec = set ^> option elt in
-  declare "find_last_opt ((>=) 0)" spec
-    (R.find_last_opt ((>=) 0))
-    (C.find_last_opt ((>=) 0));
+  let spec = increasing ^> set ^> option elt in
+  declare "Set.find_first_opt" spec R.Set.find_first_opt C.Set.find_first_opt;
 
-  (* [map] is tested in three different scenarios: applied to the identity;
-     applied to a monotonically increasing function; applied to an arbitrary
-     function. In the first scenario, we check that sharing is preserved. *)
+  let spec = decreasing ^> set ^!> elt in
+  declare "Set.find_last" spec R.Set.find_last C.Set.find_last;
 
-  let spec = set ^> set in
-  let f = Fun.id in
-  declare "map Fun.id" spec (R.map f) (must_preserve_sharing (C.map f));
+  let spec = decreasing ^> set ^> option elt in
+  declare "Set.find_last_opt" spec R.Set.find_last_opt C.Set.find_last_opt;
 
-  let spec = set ^> set in
-  let f = succ in
-  declare "map succ" spec (R.map f) (C.map f);
+  (* When applied to the identity function, [map] must preserve sharing. *)
+  let spec = sharing (set ^> set) in
+  declare "(Set.map Fun.id)" spec (R.Set.map Fun.id) (C.Set.map Fun.id);
 
-  let spec = set ^> set in
-  let f = Int.neg in
-  declare "map Int.neg" spec (R.map f) (C.map f);
+  let spec = transformation ^> set ^> set in
+  declare "Set.map" spec R.Set.map C.Set.map;
 
-  let spec = set ^> set in
-  let p _ = true in
-  declare "filter (fun _ -> true)" spec
-    (R.filter p) (must_preserve_sharing (C.filter p));
+  (* When applied to [always], [filter] must preserve sharing. *)
+  let spec = sharing (set ^> set) in
+  declare "(Set.filter always)" spec (R.Set.filter always) (C.Set.filter always);
 
-  let spec = set ^> set in
-  let p x = x mod 2 = 0 in
-  declare "filter (fun x -> x mod 2 = 0)" spec
-    (R.filter p) (C.filter p);
+  let spec = predicate ^> set ^> set in
+  declare "Set.filter" spec R.Set.filter C.Set.filter;
 
-  let spec = set ^> set in
-  let f x = Some x in
-  declare "filter_map (fun x -> Some x)"
-    spec (R.filter_map f) (must_preserve_sharing (C.filter_map f));
+  (* When applied to [keep], [filter_map] must preserve sharing. *)
+  let spec = sharing (set ^> set) in
+  declare "(Set.filter_map keep)" spec (R.Set.filter_map keep) (C.Set.filter_map keep);
 
-  let spec = set ^> set in
-  let f x = if x mod 2 = 0 then Some (x + 1) else None in
-  declare
-    "filter_map (fun x -> if x mod 2 = 0 then Some (x + 1) else None) "
-    spec (R.filter_map f) (C.filter_map f);
+  let spec = otransformation ^> set ^> set in
+  declare "Set.filter_map" spec R.Set.filter_map C.Set.filter_map;
 
-  let spec = set ^> set in
-  let f x = if x mod 2 = 0 then Some (-x) else None in
-  declare
-    "filter_map (fun x -> if x mod 2 = 0 then Some (-x) else None) "
-    spec (R.filter_map f) (C.filter_map f);
-
-  let spec = set ^> set *** set in
-  let p x = x mod 2 = 0 in
-  declare "partition (fun x -> x mod 2 = 0)" spec
-    (R.partition p) (C.partition p);
+  let spec = predicate ^> set ^> set *** set in
+  declare "Set.partition" spec R.Set.partition C.Set.partition;
 
   (* Section 5: random access. *)
 
-  if C.has_random_access_functions then begin
+  if Candidate.has_random_access_functions then begin
 
-    let spec = set ^>> fun s -> lt (R.cardinal s) ^> elt in
-    declare "get" spec R.get C.get;
+    let spec = set ^>> fun s -> lt (R.Set.cardinal s) ^> elt in
+    declare "Set.get" spec R.Set.get C.Set.get;
 
-    declare_elt_set_function_may_fail_if_absent int "index" R.index C.index;
+    declare_elt_set_function `MayFailWhenAbsentKey int
+      "Set.index" R.Set.index C.Set.index;
 
-    let spec = set ^>> fun s -> le (R.cardinal s) ^> set *** set in
-    declare "cut" spec R.cut C.cut;
+    let spec = set ^>> fun s -> le (R.Set.cardinal s) ^> set *** set in
+    declare "Set.cut" spec R.Set.cut C.Set.cut;
 
-    let spec = set ^>> fun s -> lt (R.cardinal s) ^> triple set elt set in
-    declare "cut_and_get" spec R.cut_and_get C.cut_and_get;
+    let spec = set ^>> fun s -> lt (R.Set.cardinal s) ^> triple set elt set in
+    declare "Set.cut_and_get" spec R.Set.cut_and_get C.Set.cut_and_get;
 
   end;
 
   (* Section 6: enumerations. *)
 
+  let enum = declare_abstract_type () in
+
   let spec = enum in
-  declare "Enum.empty" spec R.Enum.empty C.Enum.empty;
+  declare "Set.Enum.empty" spec R.Set.Enum.empty C.Set.Enum.empty;
 
   let spec = enum ^> bool in
-  declare "Enum.is_empty" spec R.Enum.is_empty C.Enum.is_empty;
+  declare "Set.Enum.is_empty" spec R.Set.Enum.is_empty C.Set.Enum.is_empty;
 
   let spec = set ^> enum in
-  declare "Enum.enum" spec R.Enum.enum C.Enum.enum;
+  declare "Set.Enum.enum" spec R.Set.Enum.enum C.Set.Enum.enum;
 
   let spec = elt ^> set ^> enum in
-  declare "Enum.from_enum" spec R.Enum.from_enum C.Enum.from_enum;
+  declare "Set.Enum.from_enum" spec R.Set.Enum.from_enum C.Set.Enum.from_enum;
 
   let spec = enum ^!> elt in
-  declare "Enum.head" spec R.Enum.head C.Enum.head;
+  declare "Set.Enum.head" spec R.Set.Enum.head C.Set.Enum.head;
 
   let spec = enum ^!> enum in
-  declare "Enum.tail" spec R.Enum.tail C.Enum.tail;
+  declare "Set.Enum.tail" spec R.Set.Enum.tail C.Set.Enum.tail;
 
   let spec = enum ^> option elt in
-  declare "Enum.head_opt" spec R.Enum.head_opt C.Enum.head_opt;
+  declare "Set.Enum.head_opt" spec R.Set.Enum.head_opt C.Set.Enum.head_opt;
 
   let spec = enum ^> option enum in
-  declare "Enum.tail_opt" spec R.Enum.tail_opt C.Enum.tail_opt;
+  declare "Set.Enum.tail_opt" spec R.Set.Enum.tail_opt C.Set.Enum.tail_opt;
 
   let spec = elt ^> enum ^> enum in
-  declare "Enum.from" spec R.Enum.from C.Enum.from;
+  declare "Set.Enum.from" spec R.Set.Enum.from C.Set.Enum.from;
 
   let spec = enum ^> seq_elt in
-  declare "Enum.to_seq" spec R.Enum.to_seq C.Enum.to_seq;
+  declare "Set.Enum.to_seq" spec R.Set.Enum.to_seq C.Set.Enum.to_seq;
 
   let spec = enum ^> set in
-  declare "Enum.elements" spec R.Enum.elements C.Enum.elements;
+  declare "Set.Enum.elements" spec R.Set.Enum.elements C.Set.Enum.elements;
 
   let spec = enum ^> int in
-  declare "Enum.length" spec R.Enum.length C.Enum.length;
+  declare "Set.Enum.length" spec R.Set.Enum.length C.Set.Enum.length;
+
+  ()
+
+(* -------------------------------------------------------------------------- *)
+
+(* Declare the operations on maps. *)
+
+let () =
+
+  (* Section 1: constructing maps. *)
+
+  let spec = map in
+  declare "Map.empty" spec R.Map.empty C.Map.empty;
+
+  let spec = key ^> value ^> map in
+  declare "Map.singleton" spec R.Map.singleton C.Map.singleton;
+
+  declare_key_foo_map_function `CannotFail value map
+    "Map.add" R.Map.add C.Map.add;
+
+  declare_key_map_function `CannotFail map
+    "Map.remove" R.Map.remove C.Map.remove;
+
+  (* When applied to the identity, [update] must preserve sharing. *)
+  let spec = key ^> sharing (map ^> map) in
+  declare "(Fun.flip Map.update Fun.id)" spec
+    (Fun.flip R.Map.update Fun.id)
+    (Fun.flip C.Map.update Fun.id);
+
+  declare_key_foo_map_function `CannotFail ootransformation map
+    "Map.update" R.Map.update C.Map.update;
+
+  (* [add_to_list] cannot be tested because it operates on int list maps,
+     whereas this test code works with int maps. *)
+
+  let spec = map ^!> map in
+  declare "Map.remove_min_binding" spec R.Map.remove_min_binding C.Map.remove_min_binding;
+
+  let spec = map ^!> map in
+  declare "Map.remove_max_binding" spec R.Map.remove_max_binding C.Map.remove_max_binding;
+
+  let spec = combination ^> map ^> map ^> map in
+  declare "Map.union" spec R.Map.union C.Map.union;
+
+  let spec = combination ^> map ^> map ^> map in
+  declare "Map.inter" spec R.Map.inter C.Map.inter;
+
+  let spec = map ^> map ^> map in
+  declare "Map.diff" spec R.Map.diff C.Map.diff;
+
+  let spec = map ^> map ^> map in
+  declare "Map.xor" spec R.Map.xor C.Map.xor;
+
+  let spec = complex_combination ^> map ^> map ^> map in
+  declare "Map.merge" spec R.Map.merge C.Map.merge;
+
+  declare_key_map_function `CannotFail (triple map (option int) map)
+    "Map.split" R.Map.split C.Map.split;
+
+  (* Section 2: querying maps. *)
+
+  let spec = map ^> bool in
+  declare "Map.is_empty" spec R.Map.is_empty C.Map.is_empty;
+
+  let spec = map ^!> binding in
+  declare "Map.min_binding" spec R.Map.min_binding C.Map.min_binding;
+
+  let spec = map ^!> option binding in
+  declare "Map.min_binding_opt" spec R.Map.min_binding_opt C.Map.min_binding_opt;
+
+  let spec = map ^!> binding in
+  declare "Map.max_binding" spec R.Map.max_binding C.Map.max_binding;
+
+  let spec = map ^!> option binding in
+  declare "Map.max_binding_opt" spec R.Map.max_binding_opt C.Map.max_binding_opt;
+
+  (* not tested: [choose], [choose_opt] *)
+
+  declare_key_map_function `CannotFail bool
+    "Map.mem" R.Map.mem C.Map.mem;
+
+  declare_key_map_function `MayFailWhenAbsentKey value
+    "Map.find" R.Map.find C.Map.find;
+
+  declare_key_map_function `CannotFail (option value)
+    "Map.find_opt" R.Map.find_opt C.Map.find_opt;
+
+  let spec = map ^> map ^> bool in
+  declare "Map.disjoint" spec R.Map.disjoint C.Map.disjoint;
+
+  let spec = bordering ^> map ^> map ^> bool in
+  declare "Map.sub" spec R.Map.sub C.Map.sub;
+
+  let spec = bequality ^> map ^> map ^> bool in
+  declare "Map.equal" spec R.Map.equal C.Map.equal;
+
+  let spec = iordering ^> map ^> map ^> int in
+  declare "Map.compare" spec R.Map.compare C.Map.compare;
+
+  let spec = map ^> int in
+  declare "Map.cardinal" spec R.Map.cardinal C.Map.cardinal;
+
+  (* Section 3: conversions to and from maps. *)
+
+  let seq_binding = declare_seq binding in
+
+  (* [of_list] is important in this test because it offers a cheap way
+     of creating nontrivial maps. It consumes just one unit of fuel. *)
+  let spec = list binding ^> map in
+  declare "Map.of_list" spec R.Map.of_list C.Map.of_list;
+
+  let spec = map ^> list binding in
+  declare "Map.bindings" spec R.Map.bindings C.Map.bindings;
+
+  (* [to_list] is a synonym for [bindings]. *)
+
+  let spec = array binding ^> map in
+  declare "Map.of_array" spec R.Map.of_array C.Map.of_array;
+
+  let spec = map ^> array binding in
+  declare "Map.to_array" spec R.Map.to_array C.Map.to_array;
+
+  let spec = seq_binding ^> map in
+  declare "Map.of_seq" spec R.Map.of_seq C.Map.of_seq;
+
+  let spec = seq_binding ^> map ^> map in
+  declare "Map.add_seq" spec R.Map.add_seq C.Map.add_seq;
+
+  let spec = map ^> seq_binding in
+  declare "Map.to_seq" spec R.Map.to_seq C.Map.to_seq;
+
+  let spec = key ^> map ^> seq_binding in
+  declare "Map.to_seq_from" spec R.Map.to_seq_from C.Map.to_seq_from;
+
+  let spec = map ^> seq_binding in
+  declare "Map.to_rev_seq" spec R.Map.to_rev_seq C.Map.to_rev_seq;
+
+  (* Section 4: iterating, searching, transforming maps. *)
+
+  (* not tested: [iter] *)
+  (* not tested: [fold] *)
+
+  let spec = ipredicate ^> map ^> bool in
+  declare "Map.for_all" spec R.Map.for_all C.Map.for_all;
+
+  let spec = ipredicate ^> map ^> bool in
+  declare "Map.exists" spec R.Map.exists C.Map.exists;
+
+  let spec = increasing ^> map ^!> binding in
+  declare "Map.find_first" spec R.Map.find_first C.Map.find_first;
+
+  let spec = increasing ^> map ^> option binding in
+  declare "Map.find_first_opt" spec R.Map.find_first_opt C.Map.find_first_opt;
+
+  let spec = decreasing ^> map ^!> binding in
+  declare "Map.find_last" spec R.Map.find_last C.Map.find_last;
+
+  let spec = decreasing ^> map ^> option binding in
+  declare "Map.find_last_opt" spec R.Map.find_last_opt C.Map.find_last_opt;
+
+  (* We use pure functions, for simplicity, so we do not test that
+     [map] invokes [f] in the correct order (that is, by increasing
+     order of keys). *)
+
+  let spec = transformation ^> map ^> map in
+  declare "Map.map" spec R.Map.map C.Map.map;
+
+  let spec = itransformation ^> map ^> map in
+  declare "Map.mapi" spec R.Map.mapi C.Map.mapi;
+
+  (* When applied to [ialways], [filter] must preserve sharing. *)
+  let spec = sharing (map ^> map) in
+  declare "(Map.filter ialways)" spec
+    (R.Map.filter ialways) (C.Map.filter ialways);
+
+  let spec = ipredicate ^> map ^> map in
+  declare "Map.filter" spec R.Map.filter C.Map.filter;
+
+  let spec = iotransformation ^> map ^> map in
+  declare "Map.filter_map" spec R.Map.filter_map C.Map.filter_map;
+
+  let spec = ipredicate ^> map ^> map *** map in
+  declare "Map.partition" spec R.Map.partition C.Map.partition;
+
+  (* Section 5: random access. *)
+
+  if Candidate.has_random_access_functions then begin
+
+    let spec = map ^>> fun m -> lt (R.Map.cardinal m) ^> binding in
+    declare "Map.get" spec R.Map.get C.Map.get;
+
+    declare_key_map_function `MayFailWhenAbsentKey int
+      "Map.index" R.Map.index C.Map.index;
+
+    let spec = map ^>> fun s -> le (R.Map.cardinal s) ^> map *** map in
+    declare "Map.cut" spec R.Map.cut C.Map.cut;
+
+    let spec = map ^>> fun s -> lt (R.Map.cardinal s) ^> triple map binding map in
+    declare "Map.cut_and_get" spec R.Map.cut_and_get C.Map.cut_and_get;
+
+  end;
+
+  (* Section 6: enumerations. *)
+
+  let enum = declare_abstract_type () in
+
+  let spec = enum in
+  declare "Map.Enum.empty" spec R.Map.Enum.empty C.Map.Enum.empty;
+
+  let spec = enum ^> bool in
+  declare "Map.Enum.is_empty" spec R.Map.Enum.is_empty C.Map.Enum.is_empty;
+
+  let spec = map ^> enum in
+  declare "Map.Enum.enum" spec R.Map.Enum.enum C.Map.Enum.enum;
+
+  let spec = key ^> map ^> enum in
+  declare "Map.Enum.from_enum" spec R.Map.Enum.from_enum C.Map.Enum.from_enum;
+
+  let spec = enum ^!> binding in
+  declare "Map.Enum.head" spec R.Map.Enum.head C.Map.Enum.head;
+
+  let spec = enum ^!> enum in
+  declare "Map.Enum.tail" spec R.Map.Enum.tail C.Map.Enum.tail;
+
+  let spec = enum ^> option binding in
+  declare "Map.Enum.head_opt" spec R.Map.Enum.head_opt C.Map.Enum.head_opt;
+
+  let spec = enum ^> option enum in
+  declare "Map.Enum.tail_opt" spec R.Map.Enum.tail_opt C.Map.Enum.tail_opt;
+
+  let spec = key ^> enum ^> enum in
+  declare "Map.Enum.from" spec R.Map.Enum.from C.Map.Enum.from;
+
+  let spec = enum ^> seq_binding in
+  declare "Map.Enum.to_seq" spec R.Map.Enum.to_seq C.Map.Enum.to_seq;
+
+  let spec = enum ^> map in
+  declare "Map.Enum.elements" spec R.Map.Enum.elements C.Map.Enum.elements;
+
+  let spec = enum ^> int in
+  declare "Map.Enum.length" spec R.Map.Enum.length C.Map.Enum.length;
+
+  ()
+
+(* -------------------------------------------------------------------------- *)
+
+(* Declare the operations that involve both sets and maps. *)
+
+(* These operations are the reason why we test sets and maps together,
+   rather than separately. This has a cost, as we end up building many
+   scenarios that involve both sets and maps, even though, most of the
+   time, this will not help us find any bugs. But things are simpler
+   this way. *)
+
+let () =
+
+  let spec = map ^> set in
+  declare "domain" spec R.domain C.domain;
+
+  let spec = transformation ^> set ^> map in
+  declare "lift" spec R.lift C.lift;
 
   ()
 
@@ -434,12 +853,7 @@ let () =
 (* Start the engine! *)
 
 let () =
-  let prologue () =
-    dprintf "          open %s;;\n" C.name;
-    dprintf "          let flip f x y = f y x;;\n";
-    dprintf "          let unnest (x, (y, z)) = (x, y, z);;\n";
-    dprintf "          let nest (x, y, z) = (x, (y, z));;\n";
-    ()
-  in
+  dprintf "          open Helpers;;\n";
+  dprintf "          open %s;;\n" Candidate.name;
   let fuel = 16 in
-  main ~prologue fuel
+  main fuel

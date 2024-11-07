@@ -17,6 +17,11 @@
 let name =
   "Height_candidate.Candidate"
 
+(* Whether this candidate is weight-balanced. *)
+
+let weight_balanced =
+  false
+
 (* Whether the random access functions should be tested. *)
 
 let has_random_access_functions =
@@ -26,4 +31,4 @@ let has_random_access_functions =
 
 (* The candidate. *)
 
-include Baby.H.Set.Make(Int)
+include Baby.H.Make(Int)

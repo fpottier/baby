@@ -10,12 +10,12 @@
 (*                                                                            *)
 (******************************************************************************)
 
-let empty : tree =
+let empty : TREE =
   leaf
 
-let is_empty (t : tree) : bool =
+let is_empty (t : TREE) : bool =
   match VIEW(t) with
   | LEAF ->
       true
-  | NODE(_, _, _) ->
+  | NODE(_, _, _)
       false

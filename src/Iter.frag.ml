@@ -10,30 +10,30 @@
 (*                                                                            *)
 (******************************************************************************)
 
-let rec iter f (t : tree) =
+let rec iter f (t : TREE) =
   match VIEW(t) with
   | LEAF ->
       ()
-  | NODE(l, v, r) ->
-      iter f l; f v; iter f r
+  | NODE(l, v, r)
+      iter f l; CURRY(f, v); iter f r
 
-let rec fold f (t : tree) accu =
+let rec fold f (t : TREE) accu =
   match VIEW(t) with
   | LEAF ->
       accu
-  | NODE(l, v, r) ->
-      fold f r (f v (fold f l accu))
+  | NODE(l, v, r)
+      fold f r (CURRY3(f, v, fold f l accu))
 
-let rec for_all p (t : tree) =
+let rec for_all p (t : TREE) =
   match VIEW(t) with
   | LEAF ->
       true
-  | NODE(l, v, r) ->
-      p v && for_all p l && for_all p r
+  | NODE(l, v, r)
+      CURRY(p, v) && for_all p l && for_all p r
 
-let rec exists p (t : tree) =
+let rec exists p (t : TREE) =
   match VIEW(t) with
   | LEAF ->
       false
-  | NODE(l, v, r) ->
-      p v || exists p l || exists p r
+  | NODE(l, v, r)
+      CURRY(p, v) || exists p l || exists p r

@@ -25,52 +25,27 @@
 (** @inline *)
 include module type of Signatures
 
-(**The functor [Baby.Make] constructs balanced binary search trees
-   based on a user-supplied balancing scheme. The main operation that
-   the user is expected to provide is [join]. *)
-module Make
-(E : OrderedType)
-(_ : CORE)
-: SET with type elt = E.t
-
 (**The module [Baby.H] provides ready-made height-balanced binary
    search trees. *)
-module H : sig
-
-  module Set : sig
-    module type OrderedType = OrderedType
-    module type S = SET
-    module Make (E : OrderedType) : SET with type elt = E.t
-    module Int : SET with type elt = int
-  end
-
-end
+module H : SET_MAP
 
 (**The module [Baby.W] provides ready-made weight-balanced binary
    search trees. *)
-module W : sig
+module W : SET_MAP
 
-  module Set : sig
-    module type OrderedType = OrderedType
-    module type S = SET
-    module Make (E : OrderedType) : SET with type elt = E.t
-    module Int : SET with type elt = int
-  end
-
-end
+(**The functor [Baby.Custom] constructs balanced binary search trees
+   based on a user-supplied balancing scheme. *)
+module Custom (_ : BASE_SET) (_ : BASE_MAP) : SET_MAP
 
 (**/**)
 
 (* The following modules must be exported, because they are (or may be) used
    in the benchmarks. Because they are somewhat unlikely to be useful to an
-   end user, their existence is not advertised. *)
+   end user, and because they may change in th future, their existence is not
+   advertised. *)
 
-module Height : sig
-  (** @inline *)
-   include module type of Height
-end
+module HeightSet : BASE_SET
+module HeightMap : BASE_MAP
 
-module Weight : sig
-  (** @inline *)
-   include module type of Weight
-end
+module WeightSet : BASE_SET
+module WeightMap : BASE_MAP

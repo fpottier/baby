@@ -14,17 +14,64 @@ include Signatures
 
 (* -------------------------------------------------------------------------- *)
 
-(* The functor [Baby.Make] constructs balanced binary search trees
+(* The functor [Custom] constructs balanced binary search trees
    based on a user-supplied balancing scheme. *)
 
-module[@inline] Make
-(E : OrderedType)
-(T : CORE)
+module[@inline] Custom
+(BaseSet : BASE_SET)
+(BaseMap : BASE_MAP)
 = struct
-include T
 
-  #include "AbstractView.macros"
-  #include "UpperLayer.frag.ml"
+  module Set = struct
+    module type OrderedType = OrderedType
+    module type S = SET
+    module[@inline] Make (E : OrderedType) = struct
+      include BaseSet
+      #scope
+      #include "AbstractView.macros"
+      #include "UpperLayer.frag.ml"
+      #endscope
+    end
+  end
+
+  module Map = struct
+    module type OrderedType = OrderedType
+    module type S = MAP
+    module[@inline] Make (E : OrderedType) = struct
+      include BaseMap
+      #scope
+      #define MAP_VARIANT
+      #include "AbstractView.macros"
+      #include "UpperLayer.frag.ml"
+      #endscope
+    end
+  end
+
+  module[@inline] Make (E : OrderedType) = struct
+
+    module Set = Set.Make(E)
+    module Map = Map.Make(E)
+
+    let rec domain m =
+      match BaseMap.view m with
+      | BaseMap.Leaf ->
+          BaseSet.leaf
+      | BaseMap.Node (l, v, r) ->
+          let (k, _) = v in
+          BaseSet.join_siblings (domain l) k (domain r)
+
+    let rec lift f s =
+      match BaseSet.view s with
+      | BaseSet.Leaf ->
+          BaseMap.leaf
+      | BaseSet.Node (l, k, r) ->
+          (* Enforce left-to-right evaluation order. *)
+          let l = lift f l in
+          let v = (k, f k) in
+          let r = lift f r in
+          BaseMap.join_siblings l v r
+
+    end
 
 end
 
@@ -39,9 +86,9 @@ end
    expect. In particular, it does not simplify match-of-match, and cannot even
    simplify match-of-constructor. *)
 
-(* For this reason, instead of applying the functor [Make] (above), we inline
-   it, using a preprocessor hack. Thus, we avoid the overhead of going through
-   a [view] function; instead, we have a [VIEW] macro. *)
+(* For this reason, instead of applying the functor [Custom] (above), we
+   inline it, using a preprocessor hack. Thus, we avoid the overhead of going
+   through a [view] function; instead, we have a [VIEW] macro. *)
 
 module H = H
 
@@ -56,7 +103,11 @@ module W = W
 
 (* The following modules must be exported, because they are (or may be) used
    in the benchmarks. Because they are somewhat unlikely to be useful to an
-   end user, their existence is not advertised. *)
+   end user, and because they may change in th future, their existence is not
+   advertised. *)
 
-module Height = Height
-module Weight = Weight
+module HeightSet = HeightSet
+module WeightSet = WeightSet
+
+module HeightMap = HeightMap
+module WeightMap = WeightMap

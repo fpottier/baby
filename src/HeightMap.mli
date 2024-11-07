@@ -10,14 +10,20 @@
 (*                                                                            *)
 (******************************************************************************)
 
-(* A reference implementation of maps. *)
+open Signatures
 
-module Make (E : sig
-  type t
-  val compare : t -> t -> int
-end) = struct
+(**This module defines a memory layout and a height-based balancing scheme
+   for binary search trees. It is specialized to the case where the values
+   carried by the tree are pairs: see the constraint ['v = 'key * 'data]
+   below. It offers an abstract API, described by the signature [BASE_MAP]. *)
 
-  (* This implementation is based on OCaml's Map library. *)
-  include Map.Make(E)
+(**Because (in light of the limited optimization ability of the current OCaml
+   compiler) the minimal abstract interface imposes a performance penalty, we
+   also expose a concrete view of the memory layout. *)
+type 'v tree =
+  | TLeaf
+  | TNode of { l : 'v tree; k : 'key; d : 'data; r : 'v tree; h : int }
+  constraint 'v = 'key * 'data
 
-end
+(**The base layer interface. *)
+include BASE_MAP with type 'v tree := 'v tree

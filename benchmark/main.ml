@@ -30,8 +30,8 @@ end
 
 module F = Baby.H.Set.Make(Int)
 module W = Baby.W.Set.Make(Int)
-module I = Baby.W.Set.Int
-module C = Baby.Make(Int)(Baby.Height)
+module Modular = Baby.Custom(Baby.HeightSet)(Baby.HeightMap)
+module C = Modular.Set.Make(Int)
 
 module type PARAMS = sig
   val seed : int
@@ -583,9 +583,8 @@ let eratosthenes u =
   let module R = Eratosthenes(R)(struct include P let candidate = "reference" end) in
   let module F = Eratosthenes(F)(struct include P let candidate = "height/flat" end) in
   let module W = Eratosthenes(W)(struct include P let candidate = "weight/flat" end) in
-  let module I = Eratosthenes(I)(struct include P let candidate = "int" end) in
-  [ R.benchmark1; F.benchmark1; W.benchmark1; I.benchmark1;
-    R.benchmark2; F.benchmark2; W.benchmark2; I.benchmark2; ]
+  [ R.benchmark1; F.benchmark1; W.benchmark1;
+    R.benchmark2; F.benchmark2; W.benchmark2; ]
 
 module SillyFixedPoint (S : sig
   type t

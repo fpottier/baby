@@ -3,6 +3,6 @@ SWITCH := default
 
 EXE := test.exe
 
-# This line is somewhat problematic, as it assumes that ocamlfind and
-# monolith are installed in the current switch, whatever it is.
--include $(shell ocamlfind query monolith)/Makefile.monolith
+# We use our own copy of Makefile.monolith, so as to avoid depending
+# on whatever version of monolith is installed.
+include ../Makefile.monolith

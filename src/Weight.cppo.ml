@@ -15,20 +15,14 @@
    algorithm are the same as in the paper, but this code is more aggressively
    optimized; some redundant tests and memory allocations are avoided. *)
 
-(* This function is not inlined, so as to reduce code size and produce
-   more readable assembly code. *)
-let impossible () =
-  assert false
-
 (* In the following, some functions have nontrivial preconditions:
    [join] and its variants require [l < v < r];
-   [doubleton] and [tripleton] require [x < y] and [x < y < z].
+   [of_sorted_unique_array_slice] requires a sorted array.
    Here, we do not have access to the ordering function [E.compare],
    so we do not write assertions to check that these preconditions
    are met. *)
 
-(* Trees are weight-balanced. Each node stores its left child, key, right
-   child, and weight. *)
+(* Trees are weight-balanced. Each node stores its weight. *)
 
 (* The weight of a tree is the number of its leaves, that is, ONE MORE
    than the number of its nodes. The weight of a tree is never zero. *)
@@ -36,9 +30,21 @@ let impossible () =
 (* Thus, the weight of a leaf is 1, and the weight of a node is the sum
    of the weights of its children. *)
 
-type 'key tree =
-  | TLeaf
-  | TNode of { l : 'key tree; v : 'key; r : 'key tree; w : int }
+(* In the case of sets, each node carries a value [v] of type ['v].
+
+   In the case of maps, we could use the same type definition, and later
+   instantiate ['v] with the product type ['key * 'data]. However, this
+   would create an indirection: every node would involve two distinct memory
+   blocks. Instead, we fuse these two memory blocks into a single one: each
+   node carries a key [k] and a datum [d]. OCaml's [constraint] keyword is
+   used to impose an equality between the types ['v] and ['key * 'data].
+
+   This non-standard representation requires us to construct a pair in the
+   macro [ANALYZE] and to deconstruct a pair in the function [create''].
+   It has no other impact. *)
+
+#define EXTRA w : int
+#include "TreeDef.frag.ml"
 
 (* [weight t] reads and returns the weight of the tree [t]. *)
 
@@ -57,26 +63,17 @@ let constant_time_cardinal =
 let[@inline] cardinal t =
   weight t - 1
 
-(* This macro destructs a tree [t] that is known not to be a leaf.
-   It binds the variables [tl], [tv], [tr].
-   It is intended to be followed with a semicolon. *)
-
-#define DESTRUCT(t,tl,tv,tr) \
-  match t with \
-  | TLeaf -> impossible() \
-  | TNode { l = tl; v = tv; r = tr; _ } -> \
-      ()
-
 (* This macro destructs a tree [t] that is known not to be a leaf
    and whose weight is [w].
    It binds the variables [wtl], [tl], [tv], [wtr], [tr].
    It is intended to be followed with a semicolon. *)
 
-#define DESTRUCTW(w,t,wtl,tl,tv,wtr,tr) \
-  DESTRUCT(t, tl, tv, tr); \
-  let wtl = weight tl in \
-  let wtr = w - wtl in \
+#def DESTRUCTW(w,t,wtl,tl,tv,wtr,tr)
+  DESTRUCT(t, tl, tv, tr);
+  let wtl = weight tl in
+  let wtr = w - wtl in
   assert (wtr = weight tr)
+#enddef
 
 (* Weight-balanced trees with parameter α maintain the following invariant:
    for every tree [t] whose children are [l] and [r],
@@ -96,7 +93,7 @@ let[@inline] cardinal t =
    The literature also mentions the constraint 2/11 < α, that is,
    0.(18.) < α. According to BFS, this constraint is *NOT* required for
    the correctness or complexity of [join]. It *IS* however required to
-   guarantee the correctness of [join_neighbors], that is, to guarantee
+   guarantee the correctness of [join_quasi_siblings], that is, to guarantee
    that if the weight of a subtree is off by one, then one (single or
    double) rotation at the root suffices. These two claims are confirmed
    by our tests. *)
@@ -157,7 +154,13 @@ let rec check t =
 let[@inline] create'' w l v r =
   assert (w = weight l + weight r);
   assert (siblings l r);
+#ifndef MAP_VARIANT
   TNode { l; v; r; w }
+#else
+  (* Deconstruct a pair: *)
+  let (k, d) = v in
+  TNode { l; k; d; r; w }
+#endif
 
 let[@inline] create l v r =
   let w = weight l + weight r in
@@ -168,11 +171,10 @@ let[@inline] create' wl l v wr r =
   let w = wl + wr in
   create'' w l v r
 
-(* [create] is published under the name [join_weight_balanced]. *)
+(* [create] is published under the name [join_siblings]. *)
 
-let join_weight_balanced l v r =
-  assert (siblings l r);
-  create l v r
+let join_siblings =
+  create
 
 (* Trees of one, two, three elements. *)
 
@@ -181,13 +183,20 @@ let join_weight_balanced l v r =
 
 let[@inline] singleton x =
   (* This is equivalent to [create TLeaf x TLeaf]. *)
-  TNode { l = TLeaf; v = x; r = TLeaf; w = 2 }
+  let w = 2 in
+  create'' w TLeaf x TLeaf
 
 let[@inline] doubleton x y =
-  TNode { l = TLeaf; v = x; r = singleton y; w = 3 }
+  let w = 3 in
+  create'' w TLeaf x (singleton y)
 
 let[@inline] tripleton x y z =
-  TNode { l = singleton x; v = y; r = singleton z; w = 4 }
+  let w = 4 in
+  create'' w (singleton x) y (singleton z)
+
+(* Trees of [n] elements. *)
+
+#include "OfSortedUniqueArraySlice.frag.ml"
 
 (* [seems_smaller t1 t2] is equivalent to [weight t1 < weight t2]. *)
 
@@ -254,11 +263,12 @@ let balance_right_heavy wl l v wr r =
     (* [rotate_left l v r] *)
     let w = wl + wr in
     create'' w (create' wl l v wrl rl) rv rr
-  else
+  else begin
     (* [rotate_left l v (rotate_right rl rv rr)] *)
     DESTRUCTW(wrl, rl, wrll, rll, rlv, wrlr, rlr);
     let w = wl + wr in
     create'' w (create' wl l v wrll rll) rlv (create' wrlr rlr rv wrr rr)
+  end
 
 (* [balance_maybe_right_heavy l v r] expects the tree [NODE(l, v, r)] to be
    either balanced or right heavy. *)
@@ -281,11 +291,12 @@ let balance_left_heavy wl l v wr r =
     (* [rotate_right l v r] *)
     let w = wl + wr in
     create'' w ll lv (create' wlr lr v wr r)
-  else
+  else begin
     (* [rotate_right (rotate_left ll lv lr) v r] *)
     DESTRUCTW(wlr, lr, wlrl, lrl, lrv, wlrr, lrr);
     let w = wl + wr in
     create'' w (create' wll ll lv wlrl lrl) lrv (create' wlrr lrr v wr r)
+  end
 
 let[@inline] balance_maybe_left_heavy wl l v wr r =
   assert (wl = weight l && wr = weight r);
@@ -363,11 +374,29 @@ let join l v r =
     (* left heavy *)
     join_left_heavy wl l v wr r
 
-(* [join_neighbors l v r] requires [l < v < r]. It assumes that the weights
-   of the subtrees [l] and [r] are close enough so that at most one step of
-   rebalancing suffices. (The exact precondition is unclear.) *)
+(* [quasi_siblings l r] checks that [l] and [r] are quasi-siblings,
+   that is, siblings where one tree has been disturbed by removing or
+   adding one element. *)
 
-let join_neighbors l v r =
+(* Unfortunately, I do not have a more pleasing definition of this
+   function. This definition is naive; perhaps it can be simplified.
+   Anyway, this function is used only in one assertion (below), so
+   this problem is not serious. *)
+
+let rec quasi_siblings l r =
+  if weight l <= weight r then
+    like_weights (weight l) (weight r - 1) ||
+    like_weights (weight l + 1) (weight r)
+  else
+    quasi_siblings r l
+
+(* [join_quasi_siblings l v r] requires [l < v < r]. It also requires
+   the trees [l] and [r] to be quasi-siblings. This ensures that the
+   weights of [l] and [r] are close enough so that at most one step of
+   rebalancing suffices. *)
+
+let join_quasi_siblings l v r =
+  assert (quasi_siblings l r);
   let wl = weight l and wr = weight r in
   if not_left_heavy wl wr then
     if not_right_heavy wl wr then
@@ -379,19 +408,3 @@ let join_neighbors l v r =
   else
     (* left heavy *)
     balance_left_heavy wl l v wr r
-
-(* A public view. *)
-
-type 'key view =
-  | Leaf
-  | Node of 'key tree * 'key * 'key tree
-
-let[@inline] view t =
-  match t with
-  | TLeaf ->
-      Leaf
-  | TNode { l; v; r; _ } ->
-      Node (l, v, r)
-
-let leaf =
-  TLeaf

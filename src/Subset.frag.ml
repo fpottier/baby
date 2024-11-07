@@ -10,22 +10,26 @@
 (*                                                                            *)
 (******************************************************************************)
 
+(* Inclusion. *)
+
 (* -------------------------------------------------------------------------- *)
 
-(* Inclusion. *)
+(* The set variant. *)
+
+#ifndef MAP_VARIANT
 
 (* This simple version of [subset] has canonical structure. *)
 
 (* (Disabled.)
 
-let rec subset (t1 : tree) (t2 : tree) : bool =
+let rec subset (t1 : set) (t2 : set) : bool =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
       true
   | _, LEAF ->
       false
-  | NODE(_, _, _), NODE(l2, k2, r2) ->
-      let l1, r1 = split13 k2 t1 in
+  | NODENODE(_, _, _, l2, v2, r2)
+      let l1, r1 = split13 v2 t1 in
       subset l1 l2 && subset r1 r2
 
  *)
@@ -43,18 +47,59 @@ let rec subset (t1 : tree) (t2 : tree) : bool =
    [weight] function returns a constant value, so this fast path is
    disabled. *)
 
-let rec subset (t1 : tree) (t2 : tree) : bool =
+let rec subset (t1 : set) (t2 : set) : bool =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
       true
   | _, LEAF ->
       false
-  | NODE(l1, k1, r1), NODE(l2, k2, r2) ->
+  | NODENODE(l1, v1, r1, l2, v2, r2)
       t1 == t2 || (* fast path *)
       if BOTH_EMPTY(l1, r1) then
-        (* The tree [t1] is [singleton k1]. *)
-        mem k1 t2
+        (* The tree [t1] is [singleton v1]. *)
+        mem v1 t2
       else
         weight t1 <= weight t2 && (* fast path *)
-        let l1, r1 = split13 k2 t1 in
+        let l1, r1 = split13 v2 t1 in
         subset l1 l2 && subset r1 r2
+
+#else
+
+(* -------------------------------------------------------------------------- *)
+
+(* The map variant. *)
+
+(* In the map variant, the name [subset] does not seem appropriate.
+   I prefer to name this function [sub]. *)
+
+(* [sub] is parameterized with a data comparison function [f]. *)
+
+(* The physical equality tests disappear, because they impose undesirable
+   type equality constraints. *)
+
+let rec sub
+  (f : 'a1 -> 'a2 -> bool)
+  (t1 : 'a1 binding tree) (t2 : 'a2 binding tree) : bool =
+  match VIEW(t1), VIEW(t2) with
+  | LEAF, _ ->
+      true
+  | _, LEAF ->
+      false
+  | NODENODE(l1, v1, r1, l2, v2, r2)
+      let (k1, d1) = v1 in
+      if BOTH_EMPTY(l1, r1) then begin
+        (* The tree [t1] is [singleton v1]. *)
+        match find_opt k1 t2 with
+        | None ->
+            false
+        | Some d2 ->
+            f d1 d2
+      end
+      else
+        weight t1 <= weight t2 && (* fast path *)
+        let (k2, d2) = v2 in
+        let l1, od1, r1 = split k2 t1 in
+        (match od1 with None -> true | Some d1 -> f d1 d2) &&
+        sub f l1 l2 && sub f r1 r2
+
+#endif

@@ -10,7 +10,19 @@
 (*                                                                            *)
 (******************************************************************************)
 
+(* [map] and [filter_map]. *)
+
+(* The set variant is more complex because the function [f] is not
+   necessarily monotone. The map variant is simpler because its API is
+   less expressive; by construction, the key component is preserved
+   and the function [f] transforms only the data component, so the
+   transformation that is applied to the key-data pair is monotone. *)
+
+#ifndef MAP_VARIANT
+
 (* -------------------------------------------------------------------------- *)
+
+(* The set variant. *)
 
 (* [map] is defined in the same way as in OCaml's Set library. *)
 
@@ -27,18 +39,18 @@
 (* Otherwise, I believe (but have not carefully checked) that the
    complexity of [map] is O(n.log n). *)
 
-let[@inline] tree_below_key (t : tree) (x : key) : bool =
+let[@inline] tree_below_key (t : TREE) (x : key) : bool =
   match VIEW(t) with
   | LEAF ->
       true
-  | NODE(_, v, r) ->
+  | NODE(_, v, r)
       E.compare (max_elt_1 v r) x < 0
 
-let[@inline] key_below_tree (x : key) (t : tree) : bool =
+let[@inline] key_below_tree (x : key) (t : TREE) : bool =
   match VIEW(t) with
   | LEAF ->
       true
-  | NODE(l, v, _) ->
+  | NODE(l, v, _)
       E.compare x (min_elt_1 v l) < 0
 
 (* [lax_join l v r] is analogous to [join l v r], but does not
@@ -50,11 +62,11 @@ let[@inline] lax_join l v r =
   else
     union l (add v r)
 
-let rec map f (t : tree) =
+let rec map f (t : TREE) =
   match VIEW(t) with
   | LEAF ->
       leaf
-  | NODE(l, v, r) ->
+  | NODE(l, v, r)
      (* Enforce left-to-right evaluation order. *)
      let l' = map f l in
      let v' = f v in
@@ -81,18 +93,70 @@ let lax_join2 t1 t2 =
 
 (* [filter_map] is defined in the same way as in OCaml's Set library. *)
 
-let rec filter_map f (t : tree) =
+let rec filter_map f (t : TREE) =
   match VIEW(t) with
   | LEAF ->
       leaf
-  | NODE(l, v, r) ->
-     (* Enforce left-to-right evaluation order. *)
-     let l' = filter_map f l in
-     let v' = f v in
-     let r' = filter_map f r in
-     match v' with
-     | Some v' ->
-         if l == l' && v == v' && r == r' then t (* preserve sharing *)
-         else lax_join l' v' r'
-     | None ->
-         lax_join2 l' r'
+  | NODE(l, v, r)
+      (* Enforce left-to-right evaluation order. *)
+      let l' = filter_map f l in
+      let v' = f v in
+      let r' = filter_map f r in
+      match v' with
+      | Some v' ->
+          if l == l' && v == v' && r == r' then t (* preserve sharing *)
+          else lax_join l' v' r'
+      | None ->
+          lax_join2 l' r'
+
+#else
+
+(* -------------------------------------------------------------------------- *)
+
+(* The map variant. *)
+
+(* [map] is defined in the same way as in OCaml's Map library. *)
+
+let rec map f t =
+  match VIEW(t) with
+  | LEAF ->
+      leaf
+  | NODE(l, v, r)
+      (* Enforce left-to-right evaluation order. *)
+      let l' = map f l in
+      let (k, d) = v in
+      let d' = f d in
+      let r' = map f r in
+      let v' = (k, d') in
+      join_siblings l' v' r'
+
+(* [mapi] is defined in the same way as in OCaml's Map library. *)
+
+let rec mapi f t =
+  match VIEW(t) with
+  | LEAF ->
+      leaf
+  | NODE(l, v, r)
+      (* Enforce left-to-right evaluation order. *)
+      let l' = mapi f l in
+      let (k, d) = v in
+      let d' = f k d in
+      let r' = mapi f r in
+      let v' = (k, d') in
+      join_siblings l' v' r'
+
+(* [filter_map] is defined in the same way as in OCaml's Map library. *)
+
+let rec filter_map f t =
+  match VIEW(t) with
+  | LEAF ->
+      leaf
+  | NODE(l, v, r)
+      (* Enforce left-to-right evaluation order. *)
+      let l' = filter_map f l in
+      let (k, d) = v in
+      let od' = f k d in
+      let r' = filter_map f r in
+      ojoin l' k od' r'
+
+#endif

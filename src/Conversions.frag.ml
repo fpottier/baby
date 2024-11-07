@@ -14,37 +14,34 @@
 
 (* [elements] converts a set, in linear time, to a sorted list. *)
 
-let rec elements (t : tree) (k : elt list) : elt list =
+let rec to_list (t : TREE) (k : ELT list) : ELT list =
   match VIEW(t) with
   | LEAF ->
       k
-  | NODE(l, v, r) ->
-      elements l (v :: elements r k)
+  | NODE(l, v, r)
+      to_list l (v :: to_list r k)
 
-let[@inline] elements (t : tree) : elt list =
-  elements t []
-
-let to_list =
-  elements
+let[@inline] to_list (t : TREE) : ELT list =
+  to_list t []
 
 (* -------------------------------------------------------------------------- *)
 
 (* [to_seq] constructs the increasing sequence of the elements of the
    tree [t]. *)
 
-let to_seq (t : tree) : key Seq.t =
+let to_seq (t : TREE) : ELT Seq.t =
   fun () -> Enum.(to_seq_node (enum t))
 
 (* [to_seq_from low t] constructs the increasing sequence of the
    elements [x] of the tree [t] such that [low <= x] holds. *)
 
-let to_seq_from (low : key) (t : tree) : key Seq.t =
+let to_seq_from (low : key) (t : TREE) : ELT Seq.t =
   fun () -> Enum.(to_seq_node (from_enum low t))
 
 (* [to_rev_seq] constructs the decreasing sequence of the elements of
    the tree [t]. *)
 
-let to_rev_seq (t : tree) : key Seq.t =
+let to_rev_seq (t : TREE) : ELT Seq.t =
   fun () -> RevEnum.(to_seq_node (enum t))
 
 (* -------------------------------------------------------------------------- *)
@@ -53,12 +50,12 @@ let to_rev_seq (t : tree) : key Seq.t =
    array slice determined by the array [a] and the start index [i].
    It returns the end index of this slice. *)
 
-let rec to_array_slice (t : tree) a i : int =
+let rec to_array_slice (t : TREE) a i : int =
   assert (0 <= i && i + cardinal t <= Array.length a);
   match VIEW(t) with
   | LEAF ->
       i
-  | NODE(l, v, r) ->
+  | NODE(l, v, r)
       let i = to_array_slice l a i in
       a.(i) <- v;
       let i = i + 1 in
@@ -68,11 +65,11 @@ let rec to_array_slice (t : tree) a i : int =
 
 (* [to_array] converts a set, in linear time, to a sorted array. *)
 
-let to_array (t : tree) : key array =
+let to_array (t : TREE) : ELT array =
   match VIEW(t) with
   | LEAF ->
       [||]
-  | NODE(_, dummy, _) ->
+  | NODE(_, dummy, _)
       let n = cardinal t in
       let a = Array.make n dummy in
       let j = to_array_slice t a 0 in
@@ -81,35 +78,8 @@ let to_array (t : tree) : key array =
 
 (* -------------------------------------------------------------------------- *)
 
-(* [of_sorted_unique_array_slice a i j] requires the array slice defined by
-   array [a], start index [i], and end index [j] to be sorted and to contain
-   no duplicate elements. It converts this array slice, in linear time, to a
-   set. *)
-
-let rec of_sorted_unique_array_slice a i j =
-  assert (0 <= i && i <= j && j <= Array.length a);
-  let n = j - i in
-  match n with
-  | 0 ->
-      empty
-  | 1 ->
-      let x = a.(i) in
-      singleton x
-  | 2 ->
-      let x = a.(i)
-      and y = a.(i+1) in
-      doubleton x y
-  | 3 ->
-      let x = a.(i)
-      and y = a.(i+1)
-      and z = a.(i+2) in
-      tripleton x y z
-  | _ ->
-      let k = i + n/2 in
-      let l = of_sorted_unique_array_slice a i k
-      and v = a.(k)
-      and r = of_sorted_unique_array_slice a (k+1) j in
-      join_weight_balanced l v r
+(* [of_sorted_unique_array_slice] is available as part of the [BASE_SET]
+   or [BASE_MAP] signature. *)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -136,9 +106,13 @@ let[@inline] of_sorted_unique_array a =
    linear time in the length of this run. Then, the union of these sets
    is computed. *)
 
+(* [override] is [union] with priority to the right-hand argument. So,
+   in the map variant, if a key appears twice in the list, the rightmost
+   binding takes over. *)
+
 let of_array a =
-  let yield accu i j = union accu (of_sorted_unique_array_slice a i j) in
-  ArrayExtra.foreach_increasing_run E.compare yield empty a
+  let yield accu i j = override accu (of_sorted_unique_array_slice a i j) in
+  ArrayExtra.foreach_increasing_run compare_elts yield empty a
 
 (* -------------------------------------------------------------------------- *)
 
@@ -167,4 +141,4 @@ let of_seq xs =
 (* [add_seq] inserts a sequence into a set. *)
 
 let add_seq xs t =
-  union (of_seq xs) t
+  override t (of_seq xs)

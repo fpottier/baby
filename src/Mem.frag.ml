@@ -10,14 +10,14 @@
 (*                                                                            *)
 (******************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
+(* The value [v] that is extracted out of the tree has type [ELT]. In the set
+   variant, it is an element of the set. In the map variant, it is a pair of
+   a key and a value. In either case, [GET_KEY(v)] is a key. *)
 
-(* Membership. *)
-
-let rec mem (x : key) (t : tree) : bool =
+let rec mem (x : key) (t : TREE) : bool =
   match VIEW(t) with
   | LEAF ->
       false
-  | NODE(l, v, r) ->
-      let c = E.compare x v in
+  | NODE(l, v, r)
+      let c = E.compare x (GET_KEY(v)) in
       c = 0 || mem x (if c < 0 then l else r)

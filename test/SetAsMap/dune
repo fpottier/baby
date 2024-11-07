@@ -1,5 +1,0 @@
-(executable
-  (name test)
-  (libraries baby monolith)
-  (enabled_if (= %{profile} dev))
-)

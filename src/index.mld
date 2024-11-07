@@ -1,14 +1,14 @@
 {0 Baby: Fast Sets Based on Balanced Binary Search Trees}
 
-[baby] is an OCaml library that offers several implementations of
-balanced binary search trees.
+[baby] is an OCaml library that offers sets and maps
+implemented as balanced binary search trees.
 
 Height-balanced and weight-balanced binary search trees are offered
 out of the box. Furthermore, to advanced users, the library offers
 a lightweight way of implementing other balancing strategies.
 
 The algorithms in [baby] are based on
-those found in OCaml's [Set] library
+those found in OCaml's [Set] and [Map] libraries
 and in the paper
 {{: https://dl.acm.org/doi/full/10.1145/3512769 }Joinable Parallel Balanced Binary Trees}
 by Blelloch, Ferizovic, and Sun (2022).
@@ -24,37 +24,57 @@ Type [opam install baby].
 In your [dune] file, add [(libraries baby)] to the description of
 your [library] or [executable].
 
-{1 Ready-Made Weight-Balanced Trees}
+{1 How to Use this Library}
 
-{b We recommend using [baby]'s ready-made weight-balanced binary
-search trees}, because they are generally faster than height-balanced
+There are three main ways of using this library.
+
+{2 Ready-Made Weight-Balanced Trees}
+
+{b We recommend using weight-balanced binary search trees}
+because they are generally faster than height-balanced
 trees, offer a constant-time [cardinal] function, and offer several
 logarithmic-time random access functions.
 
 To use them,
-just use the functor {!Baby.W.Set.Make}
-instead of the usual [Set.Make].
 
-{1 Ready-Made Height-Balanced Trees}
++ use {!Baby.W.Set.Make}
+  instead of the usual [Set.Make];
++ use {!Baby.W.Map.Make}
+  instead of the usual [Map.Make];
+  or
++ use {!Baby.W.Make}
+  to obtain sets, maps,
+  and conversions between sets and maps.
 
-If you prefer to use [baby]'s ready-made height-balanced binary
-search trees, use {!Baby.H.Set.Make}.
+{2 Ready-Made Height-Balanced Trees}
+
+If you prefer to use height-balanced binary search trees,
+
++ use {!Baby.H.Set.Make}
+  instead of the usual [Set.Make];
++ use {!Baby.H.Map.Make}
+  instead of the usual [Map.Make];
+  or
++ use {!Baby.H.Make}
+  to obtain sets, maps,
+  and conversions between sets and maps.
 
 Please be aware that, in this implementation, the [cardinal] function
 is slow: its time complexity is linear. Furthermore, the random access
 functions are unavailable: an attempt to invoke one of them will
 result in a [Failure] exception.
 
-{1 Rolling Your Own Balanced Trees}
+{2 Rolling Your Own Balanced Trees}
 
 If you wish to design your own balancing scheme, while re-using most of
-[baby]'s functionality, use the functor {!Baby.Make}. This requires
-you to implement a module that satisfies the signature {!Baby.CORE}.
+[baby]'s functionality, use the functor {!Baby.Custom}. This requires
+you to implement two modules that meet the signatures {!Baby.BASE_SET}
+and {!Baby.BASE_MAP}.
 
-As part of this signature, the central operation that you must provide
-is [join]. You must also implement [join_neighbors] and
-[join_weight_balanced], two variants of [join]
-that make stronger assumptions about their inputs.
+As part of the signature {!Baby.BASE_SET},
+the central operation that you must provide is [join].
+You must also implement [join_siblings] and [join_quasi_siblings],
+two variants of [join] that make stronger assumptions about their inputs.
 If you are lazy, you can implement both of them as just [join].
 
 {1:comparison Comparison With OCaml's Set Library}
@@ -97,6 +117,7 @@ library:
 + The symmetric difference, [xor];
 + The conversion functions [of_array] and [to_array];
 + The extremum-removal functions [remove_min_elt] and [remove_max_elt];
++ The random access functions [get], [index], [cut], [cut_and_get];
 + The enumeration API in the submodule [Enum].
   Enumerations should be slightly faster than standard sequences,
   and are able to efficiently seek ahead, via the function [from].
@@ -107,7 +128,7 @@ In [baby], the time complexity of every operation is documented.
 
 {2 Compatibility}
 
-[baby] is perfectly compatible with OCaml's Set library.
+[baby] is perfectly compatible with OCaml's [Set] library.
 In other words, using [Baby.W.Set] instead of [Set] is safe.
 
 As a word of warning, though, if the equivalence relation on elements
@@ -116,3 +137,56 @@ that [x] and [y] are indistinguishable), then [Baby.W.Set] and [Set]
 might behave differently when a choice must be made between two
 equivalent elements. This can occur in [union], [of_list], [of_array],
 [of_seq], [add_seq], [map].
+
+{1:comparison Comparison With OCaml's Map Library}
+
+{2 Performance}
+
+At the time of writing (2024), a performance comparison between [baby]
+and OCaml's [Map] library has not yet been carried out.
+
+{2 Constant-Time Cardinal}
+
+In contrast with the [Map] library, [baby]'s weight-balanced trees
+offer a [cardinal] function whose time complexity is {m O(1)}. They
+also offer a family of random access functions ([get], [index], etc.)
+whose time complexity is {m O(\log n)}. Furthermore, by exploiting
+cardinality information, the functions [sub] and [equal] are
+sometimes able to return [false] in constant time.
+
+{2 Adaptive Conversions To Maps}
+
+[baby]'s conversion functions [of_list], [of_array], and [of_seq]
+have adaptive complexity. If the input data is sorted, their
+complexity is {m O(n)}; otherwise, their complexity gracefully
+degrades down to {m O(n.\log n)}.
+
+{2 More Operations}
+
+[baby] offers a few operations that do not exist in OCaml's [Map]
+library:
+
++ The intersection, [inter];
++ The difference, [diff];
++ The symmetric difference, [xor];
++ The disjointness test, [disjoint];
++ The inclusion test, [sub];
++ The conversion functions [of_array] and [to_array];
++ The extremum-removal functions [remove_min_binding] and [remove_max_binding];
++ The random access functions [get], [index], [cut], [cut_and_get];
++ The functions [domain] and [lift],
+  which convert a map to a set, and vice-versa.
+  These functions are available when [Baby.W.Make] is used;
+  they are not available when [Baby.W.Set.Make] or [Baby.W.Map.Make] is used.
++ The enumeration API in the submodule [Enum].
+  Enumerations should be slightly faster than standard sequences,
+  and are able to efficiently seek ahead, via the function [from].
+
+{2 Documented Complexity}
+
+In [baby], the time complexity of every operation is documented.
+
+{2 Compatibility}
+
+[baby] is perfectly compatible with OCaml's [Map] library.
+In other words, using [Baby.W.Map] instead of [Map] is safe.

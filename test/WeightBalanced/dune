@@ -1,6 +1,6 @@
 (executable
   (name test)
-  (libraries weight_candidate monolith)
+  (libraries weight_candidate monolith helpers)
   (flags (:standard "-open" "Weight_candidate"))
   (enabled_if (= %{profile} dev))
 )

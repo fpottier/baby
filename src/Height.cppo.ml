@@ -15,32 +15,18 @@
 let[@inline] max (x : int) (y : int) =
   if x <= y then y else x
 
-(* This function is not inlined, so as to reduce code size and produce
-   more readable assembly code. *)
-let impossible () =
-  assert false
-
 (* In the following, some functions have nontrivial preconditions:
    [join] and its variants require [l < v < r];
-   [doubleton] and [tripleton] require [x < y] and [x < y < z].
+   [of_sorted_unique_array_slice] requires a sorted array.
    Here, we do not have access to the ordering function [E.compare],
    so we do not write assertions to check that these preconditions
    are met. *)
 
-(* Trees are height-balanced. Each node stores its left child, key, right
-   child, and height. The code maintains the invariant that the heights of
-   the two children differ by at most 2. *)
+(* Trees are height-balanced. Each node stores its height. The heights
+   of two siblings differ by at most 2. *)
 
-type 'key tree =
-  | TLeaf
-  | TNode of { l : 'key tree; v : 'key; r : 'key tree; h : int }
-
-(* This macro destructs a tree [t] that is known not to be a leaf. *)
-
-#define DESTRUCT(t,tl,tv,tr) \
-  match t with \
-  | TLeaf -> impossible() \
-  | TNode { l = tl; v = tv; r = tr; _ }
+#define EXTRA h : int
+#include "TreeDef.frag.ml"
 
 (* [height t] reads and returns the height of the tree [t]. *)
 
@@ -75,15 +61,17 @@ let rec cardinal accu t : int =
 let cardinal t : int =
   cardinal 0 t
 
-(* [siblings l r] checks that [l] and [r] could be siblings in a valid
-   tree. [neighbors l r] checks that [l] and [r] could be neighbors,
+(* [siblings l r] checks that [l] and [r] are siblings, that is, they
+   could be siblings (the children of a binary node) in a valid tree. *)
+
+(* [quasi_siblings l r] checks that [l] and [r] are quasi-siblings,
    that is, siblings where one tree has been disturbed by removing or
    adding one element. *)
 
 let siblings l r =
   abs (height l - height r) <= 2
 
-let neighbors l r =
+let quasi_siblings l r =
   abs (height l - height r) <= 3
 
 (* A well-formedness check. *)
@@ -102,14 +90,27 @@ let rec check t =
    [l], value [v], and right child [r]. The subtrees [l] and [r] must be
    balanced, and the difference in their heights must be at most 2. *)
 
-let[@inline] create l v r =
+(* [create'' h l v r] is analogous, but requires the user to provide the
+   height [h] of the new tree. *)
+
+let[@inline] create'' h l v r =
   assert (siblings l r);
-  let h = max (height l) (height r) + 1 in
+  assert (h = max (height l) (height r) + 1);
+#ifndef MAP_VARIANT
   TNode { l; v; r; h }
+#else
+  (* Deconstruct a pair: *)
+  let (k, d) = v in
+  TNode { l; k; d; r; h }
+#endif
 
-(* [create] is published under the name [join_weight_balanced]. *)
+let[@inline] create l v r =
+  let h = max (height l) (height r) + 1 in
+  create'' h l v r
 
-let join_weight_balanced =
+(* [create] is published under the name [join_siblings]. *)
+
+let join_siblings =
   create
 
 (* Trees of one, two, three elements. *)
@@ -119,13 +120,20 @@ let join_weight_balanced =
 
 let[@inline] singleton x =
   (* This is equivalent to [create TLeaf x TLeaf]. *)
-  TNode { l = TLeaf; v = x; r = TLeaf; h = 1 }
+  let h = 1 in
+  create'' h TLeaf x TLeaf
 
 let[@inline] doubleton x y =
-  TNode { l = TLeaf; v = x; r = singleton y; h = 2 }
+  let h = 2 in
+  create'' h TLeaf x (singleton y)
 
 let[@inline] tripleton x y z =
-  TNode { l = singleton x; v = y; r = singleton z; h = 2 }
+  let h = 2 in
+  create'' h (singleton x) y (singleton z)
+
+(* Trees of [n] elements. *)
+
+#include "OfSortedUniqueArraySlice.frag.ml"
 
 (* [seems_smaller t1 t2] is equivalent to [height t1 < height t2]. *)
 
@@ -151,55 +159,58 @@ let[@inline] seems_smaller t1 t2 =
    difference in the run time. *)
 
 let bal l v r =
-  assert (neighbors l r);
+  assert (quasi_siblings l r);
   let hl = height l
   and hr = height r in
   if hl > hr + 2 then begin
-    DESTRUCT(l, ll, lv, lr) ->
+    DESTRUCT(l, ll, lv, lr);
     if height ll >= height lr then
       create ll lv (create lr v r)
-    else
-      DESTRUCT(lr, lrl, lrv, lrr) ->
+    else begin
+      DESTRUCT(lr, lrl, lrv, lrr);
       create (create ll lv lrl) lrv (create lrr v r)
+    end
   end
   else if hr > hl + 2 then begin
-    DESTRUCT(r, rl, rv, rr) ->
+    DESTRUCT(r, rl, rv, rr);
     if height rr >= height rl then
       create (create l v rl) rv rr
-    else
-      DESTRUCT(rl, rll, rlv, rlr) ->
+    else begin
+      DESTRUCT(rl, rll, rlv, rlr);
       create (create l v rll) rlv (create rlr rv rr)
+    end
   end
   else
     (* This is equivalent to [create l v r]. *)
     let h = max hl hr + 1 in
-    TNode { l; v; r; h }
+    create'' h l v r
 
-let join_neighbors =
+let join_quasi_siblings =
   bal
 
 (* [add_min_element x t] requires [x < t]. It is the special case of
    [join] where the left-hand tree is empty. *)
 
 let rec add_min_element x t =
-  match t with
-  | TLeaf ->
-      singleton x
-  | TNode { l; v; r; _ } ->
-      bal (add_min_element x l) v r
+  (* If [t] is empty, return [singleton x], otherwise bind [l, v, r]. *)
+  ANALYZE(t, singleton x, l, v, r);
+  (* Insert [x] into the left-hand child and reconstruct a node. *)
+  bal (add_min_element x l) v r
 
 (* [add_max_element x t] requires [t < x]. It is the special case of
    [join] where the right-hand tree is empty. *)
 
 let rec add_max_element x t =
-  match t with
-  | TLeaf ->
-      singleton x
-  | TNode { l; v; r; _ } ->
-      bal l v (add_max_element x r)
+  ANALYZE(t, singleton x, l, v, r);
+  bal l v (add_max_element x r)
 
 (* [join l v r] requires [l < v < r]. It makes no assumptions about
    the heights of the subtrees [l] and [r]. *)
+
+(* Sharing the code between the set and map variants by using our tree
+   destruction macros, without introducing any overhead, is not so easy.
+   It is easier to not use the tree destruction macros and duplicate a few
+   lines of code, as follows. *)
 
 let rec join l v r =
   match l, r with
@@ -207,22 +218,16 @@ let rec join l v r =
       add_min_element v r
   | _, TLeaf ->
       add_max_element v l
+#ifndef MAP_VARIANT
   | TNode { l = ll; v = lv; r = lr; h = hl },
     TNode { l = rl; v = rv; r = rr; h = hr } ->
       if hl > hr + 2 then bal ll lv (join lr v r) else
       if hr > hl + 2 then bal (join l v rl) rv rr else
       create l v r
-
-type 'key view =
-  | Leaf
-  | Node of 'key tree * 'key * 'key tree
-
-let[@inline] view t =
-  match t with
-  | TLeaf ->
-      Leaf
-  | TNode { l; v; r; _ } ->
-      Node (l, v, r)
-
-let leaf =
-  TLeaf
+#else
+  | TNode { l = ll; k = lk; d = ld; r = lr; h = hl },
+    TNode { l = rl; k = rk; d = rd; r = rr; h = hr } ->
+      if hl > hr + 2 then let lv = (lk, ld) in bal ll lv (join lr v r) else
+      if hr > hl + 2 then let rv = (rk, rd) in bal (join l v rl) rv rr else
+      create l v r
+#endif

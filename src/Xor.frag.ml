@@ -14,15 +14,15 @@
 
 (* Symmetric difference. *)
 
-(* This is a simple, elegant version of [xor].
+(* This is a simple, elegant version of [xor]. (Set variant only.)
 
-let rec xor (t1 : tree) (t2 : tree) : tree =
+let rec xor (t1 : TREE) (t2 : TREE) : TREE =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
       t2
   | _, LEAF ->
       t1
-  | NODE(_, _, _), NODE(l2, k2, r2) ->
+  | NODENODE(_, _, _, l2, k2, r2)
       let l1, b, r1 = split k2 t1 in
       let l = xor l1 l2
       and r = xor r1 r2 in
@@ -34,25 +34,26 @@ let rec xor (t1 : tree) (t2 : tree) : tree =
    equal to [t1] or [t2]. So there is no need to attempt to preserve
    sharing when constructing new nodes. *)
 
-let rec xor (t1 : tree) (t2 : tree) : tree =
+let rec xor (t1 : TREE) (t2 : TREE) : TREE =
   match VIEW(t1), VIEW(t2) with
   | LEAF, _ ->
       t2
   | _, LEAF ->
       t1
-  | NODE(_, _, _), NODE(l2, k2, r2) ->
+  | NODENODE(_, _, _, l2, v2, r2)
       if t1 == t2 then leaf else (* fast path *)
+      let k2 = GET_KEY(v2) in
       if BOTH_EMPTY(l2, r2) then
-        (* [t2] is [singleton k2]. *)
+        (* [t2] is [singleton v2]. *)
         if mem k2 t1 then
           remove k2 t1
         else
-          add k2 t1
+          add_absent v2 t1
       else
         let l1, b, r1 = split k2 t1 in
         let l = xor l1 l2
         and r = xor r1 r2 in
-        if b then
+        IF(b)
           join2 l r
-        else
-          join l k2 r
+        ELSE
+          join l v2 r

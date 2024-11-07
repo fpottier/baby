@@ -22,16 +22,16 @@
    would be less effective at preserving sharing in scenarios where many
    elements are retained. *)
 
-let rec filter p (t : tree) : tree =
+let rec filter p (t : TREE) : TREE =
   match VIEW(t) with
   | LEAF ->
       leaf
-  | NODE(l, v, r) ->
+  | NODE(l, v, r)
       (* Enforce left-to-right evaluation order. *)
       let l' = filter p l in
-      let pv = p v in
+      let keep = CURRY(p, v) in
       let r' = filter p r in
-      if pv then
+      if keep then
         if l == l' && r == r' then t else join l' v r'
       else
         join2 l' r'
@@ -40,16 +40,16 @@ let rec filter p (t : tree) : tree =
    optimization: as in [filter], we attempt to preserve sharing where
    possible. *)
 
-let rec partition p (t : tree) : tree * tree =
+let rec partition p (t : TREE) : TREE * TREE =
   match VIEW(t) with
   | LEAF ->
       leaf, leaf
-  | NODE(l, v, r) ->
+  | NODE(l, v, r)
       (* Enforce left-to-right evaluation order. *)
       let lt, lf = partition p l in
-      let pv = p v in
+      let keep = CURRY(p, v) in
       let rt, rf = partition p r in
-      if pv then
+      if keep then
         (if lt == l && rt == r then t else join lt v rt),
         join2 lf rf
       else

@@ -1,8 +1,39 @@
 (* In the concrete view, to deconstruct a tree [t], one matches the tree [t]
    directly against the patterns [TLeaf] and [TNode _]. This requires the
    concrete definition of the type [tree] to be visible. *)
-#define VIEW(t)       (t)
-#define LEAF          TLeaf
-#define NODE(x, y, z) TNode { l = x; v = y; r = z; _ }
+
+(* In the map variant, a pair must be constructed. This is rather painful,
+   as it cannot be done in a pattern, on the left-hand side of the arrow;
+   it must be done in an expression, on the right-hand side of the arrow.
+   This forces the macro [NODE] to include the arrow itself. *)
+
+#define VIEW(t) \
+  (t)
+
+#define LEAF \
+  TLeaf
+
+#ifndef MAP_VARIANT
+
+#define NODE(x, y, z) \
+  TNode { l = x; v = y; r = z; _ } ->
+
+#define NODENODE(l1, v1, r1, l2, v2, r2) \
+  TNode { l = l1; v = v1; r = r1; _ }, \
+  TNode { l = l2; v = v2; r = r2; _ } ->
+
+#else
+
+#define NODE(x, y, z) \
+  TNode { l = x; k = _k; d = _d; r = z; _ } -> \
+    let y = (_k, _d) in
+
+#define NODENODE(l1, v1, r1, l2, v2, r2) \
+  TNode { l = l1; k = _k1; d = _d1; r = r1; _ }, \
+  TNode { l = l2; k = _k2; d = _d2; r = r2; _ } -> \
+    let v1 = (_k1, _d1) \
+    and v2 = (_k2, _d2) in
+
+#endif
 
 #include "Derived.macros"

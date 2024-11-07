@@ -1,7 +1,16 @@
 (* In the abstract view, to deconstruct a tree [t], one must call [view t]
    and match the result against the patterns [Leaf] and [Node _]. *)
-#define VIEW(t)       (view t)
-#define LEAF          Leaf
-#define NODE(x, y, z) Node (x, y, z)
+
+#define VIEW(t) \
+  (view t)
+
+#define LEAF \
+  Leaf
+
+#define NODE(l, v, r) \
+  Node (l, v, r) ->
+
+#define NODENODE(l1, v1, r1, l2, v2, r2) \
+  Node (l1, v1, r1), Node (l2, v2, r2) ->
 
 #include "Derived.macros"

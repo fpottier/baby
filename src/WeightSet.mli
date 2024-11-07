@@ -12,15 +12,16 @@
 
 open Signatures
 
-(**This module defines a memory layout and a balancing scheme for
-   height-balanced binary search trees. *)
+(**This module defines a memory layout and a weight-based balancing scheme for
+   binary search trees. It offers an abstract API, described by the signature
+   [BASE_SET]. *)
 
 (**Because (in light of the limited optimization ability of the current OCaml
    compiler) the minimal abstract interface imposes a performance penalty, we
    also expose a concrete view of the memory layout. *)
-type 'key tree =
+type 'v tree =
   | TLeaf
-  | TNode of { l : 'key tree; v : 'key; r : 'key tree; h : int }
+  | TNode of { l : 'v tree; v : 'v; r : 'v tree; w : int }
 
-(**The minimal abstract interface. *)
-include CORE with type 'key tree := 'key tree
+(**The base layer interface. *)
+include BASE_SET with type 'v tree := 'v tree

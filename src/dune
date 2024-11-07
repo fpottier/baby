@@ -11,17 +11,39 @@
   (release (flags :standard -noassert ) (ocamlopt_flags :standard -S))
 )
 
+;; To avoid warning 70, we copy Signatures.ml to Signatures.mli.
+
+(rule
+  (targets Signatures.mli)
+  (action (copy Signatures.ml Signatures.mli))
+)
+
 ;; Some files require preprocessing by cppo.
 
 (rule
-  (targets Height.ml)
-  (deps Height.cppo.ml (glob_files *.frag.ml))
+  (targets Signatures.ml)
+  (deps Signatures.cppo.ml)
+  (action (run %{bin:cppo} Signatures.cppo.ml -o %{targets})))
+
+(rule
+  (targets HeightSet.ml)
+  (deps Height.cppo.ml TreeDef.frag.ml OfSortedUniqueArraySlice.frag.ml)
   (action (run %{bin:cppo} Height.cppo.ml -o %{targets})))
 
 (rule
-  (targets Weight.ml)
-  (deps Weight.cppo.ml (glob_files *.frag.ml))
+  (targets HeightMap.ml)
+  (deps Height.cppo.ml TreeDef.frag.ml OfSortedUniqueArraySlice.frag.ml)
+  (action (run %{bin:cppo} Height.cppo.ml -o %{targets} -D MAP_VARIANT)))
+
+(rule
+  (targets WeightSet.ml)
+  (deps Weight.cppo.ml TreeDef.frag.ml OfSortedUniqueArraySlice.frag.ml)
   (action (run %{bin:cppo} Weight.cppo.ml -o %{targets})))
+
+(rule
+  (targets WeightMap.ml)
+  (deps Weight.cppo.ml TreeDef.frag.ml OfSortedUniqueArraySlice.frag.ml)
+  (action (run %{bin:cppo} Weight.cppo.ml -o %{targets} -D MAP_VARIANT)))
 
 (rule
   (targets Baby.ml)

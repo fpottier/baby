@@ -10,17 +10,18 @@
 (*                                                                            *)
 (******************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
+open Signatures
 
-(* Comparison. *)
+(**This module defines a memory layout and a height-based balancing scheme for
+   binary search trees. It offers an abstract API, described by the signature
+   [BASE_SET]. *)
 
-(* Instead of using enumerations of the trees [t1] and [t2], one could perform
-   a recursive traversal of [t1], while consuming an enumeration of [t2]. I
-   have benchmarked this variant: it allocates less memory, and can be faster,
-   but can also be about twice slower. *)
+(**Because (in light of the limited optimization ability of the current OCaml
+   compiler) the minimal abstract interface imposes a performance penalty, we
+   also expose a concrete view of the memory layout. *)
+type 'v tree =
+  | TLeaf
+  | TNode of { l : 'v tree; v : 'v; r : 'v tree; h : int }
 
-let compare EXTRA(cmp) (t1 : TREE) (t2 : TREE) : int =
-#ifndef MAP_VARIANT
-  if t1 == t2 then 0 else (* fast path *)
-#endif
-  Enum.(compare EXTRA(cmp) (enum t1) (enum t2))
+(**The base layer interface. *)
+include BASE_SET with type 'v tree := 'v tree
