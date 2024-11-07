@@ -15,6 +15,10 @@
 * Benchmark (some operations on) maps.
   Compare with OCaml's standard library.
 
+* Benchmark each specialized version of `merge`
+  (namely `union`, `inter`, `diff`, `xor`)
+  versus its emulation via `merge`.
+
 * In `xor`, the singleton case can be optimized.
 
 * In `union` (map variant), perhaps the special case where `t2` is a singleton
