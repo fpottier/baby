@@ -1,3 +1,15 @@
+(******************************************************************************)
+(*                                                                            *)
+(*                                    Baby                                    *)
+(*                                                                            *)
+(*                       François Pottier, Inria Paris                        *)
+(*                                                                            *)
+(*       Copyright 2024--2024 Inria. All rights reserved. This file is        *)
+(*       distributed under the terms of the GNU Library General Public        *)
+(*       License, with an exception, as described in the file LICENSE.        *)
+(*                                                                            *)
+(******************************************************************************)
+
 (* [of_sorted_unique_array_slice a i j] requires the array slice defined by
    array [a], start index [i], and end index [j] to be sorted and to contain
    no duplicate elements. It converts this array slice, in linear time, to a
