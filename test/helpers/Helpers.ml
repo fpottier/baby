@@ -129,27 +129,27 @@ let fold spec =
 (* Combinators to test [iter] and [fold] functions that produce pairs
    with a curried calling convention. *)
 
-let elements_of_pair_iter iter c =
+let elements_of_iteri iteri c =
   let xvs = ref [] in
   let push x v = xvs := (x, v) :: !xvs in
-  iter push c;
+  iteri push c;
   List.rev !xvs
 
-let pair_iter spec =
+let iteri spec =
   map_into
-    elements_of_pair_iter
-    (elements_of_pair_iter, constant "elements_of_pair_iter")
+    elements_of_iteri
+    (elements_of_iteri, constant "elements_of_iteri")
     spec
 
-let elements_of_pair_fold fold c =
+let elements_of_foldi foldi c =
   let cons x v xvs = (x, v) :: xvs in
-  fold cons c []
+  foldi cons c []
   |> List.rev
 
-let pair_fold spec =
+let foldi spec =
   map_into
-    elements_of_pair_fold
-    (elements_of_pair_fold, constant "elements_of_pair_fold")
+    elements_of_foldi
+    (elements_of_foldi, constant "elements_of_foldi")
     spec
 
 (* -------------------------------------------------------------------------- *)
