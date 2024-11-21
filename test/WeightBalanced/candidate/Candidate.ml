@@ -31,4 +31,11 @@ let has_random_access_functions =
 
 (* The candidate. *)
 
-include Baby.W.Make(Int)
+(* In order to detect an unintentional use of [Stdlib.compare], we use
+   a nonstandard ordering on keys: the reverse of the usual ordering. *)
+module Key = struct
+  type t = int
+  let compare x y = - (Int.compare x y)
+end
+
+include Baby.W.Make(Key)

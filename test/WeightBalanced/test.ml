@@ -13,19 +13,32 @@
 open Monolith
 open Helpers
 
-(* TODO
+(* -------------------------------------------------------------------------- *)
+
 (* In order to detect an unintentional use of [Stdlib.compare], we use
    a nonstandard ordering on keys: the reverse of the usual ordering. *)
+
+(* This decision appears here and is repeated in the two candidate
+   implementations (ugh). It also appears in the implementation of
+   the functions [inhabits_set] and [inhabits_map]. *)
+
+let reversed = true
+
+let exchange (x, y) =
+  if reversed then (y, x) else (x, y)
+
 module Key = struct
   type t = int
   let compare x y = - (Int.compare x y)
 end
 
-let increasing, decreasing = decreasing, increasing
-*)
+let increasing, decreasing =
+  exchange (increasing, decreasing)
+
+(* -------------------------------------------------------------------------- *)
 
 (* This is the reference implementation. *)
-module R = Reference.Make(Int)
+module R = Reference.Make(Key)
 
 (* The candidate implementation is supplied by a separate library,
    which is either [Weight_candidate] or [Height_candidate]. Both
@@ -276,8 +289,7 @@ let inhabits_set s =
     let open R.Set in
     let open Gen in
     if is_empty s then reject() else
-    let x = min_elt s
-    and y = max_elt s in
+    let x, y = exchange (min_elt s, max_elt s) in
     let k = x + Random.int (y - x + 1) in
     let _, b, r = split k s in
     let z = if b then k else min_elt r in
@@ -289,8 +301,7 @@ let inhabits_map m =
     let open R.Map in
     let open Gen in
     if is_empty m then reject() else
-    let x, _ = min_binding m
-    and y, _ = max_binding m in
+    let (x, _), (y, _) = exchange (min_binding m, max_binding m) in
     let k = x + Random.int (y - x + 1) in
     if mem k m then k else
     let _, ov, r = split k m in
