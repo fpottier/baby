@@ -494,8 +494,11 @@ let () =
 
   (* Section 4: iterating, searching, transforming sets. *)
 
-  (* not tested: [iter] *)
-  (* not tested: [fold] *)
+  let spec = iter (set ^> list elt) in
+  declare "Set.iter" spec R.Set.iter C.Set.iter;
+
+  let spec = fold (set ^> list elt) in
+  declare "Set.fold" spec R.Set.fold C.Set.fold;
 
   let spec = predicate ^> set ^> bool in
   declare "Set.for_all" spec R.Set.for_all C.Set.for_all;

@@ -93,6 +93,39 @@ let sharing spec =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Combinators to test [iter] and [fold] functions. *)
+
+type ('a, 'c) iter =
+  ('a -> unit) -> 'c -> unit
+
+let elements_of_iter (iter : ('a, 'c) iter) (c : 'c) : 'a list =
+  let xs = ref [] in
+  let push x = xs := x :: !xs in
+  iter push c;
+  List.rev !xs
+
+let iter spec =
+  map_into
+    elements_of_iter
+    (elements_of_iter, constant "elements_of_iter")
+    spec
+
+type ('a, 's, 'c) fold =
+  ('a -> 's -> 's) -> 'c -> 's -> 's
+
+let elements_of_fold (fold : ('a, 's, 'c) fold) (c : 'c) : 'a list =
+  let cons x xs = x :: xs in
+  fold cons c []
+  |> List.rev
+
+let fold spec =
+  map_into
+    elements_of_fold
+    (elements_of_fold, constant "elements_of_fold")
+    spec
+
+(* -------------------------------------------------------------------------- *)
+
 (* Ad hoc support functions. *)
 
 (* -------------------------------------------------------------------------- *)
