@@ -282,7 +282,8 @@ let binding =
    does not support random access. We pick a random key [k] between the
    minimum and maximum keys. If [k] exists in the tree, we return [k].
    Otherwise, we return the next key; this is done by splitting the tree
-   based on [k] and returning the minimum key of the right-hand subtree. *)
+   based on [k] and returning the minimum key of the right-hand subtree,
+   which in this case cannot be empty. *)
 
 let inhabits_set s =
   int_within @@ fun () ->
