@@ -738,8 +738,11 @@ let () =
 
   (* Section 4: iterating, searching, transforming maps. *)
 
-  (* not tested: [iter] *)
-  (* not tested: [fold] *)
+  let spec = pair_iter (map ^> list binding) in
+  declare "Map.iter" spec R.Map.iter C.Map.iter;
+
+  let spec = pair_fold (map ^> list binding) in
+  declare "Map.fold" spec R.Map.fold C.Map.fold;
 
   let spec = ipredicate ^> map ^> bool in
   declare "Map.for_all" spec R.Map.for_all C.Map.for_all;
