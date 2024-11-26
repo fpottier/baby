@@ -12,65 +12,7 @@
 
 (* This library defines a few helper functions that are useful while testing. *)
 
-(* In the future, some of these functions could move into Monolith or
-   Monolith.Support. *)
-
 open Monolith
-
-let pair (x, y) =
-  (x, constant y)
-
-let choose items =
-  constructible (Gen.choose (List.map pair items))
-
-(* -------------------------------------------------------------------------- *)
-
-(* Support functions. *)
-
-let unnest (x, (y, z)) = (x,  y, z)
-let   nest (x,  y, z)  = (x, (y, z))
-
-(* -------------------------------------------------------------------------- *)
-
-(* A combinator for arrays. *)
-
-let constructible_array spec =
-  map_outof
-    Array.of_list
-    (Array.of_list, constant "Array.of_list")
-    (list spec)
-
-let deconstructible_array spec =
-  map_into
-    Array.to_list
-    (Array.to_list, constant "Array.to_list")
-    (list spec)
-
-let array spec =
-  ifpol
-    (constructible_array spec)
-    (deconstructible_array spec)
-
-(* -------------------------------------------------------------------------- *)
-
-(* A combinator for triples. *)
-
-let constructible_triple spec1 spec2 spec3 =
-  map_outof
-    unnest
-    (unnest, constant "unnest")
-    (spec1 *** (spec2 *** spec3))
-
-let deconstructible_triple spec1 spec2 spec3 =
-  map_into
-    nest
-    (nest, constant "nest")
-    (spec1 *** (spec2 *** spec3))
-
-let triple spec1 spec2 spec3 =
-  ifpol
-    (constructible_triple spec1 spec2 spec3)
-    (deconstructible_triple spec1 spec2 spec3)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -93,68 +35,11 @@ let sharing spec =
 
 (* -------------------------------------------------------------------------- *)
 
-(* Combinators to test [iter] and [fold] functions. *)
-
-type ('a, 'c) iter =
-  ('a -> unit) -> 'c -> unit
-
-let elements_of_iter (iter : ('a, 'c) iter) (c : 'c) : 'a list =
-  let xs = ref [] in
-  let push x = xs := x :: !xs in
-  iter push c;
-  List.rev !xs
-
-let iter spec =
-  map_into
-    elements_of_iter
-    (elements_of_iter, constant "elements_of_iter")
-    spec
-
-type ('a, 's, 'c) fold =
-  ('a -> 's -> 's) -> 'c -> 's -> 's
-
-let elements_of_fold (fold : ('a, 's, 'c) fold) (c : 'c) : 'a list =
-  let cons x xs = x :: xs in
-  fold cons c []
-  |> List.rev
-
-let fold spec =
-  map_into
-    elements_of_fold
-    (elements_of_fold, constant "elements_of_fold")
-    spec
-
-(* -------------------------------------------------------------------------- *)
-
-(* Combinators to test [iter] and [fold] functions that produce pairs
-   with a curried calling convention. *)
-
-let elements_of_iteri iteri c =
-  let xvs = ref [] in
-  let push x v = xvs := (x, v) :: !xvs in
-  iteri push c;
-  List.rev !xvs
-
-let iteri spec =
-  map_into
-    elements_of_iteri
-    (elements_of_iteri, constant "elements_of_iteri")
-    spec
-
-let elements_of_foldi foldi c =
-  let cons x v xvs = (x, v) :: xvs in
-  foldi cons c []
-  |> List.rev
-
-let foldi spec =
-  map_into
-    elements_of_foldi
-    (elements_of_foldi, constant "elements_of_foldi")
-    spec
-
-(* -------------------------------------------------------------------------- *)
-
 (* Ad hoc support functions. *)
+
+let choose items =
+  let pair (x, y) = (x, constant y) in
+  constructible (Gen.choose (List.map pair items))
 
 (* -------------------------------------------------------------------------- *)
 

@@ -11,6 +11,7 @@
 (******************************************************************************)
 
 open Monolith
+let array = naive_array
 open Helpers
 
 (* -------------------------------------------------------------------------- *)
@@ -497,7 +498,7 @@ let () =
   let spec = iter (set ^> list elt) in
   declare "Set.iter" spec R.Set.iter C.Set.iter;
 
-  let spec = fold (set ^> list elt) in
+  let spec = foldr (set ^> list elt) in
   declare "Set.fold" spec R.Set.fold C.Set.fold;
 
   let spec = predicate ^> set ^> bool in
@@ -741,7 +742,7 @@ let () =
   let spec = iteri (map ^> list binding) in
   declare "Map.iter" spec R.Map.iter C.Map.iter;
 
-  let spec = foldi (map ^> list binding) in
+  let spec = foldri (map ^> list binding) in
   declare "Map.fold" spec R.Map.fold C.Map.fold;
 
   let spec = ipredicate ^> map ^> bool in
