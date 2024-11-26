@@ -6,6 +6,12 @@ SHELL := bash
 # The following variables can be overridden via the command line or in a
 # Makefile that includes this Makefile.
 
+# The variable SWITCH must refer to a version of OCaml that has been
+# compiled with support for afl instrumentation.
+ifndef SWITCH
+  SWITCH := 4.14.2+afl
+endif
+
 # The variable SEED_SIZE determines the size (in bytes) of the random
 # data that we use as an initial input.
 ifndef SEED_SIZE
@@ -52,11 +58,15 @@ BUILD := $(shell \
 
 # ----------------------------------------------------------------------------
 
-# [make all] compiles the code (in the current opam switch).
+# [make all] compiles the code in an appropriate opam switch.
 
 .PHONY: all
 all:
-	@ $(DUNEBUILD) .
+	@ $(DUNEBUILD) @check # build src/.merlin, etc.
+	@(echo "(lang dune 2.0)" && \
+	  echo "(context (opam (switch $(SWITCH))))" \
+	 ) > dune-workspace.afl
+	@ $(DUNEBUILD) --workspace dune-workspace.afl .
 
 # ----------------------------------------------------------------------------
 
@@ -102,8 +112,10 @@ LOG     := $(WHERE)/log
 # This is where dune places the executable file.
 BINARY  := $(BUILD)/$(EXE)
 
-# On MacOS, the highest stack size that seems permitted is 65532.
-STACK   := ulimit -s 65532
+# Setting a high stack size limit may be useful or necessary.
+# For now, we do not do so.
+# STACK   := ulimit -s unlimited
+STACK   := true
 
 # ----------------------------------------------------------------------------
 
@@ -114,7 +126,9 @@ GOVERNOR := /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 
 .PHONY: prepare
 prepare:
-	@ if [[ "$$OSTYPE" == "linux-gnu" ]]; then \
+	@ \
+	case "$$OSTYPE" in \
+	linux-gnu) \
 	  if grep -v -w --quiet core $(PATTERN) || \
 	     grep -v -w --quiet performance $(GOVERNOR) ; then \
 	    echo "Disabling the crash reporter, and changing CPU settings" ; \
@@ -123,8 +137,16 @@ prepare:
 	    sudo bash -c \
 	      'echo core >$(PATTERN) && \
 	       (echo performance | tee $(GOVERNOR) >/dev/null)' ; \
-	  fi \
-	fi
+	  fi ;; \
+	darwin*) \
+	  if launchctl list | grep ReportCrash ; then \
+	    echo "Disabling the crash reporter." ; \
+	    echo "(This uses sudo; you may be asked for your password.)" ; \
+	    SL=/System/Library ; PL=com.apple.ReportCrash ; \
+	    launchctl unload -w $${SL}/LaunchAgents/$${PL}.plist ; \
+	    sudo launchctl unload -w $${SL}/LaunchDaemons/$${PL}.Root.plist ; \
+	  fi ;; \
+	esac
 	@ rm -rf $(INPUT) $(OUTPUT)
 	@ mkdir -p $(INPUT) $(OUTPUT)/crashes
 	@ dd if=/dev/urandom bs=$(SEED_SIZE) count=1 > $(INPUT)/dummy 2>/dev/null
