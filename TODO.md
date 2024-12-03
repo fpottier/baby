@@ -1,10 +1,5 @@
 # To Do
 
-# Before the next release
-
-* The new version of `cppo` (with `#scope`) is needed.
-  Place a suitable version constraint in `dune-project`.
-
 # Benchmark and minor optimizations
 
 * Create a cleaner benchmark,
