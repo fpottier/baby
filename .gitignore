@@ -1,4 +1,5 @@
 *~
 _build
 *.opam
+*.install
 dune-workspace.versions
