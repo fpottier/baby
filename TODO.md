@@ -1,6 +1,6 @@
 # To Do
 
-# Benchmark and minor optimizations
+## Benchmark and minor optimizations
 
 * Create a cleaner benchmark,
   which tests many sizes,
@@ -41,7 +41,7 @@
   This would require exposing the balancing information in the type `view`
   and in variants of the view macro (`NODE`, etc.).
 
-# New Operations
+## New Operations
 
 * In `union` on maps,
   do we want a specialized monomorphic variant
@@ -58,7 +58,7 @@
   Should we define `restrict` as a specialized version of `inter`
   and publish it?
 
-# Maybe Later
+## Maybe Later
 
 * Explore parallel computation on top of `domainslib`.
   Make `of_array` parallel.
