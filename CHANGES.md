@@ -1,6 +1,6 @@
 # Changes
 
-## 2024/MM/DD
+## 2024/12/04
 
 * The library now offers both sets and maps.
   The modules `Baby.H.Set` and `Baby.W.Set` continue to exist,
