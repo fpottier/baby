@@ -12,7 +12,7 @@
   (source (uri git+https://github.com/fpottier/baby.git))
   (homepage https://github.com/fpottier/baby/)
   (bug_reports https://github.com/fpottier/baby/issues)
-  (synopsis "Fast sets based on balanced binary search trees")
+  (synopsis "Fast sets and maps based on balanced binary search trees")
   (license "LGPL-2.0-only WITH OCaml-LGPL-linking-exception")
   (depends
     (ocaml (>= 4.14))
