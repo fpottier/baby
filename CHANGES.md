@@ -6,7 +6,7 @@
   The modules `Baby.H.Set` and `Baby.W.Set` continue to exist,
     and are compatible with OCaml's `Set` library.
   The modules `Baby.H.Map` and `Baby.W.Map` appear,
-    and are compatible with OCaml's `Set` library.
+    and are compatible with OCaml's `Map` library.
   Furthermore,
   the functors `Baby.H.Make` and `Baby.W.Make` appear.
   These functors produce a module that contains sets, maps,
