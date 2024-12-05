@@ -15,7 +15,7 @@ by Blelloch, Ferizovic, and Sun (2022).
 
 For a discussion of the strengths of [baby]
 over OCaml's standard library,
-see {!section-comparison}.
+see {!section-comparisonset} and {!section-comparisonmap}.
 
 {1 Installation and Usage}
 
@@ -77,7 +77,7 @@ You must also implement [join_siblings] and [join_quasi_siblings],
 two variants of [join] that make stronger assumptions about their inputs.
 If you are lazy, you can implement both of them as just [join].
 
-{1:comparison Comparison With OCaml's Set Library}
+{1:comparisonset Comparison With OCaml's Set Library}
 
 {2 Better Performance}
 
@@ -138,7 +138,7 @@ might behave differently when a choice must be made between two
 equivalent elements. This can occur in [union], [of_list], [of_array],
 [of_seq], [add_seq], [map].
 
-{1:comparison Comparison With OCaml's Map Library}
+{1:comparisonmap Comparison With OCaml's Map Library}
 
 {2 Performance}
 
