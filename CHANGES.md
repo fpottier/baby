@@ -33,7 +33,7 @@
   of the function `compare`; this function decides a total preorder `≤`.
 
 * Documentation: in the preamble, clarify that, most of the time, we assume
-  that `≤` is total order; if an operation must be understood in the more
+  that `≤` is a total order; if an operation must be understood in the more
   general case where `≤` is a total preorder, then this is explicitly
   indicated.
 
