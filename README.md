@@ -1,7 +1,7 @@
 # Baby: Fast Sets Based on Balanced Binary Search Trees
 
 `baby` is an OCaml library that offers several implementations of
-balanced binary search trees.
+immutable balanced binary search trees.
 
 Height-balanced and weight-balanced binary search trees are offered
 out of the box. Furthermore, to advanced users, the library offers

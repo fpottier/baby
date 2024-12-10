@@ -1,7 +1,7 @@
 {0 Baby: Fast Sets and Maps Based on Balanced Binary Search Trees}
 
 [baby] is an OCaml library that offers sets and maps
-implemented as balanced binary search trees.
+implemented as immutable balanced binary search trees.
 
 Height-balanced and weight-balanced binary search trees are offered
 out of the box. Furthermore, to advanced users, the library offers
