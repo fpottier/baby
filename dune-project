@@ -17,10 +17,6 @@
   (depends
     (ocaml (>= 4.14))
     (cppo (>= 1.8.0))
-    (monolith (>= 20241126))
+    (monolith (and :with-test (>= 20241126)))
   )
 )
-;; monolith is needed only for testing, but I do not know
-;; how to say both :with-test and (>= 20241126).
-;; dune accepts either indication,
-;; but not both indications together.
