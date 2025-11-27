@@ -113,8 +113,8 @@ view: doc
 
 .PHONY: export
 export: doc
-	ssh yquem.inria.fr rm -rf public_html/$(THIS)/doc
-	scp -r $(DOCDIR) yquem.inria.fr:public_html/$(THIS)/doc
+	ssh yquem.paris.inria.fr rm -rf public_html/$(THIS)/doc
+	scp -r $(DOCDIR) yquem.paris.inria.fr:public_html/$(THIS)/doc
 
 # ------------------------------------------------------------------------------
 
@@ -129,7 +129,9 @@ VERSIONS := \
   4.14.2 \
   5.0.0 \
   5.1.0 \
-  5.2.0
+  5.2.0 \
+  5.3.0 \
+  5.4.0 \
 
 .PHONY: versions
 versions:
@@ -192,7 +194,7 @@ release:
 	@ echo "Done."
 	@ echo "If happy, please type:"
 	@ echo "  \"make publish\"   to publish a new opam package"
-	@ echo "  \"make export\"    to upload the documentation to yquem.inria.fr"
+	@ echo "  \"make export\"    to upload the documentation to yquem.paris.inria.fr"
 
 .PHONY: publish
 publish:
