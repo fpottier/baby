@@ -43,6 +43,21 @@
 
 ## New Operations
 
+* It would useful/convenient to offer `split_first`,
+  which resembles `find_first`
+  but expects a monotonic function (not a key)
+  and performs a binary split.
+
+* In `Enum`, it would be useful/convenient to offer `from_first`,
+  which jumps ahead like `from`, but instead of the key `low`
+  as a parameter, expects an increasing function `compare low`.
+
+* Add a `hash` function on sets and maps,
+  which takes a `hash` function on elements as a parameter.
+  The idea is to hash a sequence of
+  + the cardinal (if it can be obtained in time O(1)); followed with
+  + the first `k` elements, for some constant `k`.
+
 * In `union` on maps,
   do we want a specialized monomorphic variant
   that preserves sharing (as does `union` on sets)?
