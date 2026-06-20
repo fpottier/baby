@@ -186,6 +186,14 @@ let[@inline] singleton x =
   let w = 2 in
   create'' w TLeaf x TLeaf
 
+let[@inline] is_singleton t =
+  match t with
+  | TLeaf ->
+      false
+  | TNode { w; _ } ->
+      w = 2
+      (* This should be faster than inspecting both children. *)
+
 let[@inline] doubleton x y =
   let w = 3 in
   create'' w TLeaf x (singleton y)

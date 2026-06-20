@@ -420,6 +420,9 @@ let () =
   let spec = set ^> bool in
   declare "Set.is_empty" spec R.Set.is_empty C.Set.is_empty;
 
+  let spec = set ^> bool in
+  declare "Set.is_singleton" spec R.Set.is_singleton C.Set.is_singleton;
+
   let spec = set ^!> elt in
   declare "Set.min_elt" spec R.Set.min_elt C.Set.min_elt;
 
@@ -663,6 +666,9 @@ let () =
 
   let spec = map ^> bool in
   declare "Map.is_empty" spec R.Map.is_empty C.Map.is_empty;
+
+  let spec = map ^> bool in
+  declare "Map.is_singleton" spec R.Map.is_singleton C.Map.is_singleton;
 
   let spec = map ^!> binding in
   declare "Map.min_binding" spec R.Map.min_binding C.Map.min_binding;

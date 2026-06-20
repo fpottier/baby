@@ -142,6 +142,9 @@ module type BASE = sig
   (**[singleton x] constructs a tree whose sole element is [x]. *)
   val singleton : 'v -> 'v tree
 
+  (**[is_singleton t] determines whether [t] is a singleton tree. *)
+  val is_singleton : 'v tree -> bool
+
   (**[of_sorted_unique_array_slice a i j] requires the array slice defined by
      array [a], start index [i], and end index [j] to be sorted and to contain
      no duplicate elements. It converts this array slice, in linear time, to a
@@ -339,6 +342,11 @@ module type SET = sig
 
      Time complexity: {m O(1)}. *)
   val is_empty : set -> bool
+
+  (**[is_singleton s] determines whether the set [s] is a singleton set.
+
+     Time complexity: {m O(1)}. *)
+  val is_singleton : set -> bool
 
   (**If the set [s] is nonempty, [min_elt s] returns the minimum
      element of this set. Otherwise, it raises [Not_found].
@@ -1072,6 +1080,11 @@ module type MAP = sig
 
      Time complexity: {m O(1)}. *)
   val is_empty : 'a map -> bool
+
+  (**[is_singleton s] determines whether the map [m] is a singleton map.
+
+     Time complexity: {m O(1)}. *)
+  val is_singleton : 'a map -> bool
 
   (**If the map [m] is nonempty, [min_binding m] returns the minimum
      binding of this map, that is, the binding whose key is minimal.
