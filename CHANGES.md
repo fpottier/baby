@@ -1,5 +1,12 @@
 # Changes
 
+## 2026/06/20
+
+* In each `Set` and `Map` submodule,
+  the new function `is_singleton` has been introduced.
+  This allows `Baby.W.Set` and `Baby.W.Map` to serve as replacements
+  for `Stdlib.Set` and `Stdlib.Map` also under OCaml 5.5.
+
 ## 2024/12/04
 
 * The library now offers both sets and maps.
