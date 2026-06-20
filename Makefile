@@ -132,6 +132,7 @@ VERSIONS := \
   5.2.0 \
   5.3.0 \
   5.4.0 \
+  5.5.0 \
 
 .PHONY: versions
 versions:
@@ -139,7 +140,7 @@ versions:
 	  for v in $(VERSIONS) ; do \
 	    echo "(context (opam (switch $$v)))" ; \
 	  done) > dune-workspace.versions
-	@ dune build --workspace dune-workspace.versions
+	@ dune build --workspace dune-workspace.versions -p baby
 
 .PHONY: handiwork
 handiwork:
